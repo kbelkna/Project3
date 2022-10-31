@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Project 3
 
-## Introduction
+## Monti - Introduction
 
 
 ## Getting Started
@@ -43,7 +43,7 @@ rawDataChannel <- rawData %>%
                                             ifelse(data_channel_is_socmed == 1, "socmed", 
                                                    ifelse(data_channel_is_tech == 1, "tech", 
                                                           ifelse(data_channel_is_world == 1, "world", "other"))))))) %>%
-    select(-data_channel_is_lifestyle, -data_channel_is_entertainment, -data_channel_is_bus, -data_channel_is_socmed, 
+  select(-data_channel_is_lifestyle, -data_channel_is_entertainment, -data_channel_is_bus, -data_channel_is_socmed, 
          -data_channel_is_tech, -data_channel_is_world)
 
 
@@ -66,3 +66,62 @@ worldData <- rawDataChannel %>%
   filter(dataChannel == "world")
 
 ```
+
+
+## Summarizations
+
+### Monti - Summary Stats
+
+
+### Belknap - Summary Stats
+
+
+### Monti - Graphs (3)
+
+
+
+### Belknap - Graphs (3)
+
+
+## Modeling
+
+### Data Split
+
+### Belknap - Linear Regression Model Explanation
+
+
+### Monti - Linear Regression Model
+
+
+### Belknap - Linear Regression Model
+
+
+
+### Monti - Ensemble Tree-based Model
+
+
+### Belknap - Ensemble Tree-based Model
+
+
+
+
+
+### Belknap - Random Forest Model & Explanation
+
+
+
+
+### Monti - Boosted Tree Model & Explanation
+
+
+
+
+## Comparison & Conclusion - Monti or Belknap (whoever doesn't do automation of R Markdown)
+
+
+
+
+
+
+
+
