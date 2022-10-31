@@ -2,6 +2,9 @@
 title: "Project 3"
 author: "Kara Belknap & Cassio Monti"
 date: "2022-10-29"
+output: html_document
+params: 
+    channel: "lifestyle"
 ---
 
 ```{r setup, include=FALSE}
@@ -64,6 +67,40 @@ techData <- rawDataChannel %>%
 
 worldData <- rawDataChannel %>%
   filter(dataChannel == "world")
+
+```
+
+## Select Data for Appropriate Data Channel
+
+To select the appropriate data channel based on the `params$channel`, we created a function `selectData` which would return the appropriate dataset and assign it to the dataset `activeData`. This will be the file we will use for the remainder of the report.
+
+```{r selectData}
+
+
+selectData <- function(dataChannel) { 
+  if (dataChannel == "lifestyle"){
+    return(lifestyleData)
+  }
+  if (dataChannel == "entertainment"){
+    return(entertainmentData)
+  }
+  if (dataChannel == "bus"){
+    return(busData)
+  }
+  if (dataChannel == "socmed"){
+    return(socmedData)
+  }
+  if (dataChannel == "tech"){
+    return(techData)
+  }
+  if (dataChannel == "world"){
+    return(worldData)
+  }
+  }
+
+dataChannelSelect <- params$channel
+
+activeData <- selectData(dataChannelSelect)
 
 ```
 
