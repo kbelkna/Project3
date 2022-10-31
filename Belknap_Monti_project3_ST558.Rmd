@@ -42,7 +42,10 @@ rawDataChannel <- rawData %>%
                                      ifelse(data_channel_is_bus == 1, "bus", 
                                             ifelse(data_channel_is_socmed == 1, "socmed", 
                                                    ifelse(data_channel_is_tech == 1, "tech", 
-                                                          ifelse(data_channel_is_world == 1, "world", "other")))))))
+                                                          ifelse(data_channel_is_world == 1, "world", "other"))))))) %>%
+    select(-data_channel_is_lifestyle, -data_channel_is_entertainment, -data_channel_is_bus, -data_channel_is_socmed, 
+         -data_channel_is_tech, -data_channel_is_world)
+
 
 lifestyleData <- rawDataChannel %>%
   filter(dataChannel == "lifestyle")
