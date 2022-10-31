@@ -8,22 +8,58 @@ date: "2022-10-29"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+# Project 3
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+## Introduction
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
-```{r cars}
-summary(cars)
+## Getting Started
+
+Before we can begin our analysis, we must load in the following packages:
+
+```{r libraries}
+library(tidyverse)
+
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+
+## Read in the Data
+
+Using the datafile `OnlineNewsPopularity.csv`, we will read in the data and add a new column corresponding to the type of data channel from which the data was classified. The new variable will be called `dataChannel`. Note that there are some rows that are unclassified according to the six channels of interest and those are indicated by `other`. 
+
+Once the data column is created, we can easily subset the data using the `filter` function to create a new dataset for each data channel.
+
+
+```{r dataImport}
+
+rawData <- read_csv("OnlineNewsPopularity.csv")
+
+rawDataChannel <- rawData %>%
+  mutate(dataChannel = ifelse(data_channel_is_lifestyle == 1, "lifestyle", 
+                              ifelse(data_channel_is_entertainment == 1, "entertainment", 
+                                     ifelse(data_channel_is_bus == 1, "bus", 
+                                            ifelse(data_channel_is_socmed == 1, "socmed", 
+                                                   ifelse(data_channel_is_tech == 1, "tech", 
+                                                          ifelse(data_channel_is_world == 1, "world", "other")))))))
+
+lifestyleData <- rawDataChannel %>%
+  filter(dataChannel == "lifestyle")
+
+entertainmentData <- rawDataChannel %>%
+  filter(dataChannel == "entertainment")
+
+busData <- rawDataChannel %>%
+  filter(dataChannel == "bus")
+
+socmedData <- rawDataChannel %>%
+  filter(dataChannel == "socmed")
+
+techData <- rawDataChannel %>%
+  filter(dataChannel == "tech")
+
+worldData <- rawDataChannel %>%
+  filter(dataChannel == "world")
+
 ```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
