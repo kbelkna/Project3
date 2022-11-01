@@ -5,7 +5,7 @@ Kara Belknap & Cassio Monti
 
 # Project 3
 
-## Report for Data Channel = bus
+## Report for Data Channel = world
 
 ## Monti - Introduction
 
@@ -112,7 +112,7 @@ dataChannelSelect <- params$channel
 activeData <- selectData(dataChannelSelect)
 ```
 
-## Summarizations for data channel bus
+## Summarizations for data channel world
 
 ### Data manipulation for statistics
 
@@ -133,14 +133,14 @@ statsData$Day <- factor(statsData$Day, levels = c("Monday", "Tuesday", "Wednesda
 ### Belknap - Summary Stats
 
 The following table gives us information about the summary statistics
-for the number of shares for articles in the data channel bus.
+for the number of shares for articles in the data channel world.
 
 ``` r
 summary(activeData$shares)
 ```
 
-    ##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
-    ##      1.0    952.2   1400.0   3063.0   2500.0 690400.0
+    ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+    ##      35     827    1100    2288    1900  284700
 
 The following table gives us information about the average, median, and
 standard deviation for the number of shares based on whether the post
@@ -155,8 +155,8 @@ statsData %>%
     ## # A tibble: 2 × 5
     ##   Weekend sumShares avgShares medShares sdShares
     ##   <chr>       <dbl>     <dbl>     <dbl>    <dbl>
-    ## 1 No       16877116     2976.      1300   15614.
-    ## 2 Yes       2291254     3910.      2400    7564.
+    ## 1 No       16368881     2230.      1100    6271.
+    ## 2 Yes       2909854     2679.      1500    4666.
 
 Likewise, this table gives us information about the number of shares by
 the day of the week.
@@ -171,13 +171,13 @@ statsData %>%
     ## # A tibble: 7 × 6
     ##   Day       sumShares avgShares medShares sdShares maxShares
     ##   <fct>         <dbl>     <dbl>     <dbl>    <dbl>     <dbl>
-    ## 1 Monday      4482214     3887.      1400   28313.    690400
-    ## 2 Tuesday     3466021     2932.      1300   10827.    310800
-    ## 3 Wednesday   3401897     2677.      1300    8160.    158900
-    ## 4 Thursday    3560327     2885.      1300   13138.    306100
-    ## 5 Friday      1966657     2364.      1400    5134.    102200
-    ## 6 Saturday    1075736     4427.      2600   10139.    144400
-    ## 7 Sunday      1215518     3544.      2200    4979.     56900
+    ## 1 Monday      3330409     2456.      1100    6865.    141400
+    ## 2 Tuesday     3432328     2220.      1100    5678.    115700
+    ## 3 Wednesday   2941868     1880.      1100    3135.     53500
+    ## 4 Thursday    3756199     2394.      1100    8585.    284700
+    ## 5 Friday      2908077     2228.      1100    5792.    128500
+    ## 6 Saturday    1432545     2760.      1500    4865.     75500
+    ## 7 Sunday      1477309     2605.      1400    4480.     55600
 
 ### Monti - Summary Stats
 
@@ -196,7 +196,7 @@ titlewordcountGraph + geom_point(aes(color = Day)) +
   xlab("Number of Words in Title")
 ```
 
-![](bus_files/figure-gfm/titlewordcountGraph-1.png)<!-- -->
+![](world_files/figure-gfm/titlewordcountGraph-1.png)<!-- -->
 
 The following plot shows the number of shares by the rate of positive
 words in the article. A positive trend would indicate that articles with
@@ -211,7 +211,7 @@ positivewordrateGraph + geom_point(aes(color = Day)) +
   xlab("Rate of Positive Words") 
 ```
 
-![](bus_files/figure-gfm/positivewordrateGraph-1.png)<!-- -->
+![](world_files/figure-gfm/positivewordrateGraph-1.png)<!-- -->
 
 The following plot shows the total number of shares as related to the
 parameter title subjectivity. A positive trend would indicate that
@@ -228,7 +228,7 @@ titleSubjectivityGraph + geom_point(aes(color = n_tokens_title)) +
   labs(color = "Word Count in Title")
 ```
 
-![](bus_files/figure-gfm/titleSubjectivityGraph-1.png)<!-- -->
+![](world_files/figure-gfm/titleSubjectivityGraph-1.png)<!-- -->
 
 ## Modeling
 

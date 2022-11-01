@@ -5,6 +5,8 @@ Kara Belknap & Cassio Monti
 
 # Project 3
 
+## Report for Data Channel = lifestyle
+
 ## Monti - Introduction
 
 ## Getting Started
