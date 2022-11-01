@@ -3,10 +3,6 @@ Project 3
 Kara Belknap & Cassio Monti
 2022-10-29
 
--   <a href="#r-markdown" id="toc-r-markdown">R Markdown</a>
--   <a href="#including-plots" id="toc-including-plots">Including Plots</a>
-
-
 The analysis for [Lifestyle articles is available here](lifestyle.html).
 
 The analysis for [Entertainment articles is available here](entertainment.html).
