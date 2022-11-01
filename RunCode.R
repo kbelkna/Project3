@@ -1,21 +1,24 @@
 
-rmarkdown::render(input = "Belknap_Monti_project3_ST558.Rmd",
-                  output_file = "README.md",
-                  output_format = "github_document",
-                  output_options = list(
-                    name_value_pairs = "value",
-                    or_something = TRUE,
-                    html_preview = FALSE,
-                    toc = TRUE,
-                    df_print = "tibble"
-                  ),
-                  runtime = "static",
-                  clean = TRUE,
-                  params = NULL,
-                  knit_meta = NULL,
-                  envir = parent.frame(),
-                  run_pandoc = TRUE,
-                  quiet = FALSE,
-                  encoding = "UTF-8"
-)
+# rmarkdown::render(input = "Belknap_Monti_project3_ST558.Rmd",
+#                   output_file = "README.md",
+#                   output_format = "github_document",
+#                   output_options = list(
+#                     name_value_pairs = "value",
+#                     or_something = TRUE,
+#                     html_preview = FALSE,
+#                     toc = TRUE,
+#                     df_print = "tibble"
+#                   ),
+#                   runtime = "static",
+#                   clean = TRUE,
+#                   params = NULL,
+#                   knit_meta = NULL,
+#                   envir = parent.frame(),
+#                   run_pandoc = TRUE,
+#                   quiet = FALSE,
+#                   encoding = "UTF-8"
+# )
 
+rmarkdown::render("Belknap_Monti_project3_ST558.Rmd", output_file = "lifestyle.html", params = list(channel = "lifestyle"))
+
+rmarkdown::render("Belknap_Monti_project3_ST558.Rmd", output_file = "bus.html", params = list(channel = "bus"))
