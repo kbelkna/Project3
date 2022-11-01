@@ -13,6 +13,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Project 3
 
+## Report for Data Channel = `r params$channel`
+
 ## Monti - Introduction
 
 ## Getting Started
