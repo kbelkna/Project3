@@ -231,6 +231,13 @@ trainIndex <- createDataPartition(activeData$shares, p = 0.7, list = FALSE)
 activeTrain <- activeData[trainIndex, ]
 activeTest <- activeData[-trainIndex, ]
 
+
+activeTrain <- activeTrain %>%
+  select(-dataChannel)
+
+activeTest <- activeTest %>%
+  select(-dataChannel)
+
 ```
 
 ### Belknap - Linear Regression Model Explanation
@@ -244,6 +251,30 @@ activeTest <- activeData[-trainIndex, ]
 ### Belknap - Ensemble Tree-based Model
 
 ### Belknap - Random Forest Model & Explanation
+
+NEEDS MORE WORK.
+
+
+```{r randomForest}
+
+
+str(activeTrain)
+
+rfFit <- train(shares ~ .,
+               data = activeTrain, 
+               method = "rf", 
+               trControl = trainControl(method = "cv", number = 5), 
+               tuneGrid = data.frame(mtry = 1:3))
+
+rfFit$results
+
+
+rfPred <- predict(rfFit, newData = activeTest)
+postResample(rfPred, activeTest$shares)
+
+
+```
+
 
 ### Monti - Boosted Tree Model & Explanation
 
