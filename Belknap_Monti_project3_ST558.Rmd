@@ -15,25 +15,22 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Monti - Introduction
 
-
 ## Getting Started
 
 Before we can begin our analysis, we must load in the following packages:
 
 ```{r libraries}
 library(tidyverse)
+library(caret)
+library(randomForest)
 
 ```
 
-
-
-
 ## Read in the Data
 
-Using the datafile `OnlineNewsPopularity.csv`, we will read in the data and add a new column corresponding to the type of data channel from which the data was classified. The new variable will be called `dataChannel`. Note that there are some rows that are unclassified according to the six channels of interest and those are indicated by `other`. 
+Using the datafile `OnlineNewsPopularity.csv`, we will read in the data and add a new column corresponding to the type of data channel from which the data was classified. The new variable will be called `dataChannel`. Note that there are some rows that are unclassified according to the six channels of interest and those are indicated by `other`.
 
-Once the data column is created, we can easily subset the data using the `filter` function to create a new dataset for each data channel.
-
+Once the data column is created, we can easily subset the data using the `filter` function to create a new dataset for each data channel. We removed the original `data_channel_is_*` columns as well as two non-predictive columns `url` and `timedelta`.
 
 ```{r dataImport}
 
@@ -47,7 +44,7 @@ rawDataChannel <- rawData %>%
                                                    ifelse(data_channel_is_tech == 1, "tech", 
                                                           ifelse(data_channel_is_world == 1, "world", "other"))))))) %>%
   select(-data_channel_is_lifestyle, -data_channel_is_entertainment, -data_channel_is_bus, -data_channel_is_socmed, 
-         -data_channel_is_tech, -data_channel_is_world)
+         -data_channel_is_tech, -data_channel_is_world, -url, -timedelta)
 
 
 lifestyleData <- rawDataChannel %>%
@@ -76,7 +73,6 @@ To select the appropriate data channel based on the `params$channel`, we created
 
 ```{r selectData}
 
-
 selectData <- function(dataChannel) { 
   if (dataChannel == "lifestyle"){
     return(lifestyleData)
@@ -104,61 +100,151 @@ activeData <- selectData(dataChannelSelect)
 
 ```
 
+## Summarizations for data channel `r params$channel`
 
-## Summarizations
+### Data manipulation for statistics
 
-### Monti - Summary Stats
+```{r statsData}
+
+
+statsData <- activeData %>%
+  mutate(Day = as.factor(ifelse(weekday_is_monday == 1, "Monday", 
+                      ifelse(weekday_is_tuesday == 1, "Tuesday", 
+                             ifelse(weekday_is_wednesday == 1, "Wednesday", 
+                                    ifelse(weekday_is_thursday == 1, "Thursday", 
+                                           ifelse(weekday_is_friday == 1, "Friday", 
+                                                  ifelse(weekday_is_saturday == 1, "Saturday", 
+                                                         ifelse(weekday_is_sunday == 1, "Sunday", "missingdata"))))))))) %>%
+  mutate(Weekend = ifelse(is_weekend == 1, "Yes", "No"))
+
+statsData$Day <- factor(statsData$Day, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
+
+
+
+```
+
 
 
 ### Belknap - Summary Stats
 
+The following table gives us information about the summary statistics for the number of shares for articles in the data channel `r params$channel`.
+
+```{r summaryStats}
+
+summary(activeData$shares)
+
+```
+
+The following table gives us information about the average, median, and standard deviation for the number of shares based on whether the post was made on a weekend or a weekday.
+
+```{r table1}
+
+statsData %>% 
+  group_by(Weekend) %>%
+  summarise(sumShares = sum(shares), avgShares = mean(shares), medShares = median(shares), sdShares = sd(shares))
+
+```
+
+Likewise, this table gives us information about the number of shares by the day of the week. 
+
+```{r table2}
+
+statsData %>% 
+  group_by(Day) %>%
+  arrange(Day) %>%
+  summarise(sumShares = sum(shares), avgShares = mean(shares), medShares = median(shares), sdShares = sd(shares), maxShares = max(shares))
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+### Monti - Summary Stats
+
 
 ### Monti - Graphs (3)
 
-
-
 ### Belknap - Graphs (3)
+
+The following graph shows the number of shares compared to the number of words in the title. The output is colored by the day of the week. 
+
+```{r titlewordcountGraph}
+
+titlewordcountGraph <- ggplot(statsData, aes(x = n_tokens_title, y = shares))
+titlewordcountGraph + geom_point(aes(color = Day)) + 
+  ggtitle("Number of Shares vs. Number of Words in Title") +
+  ylab("Number of Shares") +
+  xlab("Number of Words in Title")
+
+```
+
+The following plot shows the number of shares by the rate of positive words in the article. A positive trend would indicate that articles with more positive words are shared more often than articles with negative words.
+
+```{r positivewordrateGraph}
+
+positivewordrateGraph <- ggplot(statsData, aes(x = rate_positive_words, y = shares))
+positivewordrateGraph + geom_point(aes(color = Day)) + 
+  ggtitle("Number of Shares vs. Rate of Positive Words") +
+  ylab("Number of Shares") +
+  xlab("Rate of Positive Words") 
+
+```
+
+The following plot shows the total number of shares as related to the parameter title subjectivity. A positive trend would indicate that articles are shared more often when the title is subjective. A negative trend would indicate that articles are shared more often when the title is less subjective.
+
+```{r titleSubjectivityGraph}
+
+titleSubjectivityGraph <- ggplot(statsData, aes(x = title_subjectivity, y = shares))
+titleSubjectivityGraph + geom_point(aes(color = n_tokens_title)) + 
+  ggtitle("Number of Shares vs. Title Subjectivity") +
+  ylab("Number of Shares") +
+  xlab("Title Subjectivity") + 
+  labs(color = "Word Count in Title")
+
+```
+
+
+
+
+
 
 
 ## Modeling
 
 ### Data Split
 
-### Belknap - Linear Regression Model Explanation
+Prior to conducting regression analysis, we split the data into a training set (70%) and a test set (30%).
 
+```{r splitData}
+
+set.seed(555)
+
+trainIndex <- createDataPartition(activeData$shares, p = 0.7, list = FALSE)
+activeTrain <- activeData[trainIndex, ]
+activeTest <- activeData[-trainIndex, ]
+
+```
+
+### Belknap - Linear Regression Model Explanation
 
 ### Monti - Linear Regression Model
 
-
 ### Belknap - Linear Regression Model
-
-
 
 ### Monti - Ensemble Tree-based Model
 
-
 ### Belknap - Ensemble Tree-based Model
-
-
-
-
 
 ### Belknap - Random Forest Model & Explanation
 
-
-
-
 ### Monti - Boosted Tree Model & Explanation
 
-
-
-
 ## Comparison & Conclusion - Monti or Belknap (whoever doesn't do automation of R Markdown)
-
-
-
-
-
-
-
-
