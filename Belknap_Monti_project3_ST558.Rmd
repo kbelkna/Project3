@@ -2,7 +2,7 @@
 title: "Project 3"
 author: "Kara Belknap & Cassio Monti"
 date: "2022-10-29"
-output: html_document
+output: github_document
 params: 
     channel: "lifestyle"
 ---
@@ -255,7 +255,7 @@ activeTest <- activeTest %>%
 NEEDS MORE WORK.
 
 
-```{r randomForest}
+```{r randomForest, eval=FALSE}
 
 
 str(activeTrain)
