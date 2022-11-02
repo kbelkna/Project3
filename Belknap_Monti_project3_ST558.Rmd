@@ -2,12 +2,18 @@
 title: "Project 3"
 author: "Kara Belknap & Cassio Monti"
 date: "2022-10-29"
+<<<<<<< HEAD
 output:
   github_document:
     html_preview: false
     toc: true
 params:
   channel: list("lifestyle","entertainment","bus","socmed","tech","world")
+=======
+output: github_document
+params: 
+    channel: "lifestyle"
+>>>>>>> aa58d189fd7eea466367118eb723237843afd97f
 ---
 
 ```{r setup, include=FALSE}
@@ -75,8 +81,6 @@ num_videos: Number of videos
 average_token_length: Average length of the words in the content
 num_keywords: Number of keywords in the metadata
 
-## Getting Started
-
 Before we can begin our analysis, we must load in the following packages:
 
 ```{r libraries}
@@ -85,6 +89,7 @@ library(tidyverse)
 library(caret)
 library(randomForest)
 library(knitr)
+
 
 ```
 
@@ -128,11 +133,54 @@ techData <- rawDataChannel %>%
 
 worldData <- rawDataChannel %>%
   filter(dataChannel == "world")
+
+```
+
+Using the datafile `OnlineNewsPopularity.csv`, we will read in the data and add a new column corresponding to the type of data channel from which the data was classified. The new variable will be called `dataChannel`. Note that there are some rows that are unclassified according to the six channels of interest and those are indicated by `other`.
+
+Once the data column is created, we can easily subset the data using the `filter` function to create a new dataset for each data channel. We removed the original `data_channel_is_*` columns as well as two non-predictive columns `url` and `timedelta`.
+
+
+```{r dataImport}
+
+rawData <- read_csv("OnlineNewsPopularity.csv")
+
+rawDataChannel <- rawData %>%
+  mutate(dataChannel = ifelse(data_channel_is_lifestyle == 1, "lifestyle", 
+                              ifelse(data_channel_is_entertainment == 1, "entertainment", 
+                                     ifelse(data_channel_is_bus == 1, "bus", 
+                                            ifelse(data_channel_is_socmed == 1, "socmed", 
+                                                   ifelse(data_channel_is_tech == 1, "tech", 
+                                                          ifelse(data_channel_is_world == 1, "world", "other"))))))) %>%
+  select(-data_channel_is_lifestyle, -data_channel_is_entertainment, -data_channel_is_bus, -data_channel_is_socmed, 
+         -data_channel_is_tech, -data_channel_is_world, -url, -timedelta)
+
+
+lifestyleData <- rawDataChannel %>%
+  filter(dataChannel == "lifestyle")
+
+entertainmentData <- rawDataChannel %>%
+  filter(dataChannel == "entertainment")
+
+busData <- rawDataChannel %>%
+  filter(dataChannel == "bus")
+
+socmedData <- rawDataChannel %>%
+  filter(dataChannel == "socmed")
+
+techData <- rawDataChannel %>%
+  filter(dataChannel == "tech")
+
+worldData <- rawDataChannel %>%
+  filter(dataChannel == "world")
+
 ```
 
 ## Select Data for Appropriate Data Channel
 
 To select the appropriate data channel based on the `params$channel`, we created a function `selectData` which would return the appropriate data set and assign it to the data set `activeData`. This will be the file we will use for the remainder of the report.
+
+To select the appropriate data channel based on the `params$channel`, we created a function `selectData` which would return the appropriate dataset and assign it to the dataset `activeData`. This will be the file we will use for the remainder of the report.
 
 ```{r selectData}
 
@@ -209,8 +257,24 @@ statsData$Day <- factor(statsData$Day,
 
 ```
 
+### Data manipulation for statistics
+
+```{r statsData}
 
 
+statsData <- activeData %>%
+  mutate(Day = as.factor(ifelse(weekday_is_monday == 1, "Monday", 
+                      ifelse(weekday_is_tuesday == 1, "Tuesday", 
+                             ifelse(weekday_is_wednesday == 1, "Wednesday", 
+                                    ifelse(weekday_is_thursday == 1, "Thursday", 
+                                           ifelse(weekday_is_friday == 1, "Friday", 
+                                                  ifelse(weekday_is_saturday == 1, "Saturday", 
+                                                         ifelse(weekday_is_sunday == 1, "Sunday", "missingdata"))))))))) %>%
+  mutate(Weekend = ifelse(is_weekend == 1, "Yes", "No"))
+
+statsData$Day <- factor(statsData$Day, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
+
+```
 
 
 ### Belknap - Summary Stats
@@ -218,11 +282,15 @@ statsData$Day <- factor(statsData$Day,
 The following table gives us information about the summary statistics for the number of shares for articles in the data channel `r params$channel`.
 
 ```{r summaryStats}
+
 table(activeData$shares)
+
+summary(activeData$shares)
 
 ```
 
 The following table gives us information about the average, median, and standard deviation for the number of shares based on whether the post was made on a weekend or a weekday.
+
 
 ```{r table1, eval=FALSE}
 
@@ -233,6 +301,7 @@ statsData %>%
 ```
 
 Likewise, this table gives us information about the number of shares by the day of the week. 
+
 
 ```{r table2, eval=FALSE}
 
@@ -263,6 +332,7 @@ statsData %>%
 
 The following graph shows the number of shares compared to the number of words in the title. The output is colored by the day of the week. 
 
+<<<<<<< HEAD
 ```{r titlewordcountGraph, eval=FALSE}
 
 titlewordcountGraph <- ggplot(statsData, aes(x = n_tokens_title, y = shares))
@@ -275,6 +345,7 @@ titlewordcountGraph + geom_point(aes(color = Day)) +
 
 The following plot shows the number of shares by the rate of positive words in the article. A positive trend would indicate that articles with more positive words are shared more often than articles with negative words.
 
+
 ```{r positivewordrateGraph, eval=FALSE}
 
 positivewordrateGraph <- ggplot(statsData, aes(x = rate_positive_words, y = shares))
@@ -286,6 +357,7 @@ positivewordrateGraph + geom_point(aes(color = Day)) +
 ```
 
 The following plot shows the total number of shares as related to the parameter title subjectivity. A positive trend would indicate that articles are shared more often when the title is subjective. A negative trend would indicate that articles are shared more often when the title is less subjective.
+
 
 ```{r titleSubjectivityGraph, eval=FALSE}
 
@@ -316,9 +388,16 @@ set.seed(555)
 
 trainIndex <- createDataPartition(activeData$shares, p = 0.7, list = FALSE)
 
+
 activeTrain <- activeData[trainIndex, ]
 
 activeTest <- activeData[-trainIndex, ]
+
+# activeTrain <- activeTrain %>%
+#   select(-dataChannel)
+# 
+# activeTest <- activeTest %>%
+#   select(-dataChannel)
 
 ```
 
@@ -335,6 +414,7 @@ activeTest <- activeData[-trainIndex, ]
 ### Belknap - Random Forest Model & Explanation
 
 NEEDS MORE WORK.
+
 
 
 # NOW RF Works
@@ -411,5 +491,4 @@ kable(tb, caption = "Accuracy Metric by Ensemble Method on Test Set")
 
 
 ```
-
 

@@ -3,6 +3,7 @@ Project 3
 Kara Belknap & Cassio Monti
 2022-10-29
 
+<<<<<<< HEAD
 -   <a href="#project-3" id="toc-project-3">Project 3</a>
     -   <a href="#report-for-data-channel--world"
         id="toc-report-for-data-channel--world">Report for Data Channel =
@@ -65,12 +66,15 @@ Kara Belknap & Cassio Monti
         &amp; Conclusion - Monti or Belknap (whoever doesn’t do automation of R
         Markdown)</a>
 
+=======
+>>>>>>> aa58d189fd7eea466367118eb723237843afd97f
 # Project 3
 
 ## Report for Data Channel = world
 
 ## Monti - Introduction
 
+<<<<<<< HEAD
 The objective of this project is to analyze data
 
 timedelta: Days between the article publication and the data set
@@ -119,6 +123,8 @@ articles published by Mashable num_imgs: Number of images num_videos:
 Number of videos average_token_length: Average length of the words in
 the content num_keywords: Number of keywords in the metadata
 
+=======
+>>>>>>> aa58d189fd7eea466367118eb723237843afd97f
 ## Getting Started
 
 Before we can begin our analysis, we must load in the following
@@ -128,12 +134,19 @@ packages:
 library(tidyverse)
 library(caret)
 library(randomForest)
+<<<<<<< HEAD
 library(knitr)
+=======
+>>>>>>> aa58d189fd7eea466367118eb723237843afd97f
 ```
 
 ## Read in the Data
 
+<<<<<<< HEAD
 Using the data file `OnlineNewsPopularity.csv`, we will read in the data
+=======
+Using the datafile `OnlineNewsPopularity.csv`, we will read in the data
+>>>>>>> aa58d189fd7eea466367118eb723237843afd97f
 and add a new column corresponding to the type of data channel from
 which the data was classified. The new variable will be called
 `dataChannel`. Note that there are some rows that are unclassified
@@ -141,11 +154,16 @@ according to the six channels of interest and those are indicated by
 `other`.
 
 Once the data column is created, we can easily subset the data using the
+<<<<<<< HEAD
 `filter` function to create a new data set for each data channel. We
+=======
+`filter` function to create a new dataset for each data channel. We
+>>>>>>> aa58d189fd7eea466367118eb723237843afd97f
 removed the original `data_channel_is_*` columns as well as two
 non-predictive columns `url` and `timedelta`.
 
 ``` r
+<<<<<<< HEAD
 rawData <- read_csv("../OnlineNewsPopularity.csv")
 
 rawDataChannel <- rawData %>%
@@ -159,6 +177,30 @@ rawDataChannel <- rawData %>%
   select(-data_channel_is_lifestyle, -data_channel_is_entertainment, 
          -data_channel_is_bus, -data_channel_is_socmed, -data_channel_is_tech,
          -data_channel_is_world, -url, -timedelta)
+=======
+rawData <- read_csv("OnlineNewsPopularity.csv")
+```
+
+    ## Rows: 39644 Columns: 61
+    ## ── Column specification ─────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr  (1): url
+    ## dbl (60): timedelta, n_tokens_title, n_tokens_content, n_unique_tokens, n_non...
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+rawDataChannel <- rawData %>%
+  mutate(dataChannel = ifelse(data_channel_is_lifestyle == 1, "lifestyle", 
+                              ifelse(data_channel_is_entertainment == 1, "entertainment", 
+                                     ifelse(data_channel_is_bus == 1, "bus", 
+                                            ifelse(data_channel_is_socmed == 1, "socmed", 
+                                                   ifelse(data_channel_is_tech == 1, "tech", 
+                                                          ifelse(data_channel_is_world == 1, "world", "other"))))))) %>%
+  select(-data_channel_is_lifestyle, -data_channel_is_entertainment, -data_channel_is_bus, -data_channel_is_socmed, 
+         -data_channel_is_tech, -data_channel_is_world, -url, -timedelta)
+>>>>>>> aa58d189fd7eea466367118eb723237843afd97f
 
 
 lifestyleData <- rawDataChannel %>%
@@ -183,9 +225,15 @@ worldData <- rawDataChannel %>%
 ## Select Data for Appropriate Data Channel
 
 To select the appropriate data channel based on the `params$channel`, we
+<<<<<<< HEAD
 created a function `selectData` which would return the appropriate data
 set and assign it to the data set `activeData`. This will be the file we
 will use for the remainder of the report.
+=======
+created a function `selectData` which would return the appropriate
+dataset and assign it to the dataset `activeData`. This will be the file
+we will use for the remainder of the report.
+>>>>>>> aa58d189fd7eea466367118eb723237843afd97f
 
 ``` r
 selectData <- function(dataChannel) { 
@@ -207,7 +255,11 @@ selectData <- function(dataChannel) {
   if (dataChannel == "world"){
     return(worldData)
   }
+<<<<<<< HEAD
 }
+=======
+  }
+>>>>>>> aa58d189fd7eea466367118eb723237843afd97f
 
 dataChannelSelect <- params$channel
 
@@ -216,6 +268,7 @@ activeData <- selectData(dataChannelSelect)
 
 ## Summarizations for data channel world
 
+<<<<<<< HEAD
 NEW TOPICS !!!!!!!!!!!!!!!!!!!!
 
 ### Subsetting Variables of Interest
@@ -238,10 +291,13 @@ anyNA(activeData)
 
     ## [1] FALSE
 
+=======
+>>>>>>> aa58d189fd7eea466367118eb723237843afd97f
 ### Data manipulation for statistics
 
 ``` r
 statsData <- activeData %>%
+<<<<<<< HEAD
   mutate(Day = ifelse(weekday_is_monday == 1, "Monday", 
                       ifelse(weekday_is_tuesday == 1, "Tuesday", 
                       ifelse(weekday_is_wednesday == 1, "Wednesday", 
@@ -255,6 +311,18 @@ statsData <- activeData %>%
 statsData$Day <- factor(statsData$Day, 
                 levels = c("Monday", "Tuesday", "Wednesday", "Thursday", 
                            "Friday", "Saturday", "Sunday"))
+=======
+  mutate(Day = as.factor(ifelse(weekday_is_monday == 1, "Monday", 
+                      ifelse(weekday_is_tuesday == 1, "Tuesday", 
+                             ifelse(weekday_is_wednesday == 1, "Wednesday", 
+                                    ifelse(weekday_is_thursday == 1, "Thursday", 
+                                           ifelse(weekday_is_friday == 1, "Friday", 
+                                                  ifelse(weekday_is_saturday == 1, "Saturday", 
+                                                         ifelse(weekday_is_sunday == 1, "Sunday", "missingdata"))))))))) %>%
+  mutate(Weekend = ifelse(is_weekend == 1, "Yes", "No"))
+
+statsData$Day <- factor(statsData$Day, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
+>>>>>>> aa58d189fd7eea466367118eb723237843afd97f
 ```
 
 ### Belknap - Summary Stats
@@ -263,12 +331,20 @@ The following table gives us information about the summary statistics
 for the number of shares for articles in the data channel world.
 
 ``` r
+<<<<<<< HEAD
 table(activeData$shares)
 ```
 
     ## 
     ##    0    1 
     ## 6318 2109
+=======
+summary(activeData$shares)
+```
+
+    ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+    ##      35     827    1100    2288    1900  284700
+>>>>>>> aa58d189fd7eea466367118eb723237843afd97f
 
 The following table gives us information about the average, median, and
 standard deviation for the number of shares based on whether the post
@@ -280,6 +356,15 @@ statsData %>%
   summarise(sumShares = sum(shares), avgShares = mean(shares), medShares = median(shares), sdShares = sd(shares))
 ```
 
+<<<<<<< HEAD
+=======
+    ## # A tibble: 2 × 5
+    ##   Weekend sumShares avgShares medShares sdShares
+    ##   <chr>       <dbl>     <dbl>     <dbl>    <dbl>
+    ## 1 No       16368881     2230.      1100    6271.
+    ## 2 Yes       2909854     2679.      1500    4666.
+
+>>>>>>> aa58d189fd7eea466367118eb723237843afd97f
 Likewise, this table gives us information about the number of shares by
 the day of the week.
 
@@ -290,6 +375,20 @@ statsData %>%
   summarise(sumShares = sum(shares), avgShares = mean(shares), medShares = median(shares), sdShares = sd(shares), maxShares = max(shares))
 ```
 
+<<<<<<< HEAD
+=======
+    ## # A tibble: 7 × 6
+    ##   Day       sumShares avgShares medShares sdShares maxShares
+    ##   <fct>         <dbl>     <dbl>     <dbl>    <dbl>     <dbl>
+    ## 1 Monday      3330409     2456.      1100    6865.    141400
+    ## 2 Tuesday     3432328     2220.      1100    5678.    115700
+    ## 3 Wednesday   2941868     1880.      1100    3135.     53500
+    ## 4 Thursday    3756199     2394.      1100    8585.    284700
+    ## 5 Friday      2908077     2228.      1100    5792.    128500
+    ## 6 Saturday    1432545     2760.      1500    4865.     75500
+    ## 7 Sunday      1477309     2605.      1400    4480.     55600
+
+>>>>>>> aa58d189fd7eea466367118eb723237843afd97f
 ### Monti - Summary Stats
 
 ### Monti - Graphs (3)
@@ -307,6 +406,11 @@ titlewordcountGraph + geom_point(aes(color = Day)) +
   xlab("Number of Words in Title")
 ```
 
+<<<<<<< HEAD
+=======
+![](world_files/figure-gfm/titlewordcountGraph-1.png)<!-- -->
+
+>>>>>>> aa58d189fd7eea466367118eb723237843afd97f
 The following plot shows the number of shares by the rate of positive
 words in the article. A positive trend would indicate that articles with
 more positive words are shared more often than articles with negative
@@ -320,6 +424,11 @@ positivewordrateGraph + geom_point(aes(color = Day)) +
   xlab("Rate of Positive Words") 
 ```
 
+<<<<<<< HEAD
+=======
+![](world_files/figure-gfm/positivewordrateGraph-1.png)<!-- -->
+
+>>>>>>> aa58d189fd7eea466367118eb723237843afd97f
 The following plot shows the total number of shares as related to the
 parameter title subjectivity. A positive trend would indicate that
 articles are shared more often when the title is subjective. A negative
@@ -335,6 +444,11 @@ titleSubjectivityGraph + geom_point(aes(color = n_tokens_title)) +
   labs(color = "Word Count in Title")
 ```
 
+<<<<<<< HEAD
+=======
+![](world_files/figure-gfm/titleSubjectivityGraph-1.png)<!-- -->
+
+>>>>>>> aa58d189fd7eea466367118eb723237843afd97f
 ## Modeling
 
 ### Data Split
@@ -346,10 +460,22 @@ training set (70%) and a test set (30%).
 set.seed(555)
 
 trainIndex <- createDataPartition(activeData$shares, p = 0.7, list = FALSE)
+<<<<<<< HEAD
 
 activeTrain <- activeData[trainIndex, ]
 
 activeTest <- activeData[-trainIndex, ]
+=======
+activeTrain <- activeData[trainIndex, ]
+activeTest <- activeData[-trainIndex, ]
+
+
+activeTrain <- activeTrain %>%
+  select(-dataChannel)
+
+activeTest <- activeTest %>%
+  select(-dataChannel)
+>>>>>>> aa58d189fd7eea466367118eb723237843afd97f
 ```
 
 ### Belknap - Linear Regression Model Explanation
@@ -366,6 +492,7 @@ activeTest <- activeData[-trainIndex, ]
 
 NEEDS MORE WORK.
 
+<<<<<<< HEAD
 # NOW RF Works
 
 ``` r
@@ -590,3 +717,24 @@ tb = data.frame(RF = acc_rf$overall[[1]],
 
 kable(tb, caption = "Accuracy Metric by Ensemble Method on Test Set")
 ```
+=======
+``` r
+str(activeTrain)
+
+rfFit <- train(shares ~ .,
+               data = activeTrain, 
+               method = "rf", 
+               trControl = trainControl(method = "cv", number = 5), 
+               tuneGrid = data.frame(mtry = 1:3))
+
+rfFit$results
+
+
+rfPred <- predict(rfFit, newData = activeTest)
+postResample(rfPred, activeTest$shares)
+```
+
+### Monti - Boosted Tree Model & Explanation
+
+## Comparison & Conclusion - Monti or Belknap (whoever doesn’t do automation of R Markdown)
+>>>>>>> aa58d189fd7eea466367118eb723237843afd97f
