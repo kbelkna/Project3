@@ -3,7 +3,6 @@ Project 3
 Kara Belknap & Cassio Monti
 2022-10-29
 
-<<<<<<< HEAD
 -   <a href="#project-3" id="toc-project-3">Project 3</a>
     -   <a href="#report-for-data-channel--bus"
         id="toc-report-for-data-channel--bus">Report for Data Channel = bus</a>
@@ -12,7 +11,6 @@ Kara Belknap & Cassio Monti
 -   <a href="#relevance-of-topic-metrics-5-top-topics-according-to-lda"
     id="toc-relevance-of-topic-metrics-5-top-topics-according-to-lda">Relevance
     of topic metrics (5 top topics according to LDA).</a>
-    -   <a href="#getting-started" id="toc-getting-started">Getting Started</a>
     -   <a href="#read-in-the-data" id="toc-read-in-the-data">Read in the
         Data</a>
     -   <a href="#select-data-for-appropriate-data-channel"
@@ -55,25 +53,21 @@ Kara Belknap & Cassio Monti
         -   <a href="#belknap---random-forest-model--explanation"
             id="toc-belknap---random-forest-model--explanation">Belknap - Random
             Forest Model &amp; Explanation</a>
--   <a href="#now-rf-works" id="toc-now-rf-works">NOW RF Works</a>
-    -   <a href="#monti---boosted-tree-model--explanation"
-        id="toc-monti---boosted-tree-model--explanation">Monti - Boosted Tree
-        Model &amp; Explanation</a>
+        -   <a href="#monti---boosted-tree-model--explanation"
+            id="toc-monti---boosted-tree-model--explanation">Monti - Boosted Tree
+            Model &amp; Explanation</a>
     -   <a
         href="#comparison--conclusion---monti-or-belknap-whoever-doesnt-do-automation-of-r-markdown"
         id="toc-comparison--conclusion---monti-or-belknap-whoever-doesnt-do-automation-of-r-markdown">Comparison
         &amp; Conclusion - Monti or Belknap (whoever doesn’t do automation of R
         Markdown)</a>
 
-=======
->>>>>>> aa58d189fd7eea466367118eb723237843afd97f
 # Project 3
 
 ## Report for Data Channel = bus
 
 ## Monti - Introduction
 
-<<<<<<< HEAD
 The objective of this project is to analyze data
 
 timedelta: Days between the article publication and the data set
@@ -122,10 +116,6 @@ articles published by Mashable num_imgs: Number of images num_videos:
 Number of videos average_token_length: Average length of the words in
 the content num_keywords: Number of keywords in the metadata
 
-=======
->>>>>>> aa58d189fd7eea466367118eb723237843afd97f
-## Getting Started
-
 Before we can begin our analysis, we must load in the following
 packages:
 
@@ -133,19 +123,12 @@ packages:
 library(tidyverse)
 library(caret)
 library(randomForest)
-<<<<<<< HEAD
 library(knitr)
-=======
->>>>>>> aa58d189fd7eea466367118eb723237843afd97f
 ```
 
 ## Read in the Data
 
-<<<<<<< HEAD
 Using the data file `OnlineNewsPopularity.csv`, we will read in the data
-=======
-Using the datafile `OnlineNewsPopularity.csv`, we will read in the data
->>>>>>> aa58d189fd7eea466367118eb723237843afd97f
 and add a new column corresponding to the type of data channel from
 which the data was classified. The new variable will be called
 `dataChannel`. Note that there are some rows that are unclassified
@@ -153,16 +136,11 @@ according to the six channels of interest and those are indicated by
 `other`.
 
 Once the data column is created, we can easily subset the data using the
-<<<<<<< HEAD
 `filter` function to create a new data set for each data channel. We
-=======
-`filter` function to create a new dataset for each data channel. We
->>>>>>> aa58d189fd7eea466367118eb723237843afd97f
 removed the original `data_channel_is_*` columns as well as two
 non-predictive columns `url` and `timedelta`.
 
 ``` r
-<<<<<<< HEAD
 rawData <- read_csv("../OnlineNewsPopularity.csv")
 
 rawDataChannel <- rawData %>%
@@ -176,30 +154,6 @@ rawDataChannel <- rawData %>%
   select(-data_channel_is_lifestyle, -data_channel_is_entertainment, 
          -data_channel_is_bus, -data_channel_is_socmed, -data_channel_is_tech,
          -data_channel_is_world, -url, -timedelta)
-=======
-rawData <- read_csv("OnlineNewsPopularity.csv")
-```
-
-    ## Rows: 39644 Columns: 61
-    ## ── Column specification ─────────────────────────────────────────────────────────
-    ## Delimiter: ","
-    ## chr  (1): url
-    ## dbl (60): timedelta, n_tokens_title, n_tokens_content, n_unique_tokens, n_non...
-    ## 
-    ## ℹ Use `spec()` to retrieve the full column specification for this data.
-    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-
-``` r
-rawDataChannel <- rawData %>%
-  mutate(dataChannel = ifelse(data_channel_is_lifestyle == 1, "lifestyle", 
-                              ifelse(data_channel_is_entertainment == 1, "entertainment", 
-                                     ifelse(data_channel_is_bus == 1, "bus", 
-                                            ifelse(data_channel_is_socmed == 1, "socmed", 
-                                                   ifelse(data_channel_is_tech == 1, "tech", 
-                                                          ifelse(data_channel_is_world == 1, "world", "other"))))))) %>%
-  select(-data_channel_is_lifestyle, -data_channel_is_entertainment, -data_channel_is_bus, -data_channel_is_socmed, 
-         -data_channel_is_tech, -data_channel_is_world, -url, -timedelta)
->>>>>>> aa58d189fd7eea466367118eb723237843afd97f
 
 
 lifestyleData <- rawDataChannel %>%
@@ -224,15 +178,14 @@ worldData <- rawDataChannel %>%
 ## Select Data for Appropriate Data Channel
 
 To select the appropriate data channel based on the `params$channel`, we
-<<<<<<< HEAD
 created a function `selectData` which would return the appropriate data
 set and assign it to the data set `activeData`. This will be the file we
 will use for the remainder of the report.
-=======
+
+To select the appropriate data channel based on the `params$channel`, we
 created a function `selectData` which would return the appropriate
 dataset and assign it to the dataset `activeData`. This will be the file
 we will use for the remainder of the report.
->>>>>>> aa58d189fd7eea466367118eb723237843afd97f
 
 ``` r
 selectData <- function(dataChannel) { 
@@ -254,11 +207,7 @@ selectData <- function(dataChannel) {
   if (dataChannel == "world"){
     return(worldData)
   }
-<<<<<<< HEAD
 }
-=======
-  }
->>>>>>> aa58d189fd7eea466367118eb723237843afd97f
 
 dataChannelSelect <- params$channel
 
@@ -267,7 +216,6 @@ activeData <- selectData(dataChannelSelect)
 
 ## Summarizations for data channel bus
 
-<<<<<<< HEAD
 NEW TOPICS !!!!!!!!!!!!!!!!!!!!
 
 ### Subsetting Variables of Interest
@@ -290,13 +238,10 @@ anyNA(activeData)
 
     ## [1] FALSE
 
-=======
->>>>>>> aa58d189fd7eea466367118eb723237843afd97f
 ### Data manipulation for statistics
 
 ``` r
 statsData <- activeData %>%
-<<<<<<< HEAD
   mutate(Day = ifelse(weekday_is_monday == 1, "Monday", 
                       ifelse(weekday_is_tuesday == 1, "Tuesday", 
                       ifelse(weekday_is_wednesday == 1, "Wednesday", 
@@ -310,18 +255,6 @@ statsData <- activeData %>%
 statsData$Day <- factor(statsData$Day, 
                 levels = c("Monday", "Tuesday", "Wednesday", "Thursday", 
                            "Friday", "Saturday", "Sunday"))
-=======
-  mutate(Day = as.factor(ifelse(weekday_is_monday == 1, "Monday", 
-                      ifelse(weekday_is_tuesday == 1, "Tuesday", 
-                             ifelse(weekday_is_wednesday == 1, "Wednesday", 
-                                    ifelse(weekday_is_thursday == 1, "Thursday", 
-                                           ifelse(weekday_is_friday == 1, "Friday", 
-                                                  ifelse(weekday_is_saturday == 1, "Saturday", 
-                                                         ifelse(weekday_is_sunday == 1, "Sunday", "missingdata"))))))))) %>%
-  mutate(Weekend = ifelse(is_weekend == 1, "Yes", "No"))
-
-statsData$Day <- factor(statsData$Day, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
->>>>>>> aa58d189fd7eea466367118eb723237843afd97f
 ```
 
 ### Belknap - Summary Stats
@@ -330,20 +263,12 @@ The following table gives us information about the summary statistics
 for the number of shares for articles in the data channel bus.
 
 ``` r
-<<<<<<< HEAD
 table(activeData$shares)
 ```
 
     ## 
     ##    0    1 
     ## 3962 2296
-=======
-summary(activeData$shares)
-```
-
-    ##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
-    ##      1.0    952.2   1400.0   3063.0   2500.0 690400.0
->>>>>>> aa58d189fd7eea466367118eb723237843afd97f
 
 The following table gives us information about the average, median, and
 standard deviation for the number of shares based on whether the post
@@ -355,15 +280,6 @@ statsData %>%
   summarise(sumShares = sum(shares), avgShares = mean(shares), medShares = median(shares), sdShares = sd(shares))
 ```
 
-<<<<<<< HEAD
-=======
-    ## # A tibble: 2 × 5
-    ##   Weekend sumShares avgShares medShares sdShares
-    ##   <chr>       <dbl>     <dbl>     <dbl>    <dbl>
-    ## 1 No       16877116     2976.      1300   15614.
-    ## 2 Yes       2291254     3910.      2400    7564.
-
->>>>>>> aa58d189fd7eea466367118eb723237843afd97f
 Likewise, this table gives us information about the number of shares by
 the day of the week.
 
@@ -374,20 +290,6 @@ statsData %>%
   summarise(sumShares = sum(shares), avgShares = mean(shares), medShares = median(shares), sdShares = sd(shares), maxShares = max(shares))
 ```
 
-<<<<<<< HEAD
-=======
-    ## # A tibble: 7 × 6
-    ##   Day       sumShares avgShares medShares sdShares maxShares
-    ##   <fct>         <dbl>     <dbl>     <dbl>    <dbl>     <dbl>
-    ## 1 Monday      4482214     3887.      1400   28313.    690400
-    ## 2 Tuesday     3466021     2932.      1300   10827.    310800
-    ## 3 Wednesday   3401897     2677.      1300    8160.    158900
-    ## 4 Thursday    3560327     2885.      1300   13138.    306100
-    ## 5 Friday      1966657     2364.      1400    5134.    102200
-    ## 6 Saturday    1075736     4427.      2600   10139.    144400
-    ## 7 Sunday      1215518     3544.      2200    4979.     56900
-
->>>>>>> aa58d189fd7eea466367118eb723237843afd97f
 ### Monti - Summary Stats
 
 ### Monti - Graphs (3)
@@ -405,11 +307,6 @@ titlewordcountGraph + geom_point(aes(color = Day)) +
   xlab("Number of Words in Title")
 ```
 
-<<<<<<< HEAD
-=======
-![](bus_files/figure-gfm/titlewordcountGraph-1.png)<!-- -->
-
->>>>>>> aa58d189fd7eea466367118eb723237843afd97f
 The following plot shows the number of shares by the rate of positive
 words in the article. A positive trend would indicate that articles with
 more positive words are shared more often than articles with negative
@@ -423,11 +320,6 @@ positivewordrateGraph + geom_point(aes(color = Day)) +
   xlab("Rate of Positive Words") 
 ```
 
-<<<<<<< HEAD
-=======
-![](bus_files/figure-gfm/positivewordrateGraph-1.png)<!-- -->
-
->>>>>>> aa58d189fd7eea466367118eb723237843afd97f
 The following plot shows the total number of shares as related to the
 parameter title subjectivity. A positive trend would indicate that
 articles are shared more often when the title is subjective. A negative
@@ -443,11 +335,6 @@ titleSubjectivityGraph + geom_point(aes(color = n_tokens_title)) +
   labs(color = "Word Count in Title")
 ```
 
-<<<<<<< HEAD
-=======
-![](bus_files/figure-gfm/titleSubjectivityGraph-1.png)<!-- -->
-
->>>>>>> aa58d189fd7eea466367118eb723237843afd97f
 ## Modeling
 
 ### Data Split
@@ -459,22 +346,11 @@ training set (70%) and a test set (30%).
 set.seed(555)
 
 trainIndex <- createDataPartition(activeData$shares, p = 0.7, list = FALSE)
-<<<<<<< HEAD
+
 
 activeTrain <- activeData[trainIndex, ]
 
 activeTest <- activeData[-trainIndex, ]
-=======
-activeTrain <- activeData[trainIndex, ]
-activeTest <- activeData[-trainIndex, ]
-
-
-activeTrain <- activeTrain %>%
-  select(-dataChannel)
-
-activeTest <- activeTest %>%
-  select(-dataChannel)
->>>>>>> aa58d189fd7eea466367118eb723237843afd97f
 ```
 
 ### Belknap - Linear Regression Model Explanation
@@ -491,8 +367,7 @@ activeTest <- activeTest %>%
 
 NEEDS MORE WORK.
 
-<<<<<<< HEAD
-# NOW RF Works
+NOW RF Works
 
 ``` r
 train.control = trainControl(method = "cv", number = 5)
@@ -502,7 +377,7 @@ rfFit <- train(shares~.,
                method = "rf",
                trControl = train.control,
                preProcess = c("center","scale"),
-               tuneGrid = data.frame(mtry = 1:10))
+               tuneGrid = data.frame(mtry = 1:5))
 
 plot(rfFit)
 ```
@@ -513,23 +388,18 @@ plot(rfFit)
 rfFit$bestTune$mtry
 ```
 
-    ## [1] 2
+    ## [1] 3
 
 ``` r
 rfFit$results
 ```
 
-    ##    mtry  Accuracy     Kappa  AccuracySD    KappaSD
-    ## 1     1 0.6960292 0.2395460 0.004815505 0.01505890
-    ## 2     2 0.7090410 0.3133877 0.014170289 0.03693640
-    ## 3     3 0.7065307 0.3153910 0.018700893 0.04668481
-    ## 4     4 0.7081288 0.3202149 0.011239348 0.03011537
-    ## 5     5 0.7037912 0.3114048 0.010052215 0.02695926
-    ## 6     6 0.7051626 0.3162310 0.016050953 0.04153628
-    ## 7     7 0.7053881 0.3171041 0.011849431 0.03154020
-    ## 8     8 0.7060730 0.3192202 0.017034265 0.04143094
-    ## 9     9 0.7037922 0.3140874 0.015010626 0.03783056
-    ## 10   10 0.7047042 0.3162807 0.017362699 0.04127057
+    ##   mtry  Accuracy     Kappa  AccuracySD    KappaSD
+    ## 1    1 0.6971697 0.2423281 0.004361633 0.01105511
+    ## 2    2 0.7065307 0.3085349 0.015415619 0.04009120
+    ## 3    3 0.7108667 0.3254355 0.016059464 0.04043093
+    ## 4    4 0.7058442 0.3152895 0.012938928 0.03345469
+    ## 5    5 0.7063034 0.3167531 0.012020316 0.03133342
 
 ``` r
 RF_pred <- predict(rfFit, newdata = activeTest)
@@ -543,28 +413,28 @@ acc_rf
     ## 
     ##           Reference
     ## Prediction    0    1
-    ##          0 1027  428
-    ##          1  161  260
-    ##                                          
-    ##                Accuracy : 0.686          
-    ##                  95% CI : (0.6645, 0.707)
-    ##     No Information Rate : 0.6333         
-    ##     P-Value [Acc > NIR] : 9.2e-07        
-    ##                                          
-    ##                   Kappa : 0.2639         
-    ##                                          
-    ##  Mcnemar's Test P-Value : < 2e-16        
-    ##                                          
-    ##             Sensitivity : 0.8645         
-    ##             Specificity : 0.3779         
-    ##          Pos Pred Value : 0.7058         
-    ##          Neg Pred Value : 0.6176         
-    ##              Prevalence : 0.6333         
-    ##          Detection Rate : 0.5474         
-    ##    Detection Prevalence : 0.7756         
-    ##       Balanced Accuracy : 0.6212         
-    ##                                          
-    ##        'Positive' Class : 0              
+    ##          0 1011  413
+    ##          1  177  275
+    ##                                           
+    ##                Accuracy : 0.6855          
+    ##                  95% CI : (0.6639, 0.7065)
+    ##     No Information Rate : 0.6333          
+    ##     P-Value [Acc > NIR] : 1.172e-06       
+    ##                                           
+    ##                   Kappa : 0.2702          
+    ##                                           
+    ##  Mcnemar's Test P-Value : < 2.2e-16       
+    ##                                           
+    ##             Sensitivity : 0.8510          
+    ##             Specificity : 0.3997          
+    ##          Pos Pred Value : 0.7100          
+    ##          Neg Pred Value : 0.6084          
+    ##              Prevalence : 0.6333          
+    ##          Detection Rate : 0.5389          
+    ##    Detection Prevalence : 0.7591          
+    ##       Balanced Accuracy : 0.6254          
+    ##                                           
+    ##        'Positive' Class : 0               
     ## 
 
 ### Monti - Boosted Tree Model & Explanation
@@ -587,84 +457,84 @@ gbmFit <- train(shares~.,
 gbmFit$bestTune$n.trees
 ```
 
-    ## [1] 175
+    ## [1] 75
 
 ``` r
 gbmFit$bestTune$interaction.depth
 ```
 
-    ## [1] 4
+    ## [1] 3
 
 ``` r
 gbmFit$results
 ```
 
     ##    shrinkage interaction.depth n.minobsinnode n.trees  Accuracy     Kappa  AccuracySD
-    ## 1        0.1                 1             10      25 0.6903230 0.2354923 0.008373842
-    ## 9        0.1                 2             10      25 0.6953427 0.2708052 0.008878926
-    ## 17       0.1                 3             10      25 0.7060691 0.2994614 0.008830218
-    ## 25       0.1                 4             10      25 0.7062998 0.3047817 0.013111349
-    ## 2        0.1                 1             10      50 0.7015060 0.2872041 0.008900625
-    ## 10       0.1                 2             10      50 0.7058400 0.3090311 0.007763631
-    ## 18       0.1                 3             10      50 0.7047003 0.3063478 0.007226405
-    ## 26       0.1                 4             10      50 0.7099501 0.3204729 0.009016010
-    ## 3        0.1                 1             10      75 0.7026463 0.2977070 0.006066666
-    ## 11       0.1                 2             10      75 0.7069810 0.3158287 0.008053033
-    ## 19       0.1                 3             10      75 0.7051538 0.3131261 0.012491490
-    ## 27       0.1                 4             10      75 0.7097192 0.3232517 0.014503314
-    ## 4        0.1                 1             10     100 0.7053829 0.3062111 0.008517331
-    ## 12       0.1                 2             10     100 0.7094922 0.3225932 0.010543388
-    ## 20       0.1                 3             10     100 0.7067530 0.3186913 0.009650856
-    ## 28       0.1                 4             10     100 0.7081213 0.3232138 0.013021341
-    ## 5        0.1                 1             10     125 0.7076655 0.3150009 0.005754758
-    ## 13       0.1                 2             10     125 0.7092636 0.3230604 0.009980396
-    ## 21       0.1                 3             10     125 0.7076678 0.3210437 0.009246917
-    ## 29       0.1                 4             10     125 0.7076665 0.3252780 0.008897402
-    ## 6        0.1                 1             10     150 0.7062956 0.3142655 0.007252066
-    ## 14       0.1                 2             10     150 0.7067551 0.3193683 0.008178720
-    ## 22       0.1                 3             10     150 0.7069829 0.3213563 0.008599559
-    ## 30       0.1                 4             10     150 0.7040140 0.3160718 0.008881527
-    ## 7        0.1                 1             10     175 0.7088060 0.3226131 0.009354524
-    ## 15       0.1                 2             10     175 0.7065257 0.3202492 0.013314764
-    ## 23       0.1                 3             10     175 0.7076673 0.3229129 0.006244911
-    ## 31       0.1                 4             10     175 0.7106298 0.3339844 0.010029917
-    ## 8        0.1                 1             10     200 0.7097184 0.3240965 0.009682877
-    ## 16       0.1                 2             10     200 0.7081221 0.3241391 0.009804124
-    ## 24       0.1                 3             10     200 0.7078951 0.3236561 0.008142576
-    ## 32       0.1                 4             10     200 0.7090345 0.3292178 0.009632902
-    ##       KappaSD
-    ## 1  0.02586525
-    ## 9  0.02603832
-    ## 17 0.02544508
-    ## 25 0.03654204
-    ## 2  0.02912060
-    ## 10 0.02207169
-    ## 18 0.01603181
-    ## 26 0.02161419
-    ## 3  0.01934817
-    ## 11 0.01812857
-    ## 19 0.02713043
-    ## 27 0.03106835
-    ## 4  0.02195190
-    ## 12 0.02277010
-    ## 20 0.02076628
-    ## 28 0.02783095
-    ## 5  0.01289400
-    ## 13 0.02291133
-    ## 21 0.01784058
-    ## 29 0.02241452
-    ## 6  0.01875368
-    ## 14 0.02139442
-    ## 22 0.02103640
-    ## 30 0.02305674
-    ## 7  0.01983133
-    ## 15 0.03209830
-    ## 23 0.01183073
-    ## 31 0.02214824
-    ## 8  0.02306002
-    ## 16 0.02148108
-    ## 24 0.02025387
-    ## 32 0.02360587
+    ## 1        0.1                 1             10      25 0.6903240 0.2388574 0.010162360
+    ## 9        0.1                 2             10      25 0.6987673 0.2740406 0.011954741
+    ## 17       0.1                 3             10      25 0.7033291 0.2917038 0.011724030
+    ## 25       0.1                 4             10      25 0.7026460 0.2969149 0.004698141
+    ## 2        0.1                 1             10      50 0.6980827 0.2816360 0.003425274
+    ## 10       0.1                 2             10      50 0.7067572 0.3108575 0.004933536
+    ## 18       0.1                 3             10      50 0.7069813 0.3160742 0.008005236
+    ## 26       0.1                 4             10      50 0.7076714 0.3205723 0.008505891
+    ## 3        0.1                 1             10      75 0.7035611 0.3027082 0.004645330
+    ## 11       0.1                 2             10      75 0.7101790 0.3221736 0.004557728
+    ## 19       0.1                 3             10      75 0.7126891 0.3301704 0.004874190
+    ## 27       0.1                 4             10      75 0.7081291 0.3221290 0.011084057
+    ## 4        0.1                 1             10     100 0.7056140 0.3117887 0.007601764
+    ## 12       0.1                 2             10     100 0.7062998 0.3146498 0.003239761
+    ## 20       0.1                 3             10     100 0.7081255 0.3231875 0.005812695
+    ## 28       0.1                 4             10     100 0.7067585 0.3219759 0.010108365
+    ## 5        0.1                 1             10     125 0.7058421 0.3134825 0.007321850
+    ## 13       0.1                 2             10     125 0.7106338 0.3256929 0.002709703
+    ## 21       0.1                 3             10     125 0.7069842 0.3197980 0.003438956
+    ## 29       0.1                 4             10     125 0.7067603 0.3219884 0.010968707
+    ## 6        0.1                 1             10     150 0.7076678 0.3178232 0.002939536
+    ## 14       0.1                 2             10     150 0.7083517 0.3213568 0.003810446
+    ## 22       0.1                 3             10     150 0.7008206 0.3049234 0.007103751
+    ## 30       0.1                 4             10     150 0.7083590 0.3263475 0.014136100
+    ## 7        0.1                 1             10     175 0.7099506 0.3248363 0.003645036
+    ## 15       0.1                 2             10     175 0.7085805 0.3233669 0.004002565
+    ## 23       0.1                 3             10     175 0.7053868 0.3157090 0.006151280
+    ## 31       0.1                 4             10     175 0.7094982 0.3301397 0.010431163
+    ## 8        0.1                 1             10     200 0.7113192 0.3301909 0.002388540
+    ## 16       0.1                 2             10     200 0.7085810 0.3248208 0.005818656
+    ## 24       0.1                 3             10     200 0.7012780 0.3088793 0.004140669
+    ## 32       0.1                 4             10     200 0.7053907 0.3212258 0.010096983
+    ##        KappaSD
+    ## 1  0.024333079
+    ## 9  0.027233479
+    ## 17 0.024236317
+    ## 25 0.015094639
+    ## 2  0.011249152
+    ## 10 0.010795092
+    ## 18 0.013389339
+    ## 26 0.020137937
+    ## 3  0.014782769
+    ## 11 0.017291524
+    ## 19 0.010673992
+    ## 27 0.028589479
+    ## 4  0.019542975
+    ## 12 0.011510140
+    ## 20 0.011025058
+    ## 28 0.027353407
+    ## 5  0.022666272
+    ## 13 0.015163193
+    ## 21 0.012655934
+    ## 29 0.028399490
+    ## 6  0.012414801
+    ## 14 0.016135233
+    ## 22 0.022031391
+    ## 30 0.039301181
+    ## 7  0.015727153
+    ## 15 0.013800759
+    ## 23 0.020796557
+    ## 31 0.028807335
+    ## 8  0.006982342
+    ## 16 0.009517755
+    ## 24 0.018386844
+    ## 32 0.028514817
 
 ``` r
 plot(gbmFit)
@@ -683,27 +553,27 @@ acc_boosting
     ## Confusion Matrix and Statistics
     ## 
     ##           Reference
-    ## Prediction   0   1
-    ##          0 998 383
-    ##          1 190 305
+    ## Prediction    0    1
+    ##          0 1023  429
+    ##          1  165  259
     ##                                           
-    ##                Accuracy : 0.6946          
-    ##                  95% CI : (0.6732, 0.7154)
+    ##                Accuracy : 0.6834          
+    ##                  95% CI : (0.6618, 0.7044)
     ##     No Information Rate : 0.6333          
-    ##     P-Value [Acc > NIR] : 1.372e-08       
+    ##     P-Value [Acc > NIR] : 3.018e-06       
     ##                                           
-    ##                   Kappa : 0.3012          
+    ##                   Kappa : 0.2584          
     ##                                           
-    ##  Mcnemar's Test P-Value : 1.050e-15       
+    ##  Mcnemar's Test P-Value : < 2.2e-16       
     ##                                           
-    ##             Sensitivity : 0.8401          
-    ##             Specificity : 0.4433          
-    ##          Pos Pred Value : 0.7227          
-    ##          Neg Pred Value : 0.6162          
+    ##             Sensitivity : 0.8611          
+    ##             Specificity : 0.3765          
+    ##          Pos Pred Value : 0.7045          
+    ##          Neg Pred Value : 0.6108          
     ##              Prevalence : 0.6333          
-    ##          Detection Rate : 0.5320          
-    ##    Detection Prevalence : 0.7361          
-    ##       Balanced Accuracy : 0.6417          
+    ##          Detection Rate : 0.5453          
+    ##    Detection Prevalence : 0.7740          
+    ##       Balanced Accuracy : 0.6188          
     ##                                           
     ##        'Positive' Class : 0               
     ## 
@@ -716,24 +586,3 @@ tb = data.frame(RF = acc_rf$overall[[1]],
 
 kable(tb, caption = "Accuracy Metric by Ensemble Method on Test Set")
 ```
-=======
-``` r
-str(activeTrain)
-
-rfFit <- train(shares ~ .,
-               data = activeTrain, 
-               method = "rf", 
-               trControl = trainControl(method = "cv", number = 5), 
-               tuneGrid = data.frame(mtry = 1:3))
-
-rfFit$results
-
-
-rfPred <- predict(rfFit, newData = activeTest)
-postResample(rfPred, activeTest$shares)
-```
-
-### Monti - Boosted Tree Model & Explanation
-
-## Comparison & Conclusion - Monti or Belknap (whoever doesn’t do automation of R Markdown)
->>>>>>> aa58d189fd7eea466367118eb723237843afd97f
