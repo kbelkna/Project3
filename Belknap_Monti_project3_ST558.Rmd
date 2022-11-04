@@ -1,7 +1,7 @@
 ---
 title: "Project 3"
 author: "Kara Belknap & Cassio Monti"
-date: "2022-10-29"
+date: "2022-11-5"
 output:
   github_document:
     html_preview: false
@@ -55,12 +55,12 @@ Before we can begin our analysis, we must load in the following packages:
 
 library(tidyverse)
 library(caret)
+library(PerformanceAnalytics)
 library(knitr)
-library(corrplot)
 
 ```
 
-`Tidyverse` is used for data management and plotting through dplyr and ggplot packages. `Caret` package is used for data splitting and modeling. `Knitr` package is used for nice printing of tables. `Corrplot` is used for nice correlation plots assisting in visualization.
+`Tidyverse` is used for data management and plotting through dplyr and ggplot packages. `Caret` package is used for data splitting and modeling. `knitr` package is used to provide nice looking tables. `PerformanceAnalytics` is used for nice correlation plots assisting in the visualization.
 
 ## Read in the Data
 
@@ -152,13 +152,13 @@ In this section, we will perform EDA for the data channel `r params$channel`
 
 ### Data Split
 
-This section splits the data set into training and test sets for the proportion of 80/20. The data summarization will be conducted on the training set. To split the data, the function `createDataPartition()`, from `caret` package, was used with the argument `p=0.8` to represent 80% of the data should be in the split. The function `set.seed(555)` was used to fix the random seed. The code below shows the creation of training and test sets.
+This section splits the data set into training and test sets for the proportion of 70/30. The data summarization will be conducted on the training set. To split the data, the function `createDataPartition()`, from `caret` package, was used with the argument `p=0.7` to represent 80% of the data should be in the split. The function `set.seed(555)` was used to fix the random seed. The code below shows the creation of training and test sets.
 
 ```{r splitData}
 
 set.seed(555)
 
-trainIndex <- createDataPartition(activeData$shares, p = 0.8, list = FALSE)
+trainIndex <- createDataPartition(activeData$shares, p = 0.7, list = FALSE)
 
 activeTrain <- activeData[trainIndex, ]
 
@@ -227,56 +227,149 @@ statsData %>%
 
 ### Monti - Summary Statistics
 
+
+First, we will analyse the frequency of occurrence of publications on each day of the week. The one-way contingency table below presents those frequencies.
+
 ```{r}
 
-# two-way contingency table between shares and Days
-
-
+table(statsData$Day)
 
 ```
 
+A second discrete analysis performed here is the two-way contingency table related to the discretization of the response variable if we divided `shares` into two categories. The function `cut()` was used for the end. In this case, we count the frequency of the number of publications in days of week with the two levels of response variable. These levels represent smaller number of shares (on the left) and larger number of shares (on the right). The table below shows this counting.
 
 ```{r}
 
+table(statsData$Day, cut(statsData$shares, breaks = 2))
+
+```
+
+An important EDA analysis for regression tasks is the calculation of correlation matrix. The function `cor()` is used in this section to return the top 10 most correlated potential predictor variables with the response variable `shares`. The code below presents the process of obtaining these variables and their respective correlations with the response variable. 
+
+```{r correl}
+
+var_sel = select(activeTrain,starts_with("LDA_"), average_token_length,
+         is_weekend, n_tokens_content, n_non_stop_unique_tokens, num_hrefs,
+         num_self_hrefs, num_videos, average_token_length, kw_avg_min, 
+         kw_avg_max, kw_avg_avg, is_weekend)
+
 # correlation matrix
+correlation = cor(activeTrain$shares, var_sel)
 
+# sorting the highest correlations
+p = sort(abs(correlation), decreasing = T)
 
+# getting column ID
+var_id = which(abs(correlation) %in% p[1:10])
+
+# collecting variable names
+var_cor = colnames(correlation)[var_id]
+
+#combining names with correlations
+tbcor = cbind(var_cor, correlation[var_id])
+
+# converting to tibble
+tbcor = as_tibble(tbcor)
+
+# updating column names
+colnames(tbcor)=c("Variables","Correlation")
+
+# rounding the digits
+tbcor$Correlation = round(as.numeric(tbcor$Correlation),3)
+
+# nice printing with kable
+kable(tbcor, caption = "Top 10 Response Correlated Variables")
+
+```
+
+The variables that present most correlation with the response variable `shares` are `r var_cor`. These variables will be studied in more depth via PCA to understand the orientation of the most variable potential predictors. The code below presents the PCA analysis as part of the EDA.
+
+```{r PCA}
+
+id = which(colnames(activeTrain) %in% var_cor)
+
+# PCA
+PC = prcomp(activeTrain[,id], center = TRUE, scale = TRUE)
+
+pc_directions=as.data.frame(PC$rotation)
+
+kable(pc_directions, caption="PCs for EDA", digits = 3)
 
 ```
 
 
 ### Monti - Graphs (3)
 
-```{r}
+The plot below presents histograms, scatter plots, and correlations in a bivariate structure of the top 5 variables chosen the correlation analysis. Notice the shape of the distributions and the values of the correlations for the first column, which the one related to the response variable `shares`.
+
+```{r correlplot}
 
 # bivariate correlation plot
-
-
+cor_data <- select(activeTrain,shares,var_id[1:5])
+chart.Correlation(cor_data, histogram=TRUE)
 
 ```
 
+The biplot below presents the PC1 and PC2 from the PCA analysis. The function `ggplot()` was used to create the plot and the segments created via `geom_segment()` were rescaled so that we could better see the variable names. The most variation in the data is contained in the PC1, hence, the most important variables in the data approximately are oriented towards the axis of PC1 and, therefore, may be good predictors for the `shares` response. Likewise, for PC2, which contains the second most variability in the data set, the variables that are oriented approximately towards the axis of PC2 are the second most important variables.
 
-```{r}
+```{r biplot}
+
+pc_df<-data.frame(PC$x)
+# plotting PC1 and PC2 for the top 5 variables
+# biplot(PC, cex = 1)
+ggplot(pc_directions)+
+  geom_point(data = pc_df, mapping = aes(x=PC1, y=PC2))+
+  geom_segment(aes(x = 0, y = 0, yend = 50 * PC2, xend = 50 * PC1))+
+  geom_label(mapping = aes(, x = 51 * PC1, y = 51 * PC2, label = row.names(pc_directions)))
+
+```
+
+The scatter plots below show the different levels of the variables related to the LDA metrics, from 0 to 4, and graphs the relationship with the response variable `shares`. The function `ggplot()` is used to create the plot frame and `geom_point()`, `geom_smooth`, and `facert_wrap()` function are used to plot the scatter points, the smooth GAM (Generalized Additive Models) lines, and split the data by LDA type, respectively. It is possible to see the behavior of the response variable in relation to each LDA types.
+
+```{r LDAplot}
+
+LDA.dat = activeTrain %>%
+  select(shares, starts_with("LDA")) %>%
+  pivot_longer(cols = LDA_00:LDA_04, names_to = "LDA", values_to = "values")
 
 # relationship between shares and LDA levels (facet_wrap+smooth)
-
-
-
-```
-
-```{r}
-
-# relationship between shares and keyword metrics (color)
-
+ggplot(LDA.dat, aes(y = shares, x = values))+
+  geom_point() + geom_smooth(method = "loess")+ facet_wrap(~LDA)+
+labs(x = "LDA Values", y = "Shares", title = "Shares by LDA Types")
 
 
 ```
 
-```{r}
+The scatter plots below show the different types of the variables related to the Keyword metrics and graphs the relationship with the response variable `shares`. The function `ggplot()` is used to create the plot frame and `geom_point()`, `geom_smooth`, and `facert_wrap()` function are used to plot the scatter points, the smooth GAM (Generalized Additive Models) lines, and split the data by keyword type, respectively. It is possible to see the behavior of the response variable in relation to each of the 3 keyword metric types.
+
+```{r keywordplot}
+
+# relationship between shares and keyword metrics
+kw.dat = activeTrain %>%
+  select(shares, kw_avg_max, kw_avg_avg, kw_avg_min) %>%
+  pivot_longer(cols = 2:4, names_to = "keyword", values_to = "values")
+
+# relationship between shares and keyword metrics types (facet_wrap+smooth)
+ggplot(kw.dat, aes(y = shares, x = values))+
+  geom_point() + geom_smooth(method = "loess")+ facet_wrap(~keyword)+
+labs(x = "Keyword Metric Values", y = "Shares", title = "Shares by Keyword Metric Types")
+
+```
+
+Finally, the scatter plots below show the different types of the variables related to the Content metrics and graphs the relationship with the response variable `shares`. The function `ggplot()` is used to create the plot frame and `geom_point()`, `geom_smooth`, and `facert_wrap()` function are used to plot the scatter points, the smooth GAM (Generalized Additive Models) lines, and split the data by content type, respectively. It is possible to see the behavior of the response variable in relation to each of the 4 content metric types.
+
+```{r Contentplot}
 
 # relationship between shares and content metrics (facet_wrap+smooth)
+cont.dat = activeTrain %>%
+  select(shares, num_videos, n_tokens_content, n_non_stop_unique_tokens,
+         num_hrefs, num_self_hrefs, average_token_length) %>%
+  pivot_longer(cols = 2:7, names_to = "content", values_to = "values")
 
-
+# relationship between shares and content metrics types (facet_wrap+smooth)
+ggplot(cont.dat, aes(y = shares, x = values))+
+  geom_point() + geom_smooth(method = "loess")+ facet_wrap(~content)+
+labs(x = "Content Metric Values", y = "Shares", title = "Shares by Content Metric Types")
 
 ```
 
@@ -322,6 +415,8 @@ titleSubjectivityGraph + geom_point(aes(color = n_tokens_title)) +
 
 ### Subsetting Variables for Modeling
 
+The variables selected below are those described in the introduction of this study and will be used in the modeling section. The function `select()` was used to subset the corresponding variables from the training and test sets and two new objects are created specially for the modeling section, `dfTrain` and `dfTest`.
+
 ```{r choseVars}
 
 dfTrain = activeTrain %>%
@@ -336,55 +431,105 @@ dfTest = activeTest %>%
          num_self_hrefs, num_videos, average_token_length, kw_avg_min, 
          kw_avg_max, kw_avg_avg, is_weekend)
 
-# looking for NAs
-anyNA(dfTrain)
-anyNA(dfTest)
-
 ```
-
-
-
 
 
 ## Modeling
 
-In this section, we will perform regression for prediction purposes for the data channel `r params$channel`.
+In this section, we will perform regression for prediction purposes for the data channel `r params$channel`. All models were fitted using 5-fold Cross-Validation via `train()` function from `caret` package.
 
 ### Belknap - Linear Regression Model Explanation
 
-### Monti - Linear Regression Model
+(add some thoughts here)
 
-```{r}
+### Monti - Linear Regression Model (LASSO Regression)
+
+The linear regression chosen for this next model is based on penalized regression via LASSO method. This method has a particular advantage of having a triangular shape of parameters search space so that it allows the estimated coefficients to be zero. Hence, LASSO regression is also a variable selection method. In this application, we will test the prediction capability of LASSO regression only. It was tested a sequence of values for the Regularization Parameter (lambda), a tuning parameter, from 0 to 10 by 1 via `seq(0,10,1)` assigned to the `tuneGrid = `argument in the `train()` function from `caret` package. The code below presents the estimated coefficients for the best hyperparameter.
+
+```{r LASSOtrain}
 
 LASSO = train(shares~., data = dfTrain,
               method="glmnet",
               preProcess = c("center","scale"),
-              tuneGrid = expand.grid(alpha = 1, lambda = seq(0,10,0.1)),
+              tuneGrid = expand.grid(alpha = 1, lambda = seq(0,10,1)),
               trControl = trainControl(method="CV",number=5))
-
-plot(LASSO)
 
 coef(LASSO$finalModel, LASSO$bestTune$lambda)
 
 ```
 
+The best lambda for this model is `r LASSO$bestTune$lambda` and this value can be seen in the table below which summarizes all the metrics for the 5-fold cross-validation.
 
-```{r}
-postResample(pred = predict(LASSO, newdata = dfTest), obs = dfTest$shares)
+```{r LASSOresultTrain}
+
+lasso_out = data.frame(LASSO$results)
+
+kable(lasso_out, caption = "Output Training Metrics for LASSO",
+      digits = 3)
+
+```
+
+The plot below shows the RMSE by Regularization Parameter (lambda). It is easy to see that RMSE is minimized when $\lambda$ = `r LASSO$bestTune$lambda`.
+
+```{r LASSOplot}
+
+plot(LASSO)
+
+```
+
+The validation step for LASSO regression is applied on the test set after predicting the response variable for unseen data (test set). By using `predict()` and `postResample()` functions, the metrics RMSE (Root Means Squared Error), R2 (Coefficient of Determination), and MAE (Mean Absolute Error) are calculated and displayed below.
+
+```{r LASSOtest}
+
+metric_LASSO = postResample(pred = predict(LASSO, newdata = dfTest),
+                            obs = dfTest$shares)
+
+metric_LASSO
+
+```
+
+### Belknap - Linear Regression Model
+
+(add some thoughts here)
+
+```{r linearTrain}
+
+lmFit = train(shares~., data = dfTrain,
+              method="lm",
+              preProcess = c("center","scale"),
+              trControl = trainControl(method="CV",number=5))
+
+summary(lmFit)
+
+```
+
+(add some thoughts here)
+
+```{r linearTrainResult}
+
+lm_out = data.frame(lmFit$results)
+
+kable(lm_out, caption = "Output Training Metrics for Linear Regression",
+      digits = 3)
 
 ```
 
 
+```{r lineartest}
 
-### Belknap - Linear Regression Model
+metric_lm = postResample(pred = predict(lmFit, newdata = dfTest), 
+                         obs = dfTest$shares)
 
-### Monti - Ensemble Tree-based Model
+metric_lm
 
-### Belknap - Ensemble Tree-based Model
+```
+
 
 ### Belknap - Random Forest Model & Explanation
 
-```{r RF}
+(add some thoughts here about RF)
+
+```{r RFtrain}
 
 train.control = trainControl(method = "cv", number = 5)
 
@@ -399,23 +544,28 @@ rfFit$bestTune$mtry
 
 ```
 
+(add some thoughts here)
 
-
-```{r}
+```{r RFplot}
 
 plot(rfFit)
 
 ```
 
+(add some thoughts here)
 
-```{r}
+```{r RFresults}
 
-rfFit$results
+rf_out = data.frame(rfFit$results)
+
+kable(rf_out, caption = "Output Training Metrics for Random Forest",
+      digits = 3)
 
 ```
 
+(add some thoughts here)
 
-```{r}
+```{r RFTest}
 
 RF_pred <- predict(rfFit, newdata = activeTest)
 
@@ -428,7 +578,9 @@ metric_rf
 
 ### Monti - Boosted Tree Model & Explanation
 
-```{r Boosting}
+(add some thoughts here)
+
+```{r boostingTrain}
 
 tunG = expand.grid(n.trees = seq(25,200,25),
                       interaction.depth = 1:4,
@@ -451,19 +603,29 @@ gbmFit$bestTune$interaction.depth
 
 ```
 
-```{r}
+The best n.trees and interaction.depth parameters for this model are `r gbmFit$bestTune$n.trees` and `r gbmFit$bestTune$interaction.depth`, respectively. These values can be seen in the table below, which summarizes all the metrics for the 5-fold cross-validation. It is easy to see that these values minimize the RMSE.
+
+```{r boostingResults}
+
+gbm_out = data.frame(gbmFit$results)
+
+kable(gbm_out, caption = "Output Training Metrics for Boosting",
+      digits = 3)
+
+```
+
+The plot below shows the RMSE by Number of Boosting Iterations and display Max Tree Depth lines for the 5-fold CV performed. It is easy to see that RMSE is minimized when n.trees = `r gbmFit$bestTune$n.trees` and interaction.depth = `r gbmFit$bestTune$interaction.depth`.
+
+```{r boostingPlot}
 
 plot(gbmFit)
 
 ```
 
-```{r}
-gbmFit$results
+The validation step for Boosting is applied on the test set after predicting the response variable for unseen data (test set). By using `predict()` and `postResample()` functions, the metrics RMSE (Root Means Squared Error), R2 (Coefficient of Determination), and MAE (Mean Absolute Error) are calculated and displayed below.
 
-```
+```{r boostingTest}
 
-
-```{r}
 gbm_pred <- predict(gbmFit, newdata = activeTest)
 
 metric_boosting = postResample(gbm_pred, activeTest$shares)
@@ -475,6 +637,8 @@ metric_boosting
 
 ## Comparison & Conclusion - Monti
 
+For the overall comparison among all 4 created models in previous sections, the test set was used for predictions and some quality of fit metrics were calculated based on these prediction on unseen data. The code below shows the function that returns the name of the best model based on RMSE values estimated on the test set. The code below displays the table comparing all 4 models.
+
 ```{r comparison}
 
 bestMethod = function(x){
@@ -483,19 +647,23 @@ bestMethod = function(x){
   
   out = switch(bestm,
                 "Random Forest",
-                "Boosting")
+                "Boosting",
+               "LASSO Regression",
+               "Linear Regression")
   
   return(out)
   
 }
 
-tb = data.frame(RF = metric_rf, Boosting = metric_boosting)
+tb = data.frame(RF = metric_rf, Boosting = metric_boosting,
+                LASSO = metric_LASSO, Linear = metric_lm)
 
 kable(tb, caption = "Accuracy Metric by Ensemble Method on Test Set",
       digits = 3)
 
 ```
 
-The best model is `r bestMethod(tb)` based on RMSE metric.
+
+After comparing all the 4 models fit throughout this analysis, the best model was chosen based on the RMSE value, such that the model with minimum RMSE is the "winner". Therefore, the best model is `r bestMethod(tb)` based on RMSE metric. The RMSE, R2 (coefficient of Determination), and MAE metrics for all 4 models can be seen in the table above.
 
 

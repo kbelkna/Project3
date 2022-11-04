@@ -1,7 +1,7 @@
 Project 3
 ================
 Kara Belknap & Cassio Monti
-2022-10-29
+2022-11-5
 
 -   <a href="#report-for-entertainment-channel"
     id="toc-report-for-entertainment-channel">Report for
@@ -36,18 +36,12 @@ Kara Belknap & Cassio Monti
         -   <a href="#belknap---linear-regression-model-explanation"
             id="toc-belknap---linear-regression-model-explanation">Belknap - Linear
             Regression Model Explanation</a>
-        -   <a href="#monti---linear-regression-model"
-            id="toc-monti---linear-regression-model">Monti - Linear Regression
-            Model</a>
+        -   <a href="#monti---linear-regression-model-lasso-regression"
+            id="toc-monti---linear-regression-model-lasso-regression">Monti - Linear
+            Regression Model (LASSO Regression)</a>
         -   <a href="#belknap---linear-regression-model"
             id="toc-belknap---linear-regression-model">Belknap - Linear Regression
             Model</a>
-        -   <a href="#monti---ensemble-tree-based-model"
-            id="toc-monti---ensemble-tree-based-model">Monti - Ensemble Tree-based
-            Model</a>
-        -   <a href="#belknap---ensemble-tree-based-model"
-            id="toc-belknap---ensemble-tree-based-model">Belknap - Ensemble
-            Tree-based Model</a>
         -   <a href="#belknap---random-forest-model--explanation"
             id="toc-belknap---random-forest-model--explanation">Belknap - Random
             Forest Model &amp; Explanation</a>
@@ -131,15 +125,15 @@ packages:
 ``` r
 library(tidyverse)
 library(caret)
+library(PerformanceAnalytics)
 library(knitr)
-library(corrplot)
 ```
 
 `Tidyverse` is used for data management and plotting through dplyr and
 ggplot packages. `Caret` package is used for data splitting and
-modeling. `Knitr` package is used for nice printing of tables.
-`Corrplot` is used for nice correlation plots assisting in
-visualization.
+modeling. `knitr` package is used to provide nice looking tables.
+`PerformanceAnalytics` is used for nice correlation plots assisting in
+the visualization.
 
 ## Read in the Data
 
@@ -240,9 +234,9 @@ In this section, we will perform EDA for the data channel entertainment
 ### Data Split
 
 This section splits the data set into training and test sets for the
-proportion of 80/20. The data summarization will be conducted on the
+proportion of 70/30. The data summarization will be conducted on the
 training set. To split the data, the function `createDataPartition()`,
-from `caret` package, was used with the argument `p=0.8` to represent
+from `caret` package, was used with the argument `p=0.7` to represent
 80% of the data should be in the split. The function `set.seed(555)` was
 used to fix the random seed. The code below shows the creation of
 training and test sets.
@@ -250,7 +244,7 @@ training and test sets.
 ``` r
 set.seed(555)
 
-trainIndex <- createDataPartition(activeData$shares, p = 0.8, list = FALSE)
+trainIndex <- createDataPartition(activeData$shares, p = 0.7, list = FALSE)
 
 activeTrain <- activeData[trainIndex, ]
 
@@ -297,7 +291,7 @@ summary(activeTrain$shares)
 ```
 
     ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-    ##      47     833    1200    2971    2100  210300
+    ##      47     833    1200    2994    2100  197600
 
 The following table gives us information about the average, median, and
 standard deviation for the number of shares based on whether the post
@@ -316,8 +310,8 @@ statsData %>%
     ## # A tibble: 2 × 5
     ##   Weekend sumShares avgShares medShares sdShares
     ##   <chr>       <dbl>     <dbl>     <dbl>    <dbl>
-    ## 1 No       14047136     2853.      1100    8074.
-    ## 2 Yes       2731157     3778.      1700    6809.
+    ## 1 No       12476151     2883.      1100    8133.
+    ## 2 Yes       2315889     3772.      1700    6189.
 
 Likewise, this table gives us information about the number of shares by
 the day of the week. The same functions were used here, by applied to
@@ -335,41 +329,246 @@ statsData %>%
     ## # A tibble: 7 × 7
     ##   Day       sumShares avgShares medShares sdShares maxShares minShares
     ##   <fct>         <dbl>     <dbl>     <dbl>    <dbl>     <dbl>     <dbl>
-    ## 1 Monday      3051423     2789.      1100    5843.     77200        59
-    ## 2 Tuesday     2643341     2643.      1100    5718.     87600        47
-    ## 3 Wednesday   3042471     2838.      1100    8420.    138700        49
-    ## 4 Thursday    3037045     3055.      1100   10251.    197600        57
-    ## 5 Friday      2272856     2975.      1200    9618.    210300        58
-    ## 6 Saturday    1132301     3737.      1700    7111.     68300       183
-    ## 7 Sunday      1598856     3807.      1700    6591.     69500       171
+    ## 1 Monday      2859993     2927.      1100    7384.    112600        59
+    ## 2 Tuesday     2388631     2739.      1100    5950.     63300        47
+    ## 3 Wednesday   2653011     2909.      1100    9164.    138700        49
+    ## 4 Thursday    2696500     3082.      1100   10687.    197600        57
+    ## 5 Friday      1878016     2718.      1200    6102.     82200        82
+    ## 6 Saturday     862980     3398.      1600    5792.     57500       183
+    ## 7 Sunday      1452909     4036.      1800    6450.     69500       171
 
 ### Monti - Summary Statistics
 
-``` r
-# two-way contingency table between shares and Days
-```
+First, we will analyse the frequency of occurrence of publications on
+each day of the week. The one-way contingency table below presents those
+frequencies.
 
 ``` r
-# correlation matrix
+table(statsData$Day)
 ```
+
+    ## 
+    ##    Monday   Tuesday Wednesday  Thursday    Friday  Saturday    Sunday 
+    ##       977       872       912       875       691       254       360
+
+A second discrete analysis performed here is the two-way contingency
+table related to the discretization of the response variable if we
+divided `shares` into two categories. The function `cut()` was used for
+the end. In this case, we count the frequency of the number of
+publications in days of week with the two levels of response variable.
+These levels represent smaller number of shares (on the left) and larger
+number of shares (on the right). The table below shows this counting.
+
+``` r
+table(statsData$Day, cut(statsData$shares, breaks = 2))
+```
+
+    ##            
+    ##             (-151,9.88e+04] (9.88e+04,1.98e+05]
+    ##   Monday                976                   1
+    ##   Tuesday               872                   0
+    ##   Wednesday             909                   3
+    ##   Thursday              873                   2
+    ##   Friday                691                   0
+    ##   Saturday              254                   0
+    ##   Sunday                360                   0
+
+An important EDA analysis for regression tasks is the calculation of
+correlation matrix. The function `cor()` is used in this section to
+return the top 10 most correlated potential predictor variables with the
+response variable `shares`. The code below presents the process of
+obtaining these variables and their respective correlations with the
+response variable.
+
+``` r
+var_sel = select(activeTrain,starts_with("LDA_"), average_token_length,
+         is_weekend, n_tokens_content, n_non_stop_unique_tokens, num_hrefs,
+         num_self_hrefs, num_videos, average_token_length, kw_avg_min, 
+         kw_avg_max, kw_avg_avg, is_weekend)
+
+# correlation matrix
+correlation = cor(activeTrain$shares, var_sel)
+
+# sorting the highest correlations
+p = sort(abs(correlation), decreasing = T)
+
+# getting column ID
+var_id = which(abs(correlation) %in% p[1:10])
+
+# collecting variable names
+var_cor = colnames(correlation)[var_id]
+
+#combining names with correlations
+tbcor = cbind(var_cor, correlation[var_id])
+
+# converting to tibble
+tbcor = as_tibble(tbcor)
+
+# updating column names
+colnames(tbcor)=c("Variables","Correlation")
+
+# rounding the digits
+tbcor$Correlation = round(as.numeric(tbcor$Correlation),3)
+
+# nice printing with kable
+kable(tbcor, caption = "Top 10 Response Correlated Variables")
+```
+
+| Variables  | Correlation |
+|:-----------|------------:|
+| LDA_00     |      -0.031 |
+| LDA_01     |      -0.025 |
+| LDA_02     |      -0.027 |
+| LDA_03     |       0.047 |
+| LDA_04     |      -0.017 |
+| is_weekend |       0.037 |
+| num_hrefs  |       0.053 |
+| kw_avg_min |       0.198 |
+| kw_avg_max |       0.055 |
+| kw_avg_avg |       0.235 |
+
+Top 10 Response Correlated Variables
+
+The variables that present most correlation with the response variable
+`shares` are LDA_00, LDA_01, LDA_02, LDA_03, LDA_04, is_weekend,
+num_hrefs, kw_avg_min, kw_avg_max, kw_avg_avg. These variables will be
+studied in more depth via PCA to understand the orientation of the most
+variable potential predictors. The code below presents the PCA analysis
+as part of the EDA.
+
+``` r
+id = which(colnames(activeTrain) %in% var_cor)
+
+# PCA
+PC = prcomp(activeTrain[,id], center = TRUE, scale = TRUE)
+
+pc_directions=as.data.frame(PC$rotation)
+
+kable(pc_directions, caption="PCs for EDA", digits = 3)
+```
+
+|            |    PC1 |    PC2 |    PC3 |    PC4 |    PC5 |    PC6 |    PC7 |    PC8 |    PC9 |  PC10 |
+|:-----------|-------:|-------:|-------:|-------:|-------:|-------:|-------:|-------:|-------:|------:|
+| num_hrefs  | -0.084 | -0.171 | -0.071 | -0.520 | -0.002 |  0.340 | -0.566 | -0.500 | -0.053 | 0.000 |
+| kw_avg_min | -0.071 |  0.618 | -0.293 | -0.347 | -0.166 |  0.138 |  0.325 | -0.017 | -0.504 | 0.000 |
+| kw_avg_max | -0.391 |  0.072 |  0.525 |  0.118 |  0.097 | -0.076 | -0.385 |  0.286 | -0.554 | 0.001 |
+| kw_avg_avg | -0.355 |  0.600 |  0.121 | -0.126 |  0.014 | -0.023 | -0.221 |  0.135 |  0.645 | 0.000 |
+| is_weekend | -0.071 | -0.066 | -0.013 | -0.328 | -0.179 | -0.899 | -0.025 | -0.200 | -0.034 | 0.000 |
+| LDA_00     |  0.041 | -0.139 | -0.317 | -0.397 |  0.651 | -0.084 | -0.055 |  0.503 | -0.008 | 0.185 |
+| LDA_01     |  0.560 |  0.330 |  0.241 |  0.088 |  0.147 | -0.084 | -0.170 | -0.194 | -0.050 | 0.643 |
+| LDA_02     |  0.055 | -0.246 |  0.472 | -0.502 | -0.395 |  0.187 |  0.299 |  0.308 |  0.126 | 0.266 |
+| LDA_03     | -0.607 | -0.172 | -0.213 |  0.188 | -0.009 |  0.035 |  0.187 | -0.193 |  0.009 | 0.669 |
+| LDA_04     |  0.129 | -0.032 | -0.438 |  0.136 | -0.574 | -0.020 | -0.470 |  0.433 | -0.030 | 0.181 |
+
+PCs for EDA
 
 ### Monti - Graphs (3)
 
+The plot below presents histograms, scatter plots, and correlations in a
+bivariate structure of the top 5 variables chosen the correlation
+analysis. Notice the shape of the distributions and the values of the
+correlations for the first column, which the one related to the response
+variable `shares`.
+
 ``` r
 # bivariate correlation plot
+cor_data <- select(activeTrain,shares,var_id[1:5])
+chart.Correlation(cor_data, histogram=TRUE)
 ```
 
+![](entertainment_files/figure-gfm/correlplot-1.png)<!-- -->
+
+The biplot below presents the PC1 and PC2 from the PCA analysis. The
+function `ggplot()` was used to create the plot and the segments created
+via `geom_segment()` were rescaled so that we could better see the
+variable names. The most variation in the data is contained in the PC1,
+hence, the most important variables in the data approximately are
+oriented towards the axis of PC1 and, therefore, may be good predictors
+for the `shares` response. Likewise, for PC2, which contains the second
+most variability in the data set, the variables that are oriented
+approximately towards the axis of PC2 are the second most important
+variables.
+
 ``` r
+pc_df<-data.frame(PC$x)
+# plotting PC1 and PC2 for the top 5 variables
+# biplot(PC, cex = 1)
+ggplot(pc_directions)+
+  geom_point(data = pc_df, mapping = aes(x=PC1, y=PC2))+
+  geom_segment(aes(x = 0, y = 0, yend = 50 * PC2, xend = 50 * PC1))+
+  geom_label(mapping = aes(, x = 51 * PC1, y = 51 * PC2, label = row.names(pc_directions)))
+```
+
+![](entertainment_files/figure-gfm/biplot-1.png)<!-- -->
+
+The scatter plots below show the different levels of the variables
+related to the LDA metrics, from 0 to 4, and graphs the relationship
+with the response variable `shares`. The function `ggplot()` is used to
+create the plot frame and `geom_point()`, `geom_smooth`, and
+`facert_wrap()` function are used to plot the scatter points, the smooth
+GAM (Generalized Additive Models) lines, and split the data by LDA type,
+respectively. It is possible to see the behavior of the response
+variable in relation to each LDA types.
+
+``` r
+LDA.dat = activeTrain %>%
+  select(shares, starts_with("LDA")) %>%
+  pivot_longer(cols = LDA_00:LDA_04, names_to = "LDA", values_to = "values")
+
 # relationship between shares and LDA levels (facet_wrap+smooth)
+ggplot(LDA.dat, aes(y = shares, x = values))+
+  geom_point() + geom_smooth(method = "loess")+ facet_wrap(~LDA)+
+labs(x = "LDA Values", y = "Shares", title = "Shares by LDA Types")
 ```
 
+![](entertainment_files/figure-gfm/LDAplot-1.png)<!-- -->
+
+The scatter plots below show the different types of the variables
+related to the Keyword metrics and graphs the relationship with the
+response variable `shares`. The function `ggplot()` is used to create
+the plot frame and `geom_point()`, `geom_smooth`, and `facert_wrap()`
+function are used to plot the scatter points, the smooth GAM
+(Generalized Additive Models) lines, and split the data by keyword type,
+respectively. It is possible to see the behavior of the response
+variable in relation to each of the 3 keyword metric types.
+
 ``` r
-# relationship between shares and keyword metrics (color)
+# relationship between shares and keyword metrics
+kw.dat = activeTrain %>%
+  select(shares, kw_avg_max, kw_avg_avg, kw_avg_min) %>%
+  pivot_longer(cols = 2:4, names_to = "keyword", values_to = "values")
+
+# relationship between shares and keyword metrics types (facet_wrap+smooth)
+ggplot(kw.dat, aes(y = shares, x = values))+
+  geom_point() + geom_smooth(method = "loess")+ facet_wrap(~keyword)+
+labs(x = "Keyword Metric Values", y = "Shares", title = "Shares by Keyword Metric Types")
 ```
+
+![](entertainment_files/figure-gfm/keywordplot-1.png)<!-- -->
+
+Finally, the scatter plots below show the different types of the
+variables related to the Content metrics and graphs the relationship
+with the response variable `shares`. The function `ggplot()` is used to
+create the plot frame and `geom_point()`, `geom_smooth`, and
+`facert_wrap()` function are used to plot the scatter points, the smooth
+GAM (Generalized Additive Models) lines, and split the data by content
+type, respectively. It is possible to see the behavior of the response
+variable in relation to each of the 4 content metric types.
 
 ``` r
 # relationship between shares and content metrics (facet_wrap+smooth)
+cont.dat = activeTrain %>%
+  select(shares, num_videos, n_tokens_content, n_non_stop_unique_tokens,
+         num_hrefs, num_self_hrefs, average_token_length) %>%
+  pivot_longer(cols = 2:7, names_to = "content", values_to = "values")
+
+# relationship between shares and content metrics types (facet_wrap+smooth)
+ggplot(cont.dat, aes(y = shares, x = values))+
+  geom_point() + geom_smooth(method = "loess")+ facet_wrap(~content)+
+labs(x = "Content Metric Values", y = "Shares", title = "Shares by Content Metric Types")
 ```
+
+![](entertainment_files/figure-gfm/Contentplot-1.png)<!-- -->
 
 ### Belknap - Graphs (3)
 
@@ -418,6 +617,12 @@ titleSubjectivityGraph + geom_point(aes(color = n_tokens_title)) +
 
 ### Subsetting Variables for Modeling
 
+The variables selected below are those described in the introduction of
+this study and will be used in the modeling section. The function
+`select()` was used to subset the corresponding variables from the
+training and test sets and two new objects are created specially for the
+modeling section, `dfTrain` and `dfTest`.
+
 ``` r
 dfTrain = activeTrain %>%
   select(shares, starts_with("LDA_"), average_token_length,
@@ -430,77 +635,186 @@ dfTest = activeTest %>%
          is_weekend, n_tokens_content, n_non_stop_unique_tokens, num_hrefs,
          num_self_hrefs, num_videos, average_token_length, kw_avg_min, 
          kw_avg_max, kw_avg_avg, is_weekend)
-
-# looking for NAs
-anyNA(dfTrain)
 ```
-
-    ## [1] FALSE
-
-``` r
-anyNA(dfTest)
-```
-
-    ## [1] FALSE
 
 ## Modeling
 
 In this section, we will perform regression for prediction purposes for
-the data channel entertainment.
+the data channel entertainment. All models were fitted using 5-fold
+Cross-Validation via `train()` function from `caret` package.
 
 ### Belknap - Linear Regression Model Explanation
 
-### Monti - Linear Regression Model
+(add some thoughts here)
+
+### Monti - Linear Regression Model (LASSO Regression)
+
+The linear regression chosen for this next model is based on penalized
+regression via LASSO method. This method has a particular advantage of
+having a triangular shape of parameters search space so that it allows
+the estimated coefficients to be zero. Hence, LASSO regression is also a
+variable selection method. In this application, we will test the
+prediction capability of LASSO regression only. It was tested a sequence
+of values for the Regularization Parameter (lambda), a tuning parameter,
+from 0 to 10 by 1 via `seq(0,10,1)` assigned to the `tuneGrid =`argument
+in the `train()` function from `caret` package. The code below presents
+the estimated coefficients for the best hyperparameter.
 
 ``` r
 LASSO = train(shares~., data = dfTrain,
               method="glmnet",
               preProcess = c("center","scale"),
-              tuneGrid = expand.grid(alpha = 1, lambda = seq(0,10,0.1)),
+              tuneGrid = expand.grid(alpha = 1, lambda = seq(0,10,1)),
               trControl = trainControl(method="CV",number=5))
 
-plot(LASSO)
-```
-
-![](entertainment_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
-
-``` r
 coef(LASSO$finalModel, LASSO$bestTune$lambda)
 ```
 
     ## 16 x 1 sparse Matrix of class "dgCMatrix"
-    ##                                  s1
-    ## (Intercept)              2971.18700
-    ## LDA_00                   -181.41140
-    ## LDA_01                     35.25719
-    ## LDA_02                   -110.36947
-    ## LDA_03                      .      
-    ## LDA_04                   -136.25484
-    ## average_token_length      152.44849
-    ## is_weekend                262.59035
-    ## n_tokens_content          117.56980
-    ## n_non_stop_unique_tokens   34.73866
-    ## num_hrefs                 309.37727
-    ## num_self_hrefs           -251.94569
-    ## num_videos                -88.74575
-    ## kw_avg_min                430.02019
-    ## kw_avg_max                -69.31501
-    ## kw_avg_avg               1240.37155
+    ##                                   s1
+    ## (Intercept)              2993.734062
+    ## LDA_00                   -174.729364
+    ## LDA_01                      .       
+    ## LDA_02                    -27.171852
+    ## LDA_03                     39.223989
+    ## LDA_04                    -37.106664
+    ## average_token_length      183.870933
+    ## is_weekend                231.903617
+    ## n_tokens_content         -123.916563
+    ## n_non_stop_unique_tokens   43.097159
+    ## num_hrefs                 492.265720
+    ## num_self_hrefs           -140.231848
+    ## num_videos               -132.431516
+    ## kw_avg_min                978.594409
+    ## kw_avg_max                  9.577283
+    ## kw_avg_avg               1429.643984
+
+The best lambda for this model is 10 and this value can be seen in the
+table below which summarizes all the metrics for the 5-fold
+cross-validation.
 
 ``` r
-postResample(pred = predict(LASSO, newdata = dfTest), obs = dfTest$shares)
+lasso_out = data.frame(LASSO$results)
+
+kable(lasso_out, caption = "Output Training Metrics for LASSO",
+      digits = 3)
+```
+
+| alpha | lambda |     RMSE | Rsquared |      MAE |   RMSESD | RsquaredSD |   MAESD |
+|------:|-------:|---------:|---------:|---------:|---------:|-----------:|--------:|
+|     1 |      0 | 12105.64 |    0.023 | 3111.719 | 8557.167 |      0.031 | 283.069 |
+|     1 |      1 | 12105.64 |    0.023 | 3111.719 | 8557.167 |      0.031 | 283.069 |
+|     1 |      2 | 12105.60 |    0.023 | 3111.710 | 8557.179 |      0.031 | 283.068 |
+|     1 |      3 | 12105.42 |    0.023 | 3111.675 | 8557.226 |      0.031 | 283.065 |
+|     1 |      4 | 11985.41 |    0.023 | 3107.624 | 8292.088 |      0.032 | 274.751 |
+|     1 |      5 | 11853.25 |    0.023 | 3103.072 | 8000.574 |      0.032 | 265.704 |
+|     1 |      6 | 11721.31 |    0.023 | 3098.448 | 7710.100 |      0.032 | 256.807 |
+|     1 |      7 | 11589.90 |    0.023 | 3093.841 | 7421.046 |      0.032 | 247.985 |
+|     1 |      8 | 11459.50 |    0.024 | 3089.260 | 7134.521 |      0.033 | 239.279 |
+|     1 |      9 | 11330.44 |    0.024 | 3084.716 | 6851.259 |      0.033 | 230.718 |
+|     1 |     10 | 11203.84 |    0.024 | 3080.252 | 6573.763 |      0.033 | 222.389 |
+
+Output Training Metrics for LASSO
+
+The plot below shows the RMSE by Regularization Parameter (lambda). It
+is easy to see that RMSE is minimized when $\lambda$ = 10.
+
+``` r
+plot(LASSO)
+```
+
+![](entertainment_files/figure-gfm/LASSOplot-1.png)<!-- -->
+
+The validation step for LASSO regression is applied on the test set
+after predicting the response variable for unseen data (test set). By
+using `predict()` and `postResample()` functions, the metrics RMSE (Root
+Means Squared Error), R2 (Coefficient of Determination), and MAE (Mean
+Absolute Error) are calculated and displayed below.
+
+``` r
+metric_LASSO = postResample(pred = predict(LASSO, newdata = dfTest),
+                            obs = dfTest$shares)
+
+metric_LASSO
 ```
 
     ##         RMSE     Rsquared          MAE 
-    ## 7.494770e+03 1.992281e-02 2.883256e+03
+    ## 8.132572e+03 1.963513e-03 2.995271e+03
 
 ### Belknap - Linear Regression Model
 
-### Monti - Ensemble Tree-based Model
+(add some thoughts here)
 
-### Belknap - Ensemble Tree-based Model
+``` r
+lmFit = train(shares~., data = dfTrain,
+              method="lm",
+              preProcess = c("center","scale"),
+              trControl = trainControl(method="CV",number=5))
+
+summary(lmFit)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = .outcome ~ ., data = dat)
+    ## 
+    ## Residuals:
+    ##    Min     1Q Median     3Q    Max 
+    ## -46080  -2109  -1177   -163 183526 
+    ## 
+    ## Coefficients:
+    ##                            Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)                 2993.73     108.62  27.561  < 2e-16 ***
+    ## LDA_00                    -81874.75   66641.11  -1.229 0.219283    
+    ## LDA_01                   -283189.51  231022.55  -1.226 0.220329    
+    ## LDA_02                   -117426.61   95763.97  -1.226 0.220179    
+    ## LDA_03                   -294585.23  240354.93  -1.226 0.220398    
+    ## LDA_04                    -79979.24   65208.03  -1.227 0.220060    
+    ## average_token_length         350.16     169.16   2.070 0.038506 *  
+    ## is_weekend                   234.99     109.39   2.148 0.031752 *  
+    ## n_tokens_content            -209.31     137.93  -1.517 0.129208    
+    ## n_non_stop_unique_tokens  -12474.67   10220.64  -1.221 0.222320    
+    ## num_hrefs                    484.21     128.66   3.764 0.000169 ***
+    ## num_self_hrefs              -155.95     125.13  -1.246 0.212728    
+    ## num_videos                  -136.58     116.77  -1.170 0.242213    
+    ## kw_avg_min                  1000.37     130.40   7.672 2.03e-14 ***
+    ## kw_avg_max                    39.06     138.88   0.281 0.778549    
+    ## kw_avg_avg                  1413.23     144.96   9.749  < 2e-16 ***
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 7635 on 4925 degrees of freedom
+    ## Multiple R-squared:  0.07393,    Adjusted R-squared:  0.07111 
+    ## F-statistic: 26.21 on 15 and 4925 DF,  p-value: < 2.2e-16
+
+(add some thoughts here)
+
+``` r
+lm_out = data.frame(lmFit$results)
+
+kable(lm_out, caption = "Output Training Metrics for Linear Regression",
+      digits = 3)
+```
+
+| intercept |     RMSE | Rsquared |      MAE |   RMSESD | RsquaredSD |   MAESD |
+|:----------|---------:|---------:|---------:|---------:|-----------:|--------:|
+| TRUE      | 14424.55 |    0.031 | 3215.092 | 15603.02 |      0.031 | 780.901 |
+
+Output Training Metrics for Linear Regression
+
+``` r
+metric_lm = postResample(pred = predict(lmFit, newdata = dfTest), 
+                         obs = dfTest$shares)
+
+metric_lm
+```
+
+    ##         RMSE     Rsquared          MAE 
+    ## 8.145986e+03 1.841703e-03 3.003641e+03
 
 ### Belknap - Random Forest Model & Explanation
+
+(add some thoughts here about RF)
 
 ``` r
 train.control = trainControl(method = "cv", number = 5)
@@ -517,22 +831,34 @@ rfFit$bestTune$mtry
 
     ## [1] 1
 
+(add some thoughts here)
+
 ``` r
 plot(rfFit)
 ```
 
-![](entertainment_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+![](entertainment_files/figure-gfm/RFplot-1.png)<!-- -->
+
+(add some thoughts here)
 
 ``` r
-rfFit$results
+rf_out = data.frame(rfFit$results)
+
+kable(rf_out, caption = "Output Training Metrics for Random Forest",
+      digits = 3)
 ```
 
-    ##   mtry     RMSE   Rsquared      MAE   RMSESD RsquaredSD    MAESD
-    ## 1    1 7668.270 0.02474358 2896.622 1930.535 0.01914560 225.8759
-    ## 2    2 7694.039 0.02559072 2960.872 1918.797 0.01429768 226.1291
-    ## 3    3 7734.620 0.02283125 3000.205 1905.843 0.01196347 237.4495
-    ## 4    4 7767.906 0.02173816 3013.959 1907.931 0.01198516 244.4183
-    ## 5    5 7800.219 0.02150511 3034.596 1903.350 0.01228746 253.4675
+| mtry |     RMSE | Rsquared |      MAE |   RMSESD | RsquaredSD |   MAESD |
+|-----:|---------:|---------:|---------:|---------:|-----------:|--------:|
+|    1 | 7669.397 |    0.039 | 2925.218 | 1450.280 |      0.014 | 157.677 |
+|    2 | 7694.337 |    0.036 | 2985.984 | 1427.870 |      0.012 | 146.450 |
+|    3 | 7740.403 |    0.031 | 3023.858 | 1420.714 |      0.010 | 147.939 |
+|    4 | 7773.487 |    0.029 | 3058.597 | 1425.617 |      0.010 | 150.266 |
+|    5 | 7782.004 |    0.029 | 3069.008 | 1423.413 |      0.009 | 153.200 |
+
+Output Training Metrics for Random Forest
+
+(add some thoughts here)
 
 ``` r
 RF_pred <- predict(rfFit, newdata = activeTest)
@@ -543,9 +869,11 @@ metric_rf
 ```
 
     ##         RMSE     Rsquared          MAE 
-    ## 7493.4836370    0.0201818 2915.9137239
+    ## 7.717221e+03 9.487408e-03 2.890411e+03
 
 ### Monti - Boosted Tree Model & Explanation
+
+(add some thoughts here)
 
 ``` r
 tunG = expand.grid(n.trees = seq(25,200,25),
@@ -572,84 +900,72 @@ gbmFit$bestTune$n.trees
 gbmFit$bestTune$interaction.depth
 ```
 
-    ## [1] 3
+    ## [1] 2
+
+The best n.trees and interaction.depth parameters for this model are 25
+and 2, respectively. These values can be seen in the table below, which
+summarizes all the metrics for the 5-fold cross-validation. It is easy
+to see that these values minimize the RMSE.
+
+``` r
+gbm_out = data.frame(gbmFit$results)
+
+kable(gbm_out, caption = "Output Training Metrics for Boosting",
+      digits = 3)
+```
+
+|     | shrinkage | interaction.depth | n.minobsinnode | n.trees |     RMSE | Rsquared |      MAE |   RMSESD | RsquaredSD |   MAESD |
+|:----|----------:|------------------:|---------------:|--------:|---------:|---------:|---------:|---------:|-----------:|--------:|
+| 1   |       0.1 |                 1 |             10 |      25 | 7627.321 |    0.017 | 2940.157 | 2266.312 |      0.011 | 279.220 |
+| 9   |       0.1 |                 2 |             10 |      25 | 7612.836 |    0.025 | 2923.521 | 2282.253 |      0.023 | 274.734 |
+| 17  |       0.1 |                 3 |             10 |      25 | 7634.108 |    0.024 | 2935.683 | 2281.707 |      0.021 | 282.344 |
+| 25  |       0.1 |                 4 |             10 |      25 | 7629.453 |    0.023 | 2944.692 | 2219.317 |      0.016 | 253.147 |
+| 2   |       0.1 |                 1 |             10 |      50 | 7641.893 |    0.020 | 2931.292 | 2250.356 |      0.011 | 271.381 |
+| 10  |       0.1 |                 2 |             10 |      50 | 7699.685 |    0.017 | 2941.947 | 2213.514 |      0.013 | 252.678 |
+| 18  |       0.1 |                 3 |             10 |      50 | 7719.324 |    0.018 | 2958.641 | 2253.515 |      0.017 | 266.424 |
+| 26  |       0.1 |                 4 |             10 |      50 | 7694.950 |    0.018 | 2961.496 | 2191.356 |      0.009 | 261.821 |
+| 3   |       0.1 |                 1 |             10 |      75 | 7630.396 |    0.022 | 2933.653 | 2233.263 |      0.012 | 267.458 |
+| 11  |       0.1 |                 2 |             10 |      75 | 7659.354 |    0.018 | 2926.283 | 2255.440 |      0.010 | 292.028 |
+| 19  |       0.1 |                 3 |             10 |      75 | 7715.623 |    0.017 | 2957.584 | 2258.915 |      0.014 | 258.062 |
+| 27  |       0.1 |                 4 |             10 |      75 | 7689.068 |    0.019 | 2964.142 | 2186.925 |      0.010 | 256.264 |
+| 4   |       0.1 |                 1 |             10 |     100 | 7670.472 |    0.018 | 2942.695 | 2233.817 |      0.014 | 276.680 |
+| 12  |       0.1 |                 2 |             10 |     100 | 7687.333 |    0.017 | 2934.244 | 2247.676 |      0.009 | 286.599 |
+| 20  |       0.1 |                 3 |             10 |     100 | 7757.027 |    0.017 | 2969.908 | 2239.025 |      0.013 | 240.443 |
+| 28  |       0.1 |                 4 |             10 |     100 | 7737.471 |    0.016 | 2976.002 | 2182.769 |      0.006 | 234.904 |
+| 5   |       0.1 |                 1 |             10 |     125 | 7703.005 |    0.017 | 2948.912 | 2209.250 |      0.010 | 269.817 |
+| 13  |       0.1 |                 2 |             10 |     125 | 7710.277 |    0.015 | 2946.095 | 2252.090 |      0.006 | 280.308 |
+| 21  |       0.1 |                 3 |             10 |     125 | 7755.999 |    0.015 | 2950.721 | 2236.074 |      0.011 | 238.041 |
+| 29  |       0.1 |                 4 |             10 |     125 | 7787.275 |    0.013 | 2997.522 | 2174.428 |      0.005 | 224.633 |
+| 6   |       0.1 |                 1 |             10 |     150 | 7674.110 |    0.016 | 2941.241 | 2236.821 |      0.010 | 256.043 |
+| 14  |       0.1 |                 2 |             10 |     150 | 7724.438 |    0.014 | 2947.755 | 2260.144 |      0.006 | 280.871 |
+| 22  |       0.1 |                 3 |             10 |     150 | 7784.909 |    0.015 | 2976.413 | 2252.740 |      0.014 | 232.476 |
+| 30  |       0.1 |                 4 |             10 |     150 | 7815.351 |    0.013 | 3023.499 | 2134.093 |      0.006 | 198.823 |
+| 7   |       0.1 |                 1 |             10 |     175 | 7651.694 |    0.018 | 2932.876 | 2250.650 |      0.011 | 273.088 |
+| 15  |       0.1 |                 2 |             10 |     175 | 7736.414 |    0.013 | 2942.394 | 2265.570 |      0.007 | 271.450 |
+| 23  |       0.1 |                 3 |             10 |     175 | 7781.968 |    0.016 | 2989.460 | 2238.291 |      0.013 | 225.759 |
+| 31  |       0.1 |                 4 |             10 |     175 | 7836.925 |    0.014 | 3035.403 | 2121.848 |      0.007 | 198.714 |
+| 8   |       0.1 |                 1 |             10 |     200 | 7704.383 |    0.015 | 2950.401 | 2232.777 |      0.012 | 259.266 |
+| 16  |       0.1 |                 2 |             10 |     200 | 7750.639 |    0.013 | 2959.693 | 2264.129 |      0.006 | 275.415 |
+| 24  |       0.1 |                 3 |             10 |     200 | 7826.612 |    0.014 | 3006.627 | 2203.422 |      0.011 | 203.335 |
+| 32  |       0.1 |                 4 |             10 |     200 | 7840.197 |    0.015 | 3055.517 | 2130.631 |      0.008 | 221.225 |
+
+Output Training Metrics for Boosting
+
+The plot below shows the RMSE by Number of Boosting Iterations and
+display Max Tree Depth lines for the 5-fold CV performed. It is easy to
+see that RMSE is minimized when n.trees = 25 and interaction.depth = 2.
 
 ``` r
 plot(gbmFit)
 ```
 
-![](entertainment_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+![](entertainment_files/figure-gfm/boostingPlot-1.png)<!-- -->
 
-``` r
-gbmFit$results
-```
-
-    ##    shrinkage interaction.depth n.minobsinnode n.trees     RMSE    Rsquared      MAE
-    ## 1        0.1                 1             10      25 7571.482 0.007604909 2935.930
-    ## 9        0.1                 2             10      25 7567.672 0.013027309 2908.814
-    ## 17       0.1                 3             10      25 7541.859 0.013349672 2904.106
-    ## 25       0.1                 4             10      25 7543.538 0.016678989 2914.223
-    ## 2        0.1                 1             10      50 7606.733 0.009273261 2932.646
-    ## 10       0.1                 2             10      50 7564.656 0.014912903 2902.880
-    ## 18       0.1                 3             10      50 7569.135 0.013833892 2912.751
-    ## 26       0.1                 4             10      50 7575.854 0.014989785 2916.318
-    ## 3        0.1                 1             10      75 7603.984 0.008666597 2922.250
-    ## 11       0.1                 2             10      75 7593.629 0.014157212 2912.110
-    ## 19       0.1                 3             10      75 7598.616 0.011796030 2922.057
-    ## 27       0.1                 4             10      75 7616.920 0.012486488 2913.073
-    ## 4        0.1                 1             10     100 7595.866 0.009380474 2906.691
-    ## 12       0.1                 2             10     100 7602.581 0.012238236 2928.510
-    ## 20       0.1                 3             10     100 7637.877 0.009362801 2933.648
-    ## 28       0.1                 4             10     100 7637.060 0.011821411 2923.984
-    ## 5        0.1                 1             10     125 7608.233 0.010126310 2933.448
-    ## 13       0.1                 2             10     125 7597.664 0.012220172 2914.993
-    ## 21       0.1                 3             10     125 7646.614 0.009952929 2926.274
-    ## 29       0.1                 4             10     125 7650.164 0.011688883 2930.362
-    ## 6        0.1                 1             10     150 7610.678 0.010549115 2916.644
-    ## 14       0.1                 2             10     150 7616.266 0.010895229 2921.366
-    ## 22       0.1                 3             10     150 7657.274 0.008536438 2931.945
-    ## 30       0.1                 4             10     150 7679.236 0.011147630 2948.681
-    ## 7        0.1                 1             10     175 7598.034 0.009615134 2915.882
-    ## 15       0.1                 2             10     175 7604.631 0.011056147 2915.885
-    ## 23       0.1                 3             10     175 7673.552 0.007599996 2947.114
-    ## 31       0.1                 4             10     175 7700.220 0.009978691 2948.838
-    ## 8        0.1                 1             10     200 7590.885 0.009951310 2914.886
-    ## 16       0.1                 2             10     200 7608.059 0.010121354 2915.855
-    ## 24       0.1                 3             10     200 7678.523 0.008342280 2932.973
-    ## 32       0.1                 4             10     200 7699.443 0.009695524 2951.539
-    ##      RMSESD  RsquaredSD    MAESD
-    ## 1  2744.389 0.009972792 289.0569
-    ## 9  2712.140 0.016383750 297.9214
-    ## 17 2734.880 0.012437380 304.6684
-    ## 25 2691.495 0.018411086 286.8925
-    ## 2  2693.759 0.012370129 275.5732
-    ## 10 2691.132 0.017067894 303.0787
-    ## 18 2712.423 0.013421852 294.1057
-    ## 26 2688.337 0.012939154 282.1422
-    ## 3  2709.537 0.009396976 288.3451
-    ## 11 2675.378 0.015441668 294.8140
-    ## 19 2702.539 0.011117052 298.7045
-    ## 27 2687.786 0.008214444 286.5542
-    ## 4  2714.491 0.009387105 276.0964
-    ## 12 2684.653 0.012680766 296.8984
-    ## 20 2708.179 0.008097498 303.7551
-    ## 28 2683.234 0.007516956 301.6400
-    ## 5  2705.646 0.009700716 284.7096
-    ## 13 2699.177 0.011649118 307.6541
-    ## 21 2692.065 0.008286494 297.3300
-    ## 29 2672.178 0.007467698 314.0392
-    ## 6  2702.286 0.009867733 289.1271
-    ## 14 2703.081 0.008972884 306.1018
-    ## 22 2706.636 0.005564456 307.4179
-    ## 30 2650.210 0.008104119 305.5429
-    ## 7  2720.418 0.008148267 293.6886
-    ## 15 2722.266 0.009447287 324.6207
-    ## 23 2728.452 0.004580420 290.9660
-    ## 31 2652.611 0.006703505 319.3803
-    ## 8  2717.257 0.009072330 292.0836
-    ## 16 2732.284 0.007756030 315.5065
-    ## 24 2724.025 0.006445840 319.7956
-    ## 32 2656.050 0.006784208 323.4204
+The validation step for Boosting is applied on the test set after
+predicting the response variable for unseen data (test set). By using
+`predict()` and `postResample()` functions, the metrics RMSE (Root Means
+Squared Error), R2 (Coefficient of Determination), and MAE (Mean
+Absolute Error) are calculated and displayed below.
 
 ``` r
 gbm_pred <- predict(gbmFit, newdata = activeTest)
@@ -660,9 +976,16 @@ metric_boosting
 ```
 
     ##         RMSE     Rsquared          MAE 
-    ## 7.574362e+03 6.489648e-03 2.921535e+03
+    ## 7.780011e+03 4.996867e-03 2.901337e+03
 
 ## Comparison & Conclusion - Monti
+
+For the overall comparison among all 4 created models in previous
+sections, the test set was used for predictions and some quality of fit
+metrics were calculated based on these prediction on unseen data. The
+code below shows the function that returns the name of the best model
+based on RMSE values estimated on the test set. The code below displays
+the table comparing all 4 models.
 
 ``` r
 bestMethod = function(x){
@@ -671,24 +994,31 @@ bestMethod = function(x){
   
   out = switch(bestm,
                 "Random Forest",
-                "Boosting")
+                "Boosting",
+               "LASSO Regression",
+               "Linear Regression")
   
   return(out)
   
 }
 
-tb = data.frame(RF = metric_rf, Boosting = metric_boosting)
+tb = data.frame(RF = metric_rf, Boosting = metric_boosting,
+                LASSO = metric_LASSO, Linear = metric_lm)
 
 kable(tb, caption = "Accuracy Metric by Ensemble Method on Test Set",
       digits = 3)
 ```
 
-|          |       RF | Boosting |
-|:---------|---------:|---------:|
-| RMSE     | 7493.484 | 7574.362 |
-| Rsquared |    0.020 |    0.006 |
-| MAE      | 2915.914 | 2921.535 |
+|          |       RF | Boosting |    LASSO |   Linear |
+|:---------|---------:|---------:|---------:|---------:|
+| RMSE     | 7717.221 | 7780.011 | 8132.572 | 8145.986 |
+| Rsquared |    0.009 |    0.005 |    0.002 |    0.002 |
+| MAE      | 2890.411 | 2901.337 | 2995.271 | 3003.641 |
 
 Accuracy Metric by Ensemble Method on Test Set
 
-The best model is Random Forest based on RMSE metric.
+After comparing all the 4 models fit throughout this analysis, the best
+model was chosen based on the RMSE value, such that the model with
+minimum RMSE is the “winner”. Therefore, the best model is Random Forest
+based on RMSE metric. The RMSE, R2 (coefficient of Determination), and
+MAE metrics for all 4 models can be seen in the table above.
