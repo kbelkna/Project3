@@ -9,13 +9,13 @@ The purpose of this repository is to provide EDA and modeling for different data
 
 ## List of Packages
 
-The packages listed in this section are used throughout the analysis. Tidyverse is used for data management and plotting through dplyr and ggplot packages. Caret package is used for data splitting and modeling. Knitr package is used for nice printing of tables. Corrplot is used for nice correlation plots assisting in visualization.
+The packages listed in this section are used throughout the analysis. `Tidyverse` is used for data management and plotting through `dplyr` and `ggplot` packages. `Caret` package is used for data splitting and modeling. `Knitr` package is used for nice printing of tables. `PerformanceAnalytics` is used for nice correlation plots assisting in visualization.
 
 ```{r}
 library(tidyverse)
 library(caret)
 library(knitr)
-library(corrplot)
+library(PerformanceAnalytics)
 ```
 ## Links to the Analysis for Data Channels
 
@@ -33,7 +33,7 @@ The analysis for [Tech articles is available here](tech.html).
 
 The analysis for [World articles is available here](world.html).
 
-## Code to Run All Analysis
+## Code to Run Analysis for All Data Channels
 
 This section shows the R code used to run all analysis listed above.
 
