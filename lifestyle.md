@@ -3,15 +3,12 @@ Project 3
 Kara Belknap & Cassio Monti
 2022-10-29
 
--   <a href="#project-3" id="toc-project-3">Project 3</a>
-    -   <a href="#report-for-data-channel--lifestyle"
-        id="toc-report-for-data-channel--lifestyle">Report for Data Channel =
-        lifestyle</a>
-    -   <a href="#monti---introduction" id="toc-monti---introduction">Monti -
-        Introduction</a>
--   <a href="#relevance-of-topic-metrics-5-top-topics-according-to-lda"
-    id="toc-relevance-of-topic-metrics-5-top-topics-according-to-lda">Relevance
-    of topic metrics (5 top topics according to LDA).</a>
+-   <a href="#report-for-lifestyle-channel"
+    id="toc-report-for-lifestyle-channel">Report for <em>lifestyle</em>
+    Channel</a>
+    -   <a href="#introduction" id="toc-introduction">Introduction</a>
+    -   <a href="#required-packages" id="toc-required-packages">Required
+        Packages</a>
     -   <a href="#read-in-the-data" id="toc-read-in-the-data">Read in the
         Data</a>
     -   <a href="#select-data-for-appropriate-data-channel"
@@ -19,23 +16,23 @@ Kara Belknap & Cassio Monti
         Appropriate Data Channel</a>
     -   <a href="#summarizations-for-data-channel-lifestyle"
         id="toc-summarizations-for-data-channel-lifestyle">Summarizations for
-        data channel lifestyle</a>
-        -   <a href="#subsetting-variables-of-interest"
-            id="toc-subsetting-variables-of-interest">Subsetting Variables of
-            Interest</a>
+        data channel <em>lifestyle</em></a>
+        -   <a href="#data-split" id="toc-data-split">Data Split</a>
         -   <a href="#data-manipulation-for-statistics"
             id="toc-data-manipulation-for-statistics">Data manipulation for
             statistics</a>
-        -   <a href="#belknap---summary-stats"
-            id="toc-belknap---summary-stats">Belknap - Summary Stats</a>
-        -   <a href="#monti---summary-stats" id="toc-monti---summary-stats">Monti -
-            Summary Stats</a>
+        -   <a href="#belknap---summary-statistics"
+            id="toc-belknap---summary-statistics">Belknap - Summary Statistics</a>
+        -   <a href="#monti---summary-statistics"
+            id="toc-monti---summary-statistics">Monti - Summary Statistics</a>
         -   <a href="#monti---graphs-3" id="toc-monti---graphs-3">Monti - Graphs
             (3)</a>
         -   <a href="#belknap---graphs-3" id="toc-belknap---graphs-3">Belknap -
             Graphs (3)</a>
+        -   <a href="#subsetting-variables-for-modeling"
+            id="toc-subsetting-variables-for-modeling">Subsetting Variables for
+            Modeling</a>
     -   <a href="#modeling" id="toc-modeling">Modeling</a>
-        -   <a href="#data-split" id="toc-data-split">Data Split</a>
         -   <a href="#belknap---linear-regression-model-explanation"
             id="toc-belknap---linear-regression-model-explanation">Belknap - Linear
             Regression Model Explanation</a>
@@ -57,65 +54,76 @@ Kara Belknap & Cassio Monti
         -   <a href="#monti---boosted-tree-model--explanation"
             id="toc-monti---boosted-tree-model--explanation">Monti - Boosted Tree
             Model &amp; Explanation</a>
-    -   <a
-        href="#comparison--conclusion---monti-or-belknap-whoever-doesnt-do-automation-of-r-markdown"
-        id="toc-comparison--conclusion---monti-or-belknap-whoever-doesnt-do-automation-of-r-markdown">Comparison
-        &amp; Conclusion - Monti or Belknap (whoever doesn’t do automation of R
-        Markdown)</a>
+    -   <a href="#comparison--conclusion---monti"
+        id="toc-comparison--conclusion---monti">Comparison &amp; Conclusion -
+        Monti</a>
 
-# Project 3
+# Report for *lifestyle* Channel
 
-## Report for Data Channel = lifestyle
+This report contains Exploratory Data Analysis (EDA) about this data
+channel and a modeling section applying three regression methods.
 
-## Monti - Introduction
+## Introduction
 
-The objective of this project is to analyze data
+The objective of this analysis is to provide a comprehensive overview
+about publication metrics and their relationship with the number of
+shares that those publications presented during the study period. These
+data have been collected from Mashable website, one of the largest news
+websites from which the content of all the lifestyle channel articles
+published in 2013 and 2014 was extracted. These data were originally
+collected analyzed By Fernandes et al. (2015) work, in which the authors
+performed classification task comparing several machine learning
+algorithms. In the present study, the subset of the data used by
+Fernandes et al.(2015) corresponding to the data channel lifestyle is
+used for regression purposes. The response variable is the number of
+`shares` that the papers presented after publication. In other words, we
+will try to predict the number of shares the papers will have before
+publication. To perform the regression, Random Forest, Boosting, and
+Multiple Linear Regression are used. More information about the methods
+will be provided in further sections.
 
-timedelta: Days between the article publication and the data set
-acquisition (non-predictive)
+Some metrics have been calculated based on the information obtained from
+Marshable website. For instance, the Latent Dirichlet Allocation (LDA)
+was applied to the data set to identify the 5 top relevant topics and
+then measure the closeness of the current article to such topic. There
+are 5 relevance of topic metrics according to LDA:
 
-Quality of keywords set of metrics:
+-   `LDA_00`: Closeness to LDA topic 0  
+-   `LDA_01`: Closeness to LDA topic 1  
+-   `LDA_02`: Closeness to LDA topic 2  
+-   `LDA_03`: Closeness to LDA topic 3  
+-   `LDA_04`: Closeness to LDA topic 4
 
-kw_min_min: Worst keyword (min. shares) kw_max_min: Worst keyword (max.
-shares) kw_avg_min: Worst keyword (avg. shares) kw_min_max: Best keyword
-(min. shares) kw_max_max: Best keyword (max. shares) kw_avg_max: Best
-keyword (avg. shares) kw_min_avg: Avg. keyword (min. shares) kw_max_avg:
-Avg. keyword (max. shares) kw_avg_avg: Avg. keyword (avg. shares)
+Additionally, some quality metrics related to the keywords have been
+calculated and will be used in this analysis. These metrics represent
+the average number of shares for publications with worst, best, and
+average keywords. The classification of keywords under these groups was
+made by the authors of the original paper. The keyword metrics are shown
+below.
 
-Mashable is one of the largest news websites from which the content of
-all the articles published in 2013 and 2014 was extracted.
+-   `kw_avg_min`: Worst keyword (avg. shares)  
+-   `kw_avg_max`: Best keyword (avg. shares)  
+-   `kw_avg_avg`: Avg. keyword (avg. shares)
 
-LDA means Latent Dirichlet Allocation algorithm and this algorithm was
-applied to the data set to Marshable texts (known before publication) to
-identify the 5 top relevant topics and then measure the closeness of the
-current article to such topic.
+Article content metrics were also used in this study. These are general
+metrics about the body of the publication that can influence the number
+of shares of that paper. The content summary metrics are shown below.
 
-# Relevance of topic metrics (5 top topics according to LDA).
+\-`num_videos`: Number of videos  
+-`n_tokens_content`: Number of words in the content  
+-`n_non_stop_unique_tokens`: Rate of unique non-stop words in the
+content  
+-`num_hrefs`: Number of links  
+-`num_self_hrefs`: Number of links to other articles published by
+Mashable  
+-`average_token_length`: Average length of the words in the content
 
-LDA_00: Closeness to LDA topic 0 LDA_01: Closeness to LDA topic 1
-LDA_02: Closeness to LDA topic 2 LDA_03: Closeness to LDA topic 3
-LDA_04: Closeness to LDA topic 4
+These data were collected during 2013 and 2014 on daily basis. To
+represent time dependent information, a binary variable indicating
+whether the publication was made in a weekend or weekday, `is_weekend`
+is used.
 
-Day of week on which papers were published
-
-weekday_is_monday: Was the article published on a Monday?
-weekday_is_tuesday: Was the article published on a Tuesday?
-weekday_is_wednesday: Was the article published on a Wednesday?
-weekday_is_thursday: Was the article published on a Thursday?
-weekday_is_friday: Was the article published on a Friday?
-weekday_is_saturday: Was the article published on a Saturday?
-weekday_is_sunday: Was the article published on a Sunday?
-
-article content summary metrics:
-
-n_tokens_title: Number of words in the title n_tokens_content: Number of
-words in the content n_unique_tokens: Rate of unique words in the
-content n_non_stop_words: Rate of non-stop words in the content
-n_non_stop_unique_tokens: Rate of unique non-stop words in the content
-num_hrefs: Number of links num_self_hrefs: Number of links to other
-articles published by Mashable num_imgs: Number of images num_videos:
-Number of videos average_token_length: Average length of the words in
-the content num_keywords: Number of keywords in the metadata
+## Required Packages
 
 Before we can begin our analysis, we must load in the following
 packages:
@@ -123,9 +131,15 @@ packages:
 ``` r
 library(tidyverse)
 library(caret)
-library(randomForest)
 library(knitr)
+library(corrplot)
 ```
+
+`Tidyverse` is used for data management and plotting through dplyr and
+ggplot packages. `Caret` package is used for data splitting and
+modeling. `Knitr` package is used for nice printing of tables.
+`Corrplot` is used for nice correlation plots assisting in
+visualization.
 
 ## Read in the Data
 
@@ -142,8 +156,10 @@ removed the original `data_channel_is_*` columns as well as two
 non-predictive columns `url` and `timedelta`.
 
 ``` r
+# reading in the data set
 rawData <- read_csv("../OnlineNewsPopularity.csv")
 
+# creating new variable to have more comprehensive names for data channels.
 rawDataChannel <- rawData %>%
   mutate(dataChannel = ifelse(data_channel_is_lifestyle == 1, "lifestyle", 
                               ifelse(data_channel_is_entertainment == 1, "entertainment", 
@@ -156,7 +172,7 @@ rawDataChannel <- rawData %>%
          -data_channel_is_bus, -data_channel_is_socmed, -data_channel_is_tech,
          -data_channel_is_world, -url, -timedelta)
 
-
+# assigning channel data to R objects.
 lifestyleData <- rawDataChannel %>%
   filter(dataChannel == "lifestyle")
 
@@ -184,11 +200,12 @@ set and assign it to the data set `activeData`. This will be the file we
 will use for the remainder of the report.
 
 To select the appropriate data channel based on the `params$channel`, we
-created a function `selectData` which would return the appropriate
-dataset and assign it to the dataset `activeData`. This will be the file
-we will use for the remainder of the report.
+created a function `selectData` which would return the appropriate data
+set and assign it to the data set `activeData`. This will be the file we
+will use for the remainder of the report.
 
 ``` r
+# function to assign automated calls for the different data channels
 selectData <- function(dataChannel) { 
   if (dataChannel == "lifestyle"){
     return(lifestyleData)
@@ -210,39 +227,49 @@ selectData <- function(dataChannel) {
   }
 }
 
+# activating corresponding data set.
 dataChannelSelect <- params$channel
 
 activeData <- selectData(dataChannelSelect)
 ```
 
-## Summarizations for data channel lifestyle
+## Summarizations for data channel *lifestyle*
 
-NEW TOPICS !!!!!!!!!!!!!!!!!!!!
+In this section, we will perform EDA for the data channel lifestyle
 
-### Subsetting Variables of Interest
+### Data Split
 
-Define .
+This section splits the data set into training and test sets for the
+proportion of 80/20. The data summarization will be conducted on the
+training set. To split the data, the function `createDataPartition()`,
+from `caret` package, was used with the argument `p=0.8` to represent
+80% of the data should be in the split. The function `set.seed(555)` was
+used to fix the random seed. The code below shows the creation of
+training and test sets.
 
 ``` r
-D1 = 1800
+set.seed(555)
 
-activeData$shares = as.factor(if_else(activeData$shares > D1,1,0))
+trainIndex <- createDataPartition(activeData$shares, p = 0.8, list = FALSE)
 
-activeData = activeData %>%
-  select(shares, starts_with("weekday_is_"), starts_with("kw_"),
-         starts_with("LDA_"),starts_with("n_"), starts_with("num_"), 
-         average_token_length,is_weekend)
+activeTrain <- activeData[trainIndex, ]
 
-# looking for NAs
-anyNA(activeData)
+activeTest <- activeData[-trainIndex, ]
 ```
-
-    ## [1] FALSE
 
 ### Data manipulation for statistics
 
+A new object is created in this section aiming to summarize publications
+during weekdays and weekends and create factor levels for them to match
+with `shares` variable. The functions `ifelse()` was used to vectorize
+the IF-ELSE statements associated to `mutate()` which took care of
+attaching the new variable to the data set. The function `factor()` was
+used to explicitly coerce the days of week into levels of the newly
+created categorical variable “Day”.
+
 ``` r
-statsData <- activeData %>%
+# IF-ELSE statements
+statsData <- activeTrain %>%
   mutate(Day = ifelse(weekday_is_monday == 1, "Monday", 
                       ifelse(weekday_is_tuesday == 1, "Tuesday", 
                       ifelse(weekday_is_wednesday == 1, "Wednesday", 
@@ -253,27 +280,32 @@ statsData <- activeData %>%
                              "missingdata")))))))) %>%
   mutate(Weekend = ifelse(is_weekend == 1, "Yes", "No"))
 
+# Assigning factor levels
 statsData$Day <- factor(statsData$Day, 
                 levels = c("Monday", "Tuesday", "Wednesday", "Thursday", 
                            "Friday", "Saturday", "Sunday"))
 ```
 
-### Belknap - Summary Stats
+### Belknap - Summary Statistics
 
 The following table gives us information about the summary statistics
-for the number of shares for articles in the data channel lifestyle.
+for the number of shares for articles in the data channel lifestyle. The
+`summary()` function was used to extract these metrics.
 
 ``` r
-table(activeData$shares)
+summary(activeTrain$shares)
 ```
 
-    ## 
-    ##    0    1 
-    ## 1152  947
+    ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+    ##      28    1100    1700    3744    3200  208300
 
 The following table gives us information about the average, median, and
 standard deviation for the number of shares based on whether the post
-was made on a weekend or a weekday.
+was made on a weekend or a weekday. The variable “weekend” was grouped,
+via `grouped_by()`, and for each level the sum, average, median, and
+standard deviation of shares were calculated via `sum()`, `mean()`,
+`meadian()`, `sd()`, and `summarise()` functions. The summary table is
+shown below.
 
 ``` r
 statsData %>% 
@@ -281,19 +313,63 @@ statsData %>%
   summarise(sumShares = sum(shares), avgShares = mean(shares), medShares = median(shares), sdShares = sd(shares))
 ```
 
+    ## # A tibble: 2 × 5
+    ##   Weekend sumShares avgShares medShares sdShares
+    ##   <chr>       <dbl>     <dbl>     <dbl>    <dbl>
+    ## 1 No        5034548     3691.      1500   10275.
+    ## 2 Yes       1259670     3974.      2200    5175.
+
 Likewise, this table gives us information about the number of shares by
-the day of the week.
+the day of the week. The same functions were used here, by applied to
+levels of variable “Day”. Also, the quantities maximum `max()` and
+minimum `min()` number of shares by levels of “Day” were calculated.
 
 ``` r
 statsData %>% 
   group_by(Day) %>%
   arrange(Day) %>%
-  summarise(sumShares = sum(shares), avgShares = mean(shares), medShares = median(shares), sdShares = sd(shares), maxShares = max(shares))
+  summarise(sumShares = sum(shares), avgShares = mean(shares), medShares = median(shares), sdShares = sd(shares), maxShares = max(shares),
+            minShares = min(shares))
 ```
 
-### Monti - Summary Stats
+    ## # A tibble: 7 × 7
+    ##   Day       sumShares avgShares medShares sdShares maxShares minShares
+    ##   <fct>         <dbl>     <dbl>     <dbl>    <dbl>     <dbl>     <dbl>
+    ## 1 Monday      1207141     4679.      1700   15581.    196700       109
+    ## 2 Tuesday     1203161     4506.      1500   14908.    208300        93
+    ## 3 Wednesday    912087     2923.      1500    4450.     35800        95
+    ## 4 Thursday     946325     3380.      1500    5897.     56000        28
+    ## 5 Friday       765834     3101.      1400    4860.     40400       127
+    ## 6 Saturday     643066     4122.      2250    5428.     43000       446
+    ## 7 Sunday       616604     3830.      2100    4931.     33100       613
+
+### Monti - Summary Statistics
+
+``` r
+# two-way contingency table between shares and Days
+```
+
+``` r
+# correlation matrix
+```
 
 ### Monti - Graphs (3)
+
+``` r
+# bivariate correlation plot
+```
+
+``` r
+# relationship between shares and LDA levels (facet_wrap+smooth)
+```
+
+``` r
+# relationship between shares and keyword metrics (color)
+```
+
+``` r
+# relationship between shares and content metrics (facet_wrap+smooth)
+```
 
 ### Belknap - Graphs (3)
 
@@ -308,6 +384,8 @@ titlewordcountGraph + geom_point(aes(color = Day)) +
   xlab("Number of Words in Title")
 ```
 
+![](lifestyle_files/figure-gfm/titlewordcountGraph-1.png)<!-- -->
+
 The following plot shows the number of shares by the rate of positive
 words in the article. A positive trend would indicate that articles with
 more positive words are shared more often than articles with negative
@@ -320,6 +398,8 @@ positivewordrateGraph + geom_point(aes(color = Day)) +
   ylab("Number of Shares") +
   xlab("Rate of Positive Words") 
 ```
+
+![](lifestyle_files/figure-gfm/positivewordrateGraph-1.png)<!-- -->
 
 The following plot shows the total number of shares as related to the
 parameter title subjectivity. A positive trend would indicate that
@@ -336,27 +416,83 @@ titleSubjectivityGraph + geom_point(aes(color = n_tokens_title)) +
   labs(color = "Word Count in Title")
 ```
 
-## Modeling
-
-### Data Split
-
-Prior to conducting regression analysis, we split the data into a
-training set (70%) and a test set (30%).
+### Subsetting Variables for Modeling
 
 ``` r
-set.seed(555)
+dfTrain = activeTrain %>%
+  select(shares, starts_with("LDA_"), average_token_length,
+         is_weekend, n_tokens_content, n_non_stop_unique_tokens, num_hrefs,
+         num_self_hrefs, num_videos, average_token_length, kw_avg_min, 
+         kw_avg_max, kw_avg_avg, is_weekend)
 
-trainIndex <- createDataPartition(activeData$shares, p = 0.7, list = FALSE)
+dfTest = activeTest %>%
+  select(shares, starts_with("LDA_"), average_token_length,
+         is_weekend, n_tokens_content, n_non_stop_unique_tokens, num_hrefs,
+         num_self_hrefs, num_videos, average_token_length, kw_avg_min, 
+         kw_avg_max, kw_avg_avg, is_weekend)
 
-
-activeTrain <- activeData[trainIndex, ]
-
-activeTest <- activeData[-trainIndex, ]
+# looking for NAs
+anyNA(dfTrain)
 ```
+
+    ## [1] FALSE
+
+``` r
+anyNA(dfTest)
+```
+
+    ## [1] FALSE
+
+## Modeling
+
+In this section, we will perform regression for prediction purposes for
+the data channel lifestyle.
 
 ### Belknap - Linear Regression Model Explanation
 
 ### Monti - Linear Regression Model
+
+``` r
+LASSO = train(shares~., data = dfTrain,
+              method="glmnet",
+              preProcess = c("center","scale"),
+              tuneGrid = expand.grid(alpha = 1, lambda = seq(0,10,0.1)),
+              trControl = trainControl(method="CV",number=5))
+
+plot(LASSO)
+```
+
+![](lifestyle_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+
+``` r
+coef(LASSO$finalModel, LASSO$bestTune$lambda)
+```
+
+    ## 16 x 1 sparse Matrix of class "dgCMatrix"
+    ##                                  s1
+    ## (Intercept)              3744.32957
+    ## LDA_00                      .      
+    ## LDA_01                   -163.86446
+    ## LDA_02                   -212.79783
+    ## LDA_03                    172.02226
+    ## LDA_04                      .      
+    ## average_token_length     -735.97479
+    ## is_weekend                -75.73633
+    ## n_tokens_content          781.11950
+    ## n_non_stop_unique_tokens  809.38299
+    ## num_hrefs                 278.15058
+    ## num_self_hrefs           -216.45534
+    ## num_videos                785.85667
+    ## kw_avg_min               -365.17607
+    ## kw_avg_max               -404.18746
+    ## kw_avg_avg                909.18695
+
+``` r
+postResample(pred = predict(LASSO, newdata = dfTest), obs = dfTest$shares)
+```
+
+    ##         RMSE     Rsquared          MAE 
+    ## 5.514858e+03 3.882426e-02 3.049372e+03
 
 ### Belknap - Linear Regression Model
 
@@ -366,77 +502,48 @@ activeTest <- activeData[-trainIndex, ]
 
 ### Belknap - Random Forest Model & Explanation
 
-NEEDS MORE WORK.
-
-NOW RF Works
-
 ``` r
 train.control = trainControl(method = "cv", number = 5)
 
 rfFit <- train(shares~.,
-               data = activeTrain,
+               data = dfTrain,
                method = "rf",
                trControl = train.control,
                preProcess = c("center","scale"),
                tuneGrid = data.frame(mtry = 1:5))
 
-plot(rfFit)
-```
-
-![](lifestyle_files/figure-gfm/RF-1.png)<!-- -->
-
-``` r
 rfFit$bestTune$mtry
 ```
 
-    ## [1] 4
+    ## [1] 1
+
+``` r
+plot(rfFit)
+```
+
+![](lifestyle_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 ``` r
 rfFit$results
 ```
 
-    ##   mtry  Accuracy     Kappa  AccuracySD    KappaSD
-    ## 1    1 0.5979712 0.1411520 0.007651678 0.01680267
-    ## 2    2 0.6027169 0.1756875 0.023063065 0.04636059
-    ## 3    3 0.5965875 0.1658111 0.010842895 0.02011173
-    ## 4    4 0.6040590 0.1819731 0.021403492 0.03977398
-    ## 5    5 0.6033996 0.1844343 0.013970096 0.02634027
+    ##   mtry     RMSE    Rsquared      MAE   RMSESD  RsquaredSD    MAESD
+    ## 1    1 8870.245 0.003022421 3509.842 4115.925 0.001827175 264.0684
+    ## 2    2 9043.676 0.002378389 3619.956 3977.387 0.001840506 229.4345
+    ## 3    3 9191.314 0.002449598 3683.992 3867.050 0.003495292 225.7122
+    ## 4    4 9314.535 0.001972980 3711.929 3795.512 0.002758264 206.7487
+    ## 5    5 9476.974 0.002241471 3753.965 3680.911 0.003498671 183.5011
 
 ``` r
 RF_pred <- predict(rfFit, newdata = activeTest)
 
-acc_rf = confusionMatrix(RF_pred, activeTest$shares)
+metric_rf = postResample(RF_pred, activeTest$shares)
 
-acc_rf
+metric_rf
 ```
 
-    ## Confusion Matrix and Statistics
-    ## 
-    ##           Reference
-    ## Prediction   0   1
-    ##          0 253 178
-    ##          1  92 106
-    ##                                          
-    ##                Accuracy : 0.5707         
-    ##                  95% CI : (0.531, 0.6098)
-    ##     No Information Rate : 0.5485         
-    ##     P-Value [Acc > NIR] : 0.1396         
-    ##                                          
-    ##                   Kappa : 0.1095         
-    ##                                          
-    ##  Mcnemar's Test P-Value : 2.304e-07      
-    ##                                          
-    ##             Sensitivity : 0.7333         
-    ##             Specificity : 0.3732         
-    ##          Pos Pred Value : 0.5870         
-    ##          Neg Pred Value : 0.5354         
-    ##              Prevalence : 0.5485         
-    ##          Detection Rate : 0.4022         
-    ##    Detection Prevalence : 0.6852         
-    ##       Balanced Accuracy : 0.5533         
-    ##                                          
-    ##        'Positive' Class : 0              
-    ## 
+    ##         RMSE     Rsquared          MAE 
+    ## 5.532774e+03 3.570029e-02 3.022682e+03
 
 ### Monti - Boosted Tree Model & Explanation
 
@@ -447,143 +554,141 @@ tunG = expand.grid(n.trees = seq(25,200,25),
                       n.minobsinnode = 10)
 
 gbmFit <- train(shares~.,
-               data = activeTrain, 
-               method = "gbm", 
+               data = dfTrain,
+               method = "gbm",
                preProcess = c("center","scale"),
                trControl = train.control,
                tuneGrid = tunG,
                verbose = FALSE
                )
 
+
 gbmFit$bestTune$n.trees
 ```
 
-    ## [1] 200
+    ## [1] 25
 
 ``` r
 gbmFit$bestTune$interaction.depth
 ```
 
-    ## [1] 3
-
-``` r
-gbmFit$results
-```
-
-    ##    shrinkage interaction.depth n.minobsinnode n.trees  Accuracy     Kappa AccuracySD
-    ## 1        0.1                 1             10      25 0.5973238 0.1487139 0.01824450
-    ## 9        0.1                 2             10      25 0.5926035 0.1429545 0.03208713
-    ## 17       0.1                 3             10      25 0.5979879 0.1593324 0.02427860
-    ## 25       0.1                 4             10      25 0.6027776 0.1719218 0.03159684
-    ## 2        0.1                 1             10      50 0.6075372 0.1763325 0.02319558
-    ## 10       0.1                 2             10      50 0.6000379 0.1694898 0.03805087
-    ## 18       0.1                 3             10      50 0.5966713 0.1676717 0.03794986
-    ## 26       0.1                 4             10      50 0.6034810 0.1795891 0.03123700
-    ## 3        0.1                 1             10      75 0.5973145 0.1592477 0.02420309
-    ## 11       0.1                 2             10      75 0.6000518 0.1731677 0.02752652
-    ## 19       0.1                 3             10      75 0.6014240 0.1810104 0.02346144
-    ## 27       0.1                 4             10      75 0.6089047 0.1965364 0.02399537
-    ## 4        0.1                 1             10     100 0.5953061 0.1573209 0.03209114
-    ## 12       0.1                 2             10     100 0.5987144 0.1723097 0.03742843
-    ## 20       0.1                 3             10     100 0.5986913 0.1776573 0.02255006
-    ## 28       0.1                 4             10     100 0.6081966 0.1981386 0.02087954
-    ## 5        0.1                 1             10     125 0.5871497 0.1403968 0.03654691
-    ## 13       0.1                 2             10     125 0.5987029 0.1734484 0.03186227
-    ## 21       0.1                 3             10     125 0.6035088 0.1888746 0.04251274
-    ## 29       0.1                 4             10     125 0.6082012 0.1974289 0.02640255
-    ## 6        0.1                 1             10     150 0.5993716 0.1691199 0.03407451
-    ## 14       0.1                 2             10     150 0.5993878 0.1783034 0.03294675
-    ## 22       0.1                 3             10     150 0.6061975 0.1952561 0.03128061
-    ## 30       0.1                 4             10     150 0.6088815 0.2010184 0.02311936
-    ## 7        0.1                 1             10     175 0.5966551 0.1643751 0.02890496
-    ## 15       0.1                 2             10     175 0.6102861 0.2029975 0.03360477
-    ## 23       0.1                 3             10     175 0.6095988 0.2050637 0.03681343
-    ## 31       0.1                 4             10     175 0.6041103 0.1920922 0.01819594
-    ## 8        0.1                 1             10     200 0.5973099 0.1687218 0.01783200
-    ## 16       0.1                 2             10     200 0.6068986 0.1958953 0.03909799
-    ## 24       0.1                 3             10     200 0.6143492 0.2138079 0.03864092
-    ## 32       0.1                 4             10     200 0.6088908 0.2023258 0.02216026
-    ##       KappaSD
-    ## 1  0.04165648
-    ## 9  0.06948879
-    ## 17 0.05096154
-    ## 25 0.06991226
-    ## 2  0.05261745
-    ## 10 0.08286753
-    ## 18 0.07878169
-    ## 26 0.06351774
-    ## 3  0.04949811
-    ## 11 0.05723323
-    ## 19 0.04790116
-    ## 27 0.04833588
-    ## 4  0.06532577
-    ## 12 0.07677901
-    ## 20 0.04587126
-    ## 28 0.04426816
-    ## 5  0.07401008
-    ## 13 0.06842551
-    ## 21 0.08557425
-    ## 29 0.05601335
-    ## 6  0.06836868
-    ## 14 0.06762362
-    ## 22 0.06187944
-    ## 30 0.04774974
-    ## 7  0.06155415
-    ## 15 0.06940888
-    ## 23 0.07405079
-    ## 31 0.03669803
-    ## 8  0.03637574
-    ## 16 0.07828347
-    ## 24 0.07739921
-    ## 32 0.04557493
+    ## [1] 1
 
 ``` r
 plot(gbmFit)
 ```
 
-![](lifestyle_files/figure-gfm/Boosting-1.png)<!-- -->
+![](lifestyle_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+
+``` r
+gbmFit$results
+```
+
+    ##    shrinkage interaction.depth n.minobsinnode n.trees     RMSE     Rsquared      MAE
+    ## 1        0.1                 1             10      25 8788.985 0.0007414257 3489.245
+    ## 9        0.1                 2             10      25 8856.292 0.0004302577 3512.172
+    ## 17       0.1                 3             10      25 8820.004 0.0031240516 3534.683
+    ## 25       0.1                 4             10      25 8875.835 0.0048739922 3568.447
+    ## 2        0.1                 1             10      50 8823.925 0.0015048263 3511.749
+    ## 10       0.1                 2             10      50 8993.563 0.0017866481 3572.414
+    ## 18       0.1                 3             10      50 8927.616 0.0031039507 3576.931
+    ## 26       0.1                 4             10      50 8985.645 0.0032934630 3598.711
+    ## 3        0.1                 1             10      75 8861.556 0.0011081213 3517.430
+    ## 11       0.1                 2             10      75 9047.249 0.0028400156 3600.477
+    ## 19       0.1                 3             10      75 9013.973 0.0033470183 3620.839
+    ## 27       0.1                 4             10      75 9142.823 0.0024595037 3653.866
+    ## 4        0.1                 1             10     100 8925.484 0.0009524989 3548.583
+    ## 12       0.1                 2             10     100 9055.929 0.0028359482 3596.893
+    ## 20       0.1                 3             10     100 9078.647 0.0034838045 3644.619
+    ## 28       0.1                 4             10     100 9228.481 0.0034315922 3706.355
+    ## 5        0.1                 1             10     125 8879.165 0.0020570536 3522.409
+    ## 13       0.1                 2             10     125 9078.230 0.0022739469 3607.353
+    ## 21       0.1                 3             10     125 9126.410 0.0048770106 3658.931
+    ## 29       0.1                 4             10     125 9282.674 0.0032960611 3722.264
+    ## 6        0.1                 1             10     150 8964.024 0.0023449245 3561.541
+    ## 14       0.1                 2             10     150 9154.439 0.0020368659 3630.409
+    ## 22       0.1                 3             10     150 9212.115 0.0040388646 3725.635
+    ## 30       0.1                 4             10     150 9404.493 0.0027451943 3772.983
+    ## 7        0.1                 1             10     175 8940.361 0.0027702602 3547.975
+    ## 15       0.1                 2             10     175 9252.640 0.0016944923 3683.072
+    ## 23       0.1                 3             10     175 9337.141 0.0037535017 3763.297
+    ## 31       0.1                 4             10     175 9485.299 0.0028027536 3788.470
+    ## 8        0.1                 1             10     200 8912.962 0.0026515664 3542.632
+    ## 16       0.1                 2             10     200 9294.443 0.0019202933 3695.467
+    ## 24       0.1                 3             10     200 9440.182 0.0031955806 3842.088
+    ## 32       0.1                 4             10     200 9573.463 0.0033783793 3815.943
+    ##      RMSESD   RsquaredSD    MAESD
+    ## 1  4500.328 0.0007141832 407.9339
+    ## 9  4449.286 0.0006294420 447.0841
+    ## 17 4412.426 0.0031474051 390.4971
+    ## 25 4412.377 0.0048685116 372.5653
+    ## 2  4494.209 0.0017258237 419.0667
+    ## 10 4310.492 0.0019865551 381.8312
+    ## 18 4337.830 0.0027881209 364.5948
+    ## 26 4285.603 0.0033887929 316.9604
+    ## 3  4458.708 0.0015129394 406.3520
+    ## 11 4282.894 0.0034071442 385.0306
+    ## 19 4244.655 0.0014121560 324.5552
+    ## 27 4162.345 0.0026115889 301.6090
+    ## 4  4424.120 0.0010656002 404.0305
+    ## 12 4305.715 0.0042418427 404.9206
+    ## 20 4193.049 0.0013827079 348.6834
+    ## 28 4088.838 0.0042186893 279.5469
+    ## 5  4456.321 0.0038030742 430.6010
+    ## 13 4286.816 0.0035220295 401.9497
+    ## 21 4109.276 0.0044508326 329.5915
+    ## 29 4052.605 0.0039504489 322.3776
+    ## 6  4353.654 0.0049270578 341.0178
+    ## 14 4221.027 0.0038254528 383.8067
+    ## 22 4057.260 0.0049381381 329.1074
+    ## 30 3996.758 0.0036672287 324.6305
+    ## 7  4390.961 0.0059538976 391.4487
+    ## 15 4151.233 0.0032685704 359.5012
+    ## 23 3955.196 0.0050398347 301.1976
+    ## 31 3889.354 0.0029183385 302.4780
+    ## 8  4402.355 0.0054072299 397.1601
+    ## 16 4064.894 0.0026758509 328.1074
+    ## 24 3901.892 0.0037739043 297.3476
+    ## 32 3815.401 0.0040364099 329.0511
 
 ``` r
 gbm_pred <- predict(gbmFit, newdata = activeTest)
 
-acc_boosting = confusionMatrix(gbm_pred, activeTest$shares)
+metric_boosting = postResample(gbm_pred, activeTest$shares)
 
-acc_boosting
+metric_boosting
 ```
 
-    ## Confusion Matrix and Statistics
-    ## 
-    ##           Reference
-    ## Prediction   0   1
-    ##          0 228 169
-    ##          1 117 115
-    ##                                           
-    ##                Accuracy : 0.5453          
-    ##                  95% CI : (0.5055, 0.5847)
-    ##     No Information Rate : 0.5485          
-    ##     P-Value [Acc > NIR] : 0.579856        
-    ##                                           
-    ##                   Kappa : 0.0669          
-    ##                                           
-    ##  Mcnemar's Test P-Value : 0.002564        
-    ##                                           
-    ##             Sensitivity : 0.6609          
-    ##             Specificity : 0.4049          
-    ##          Pos Pred Value : 0.5743          
-    ##          Neg Pred Value : 0.4957          
-    ##              Prevalence : 0.5485          
-    ##          Detection Rate : 0.3625          
-    ##    Detection Prevalence : 0.6312          
-    ##       Balanced Accuracy : 0.5329          
-    ##                                           
-    ##        'Positive' Class : 0               
-    ## 
+    ##         RMSE     Rsquared          MAE 
+    ## 5.641000e+03 3.925012e-03 2.945873e+03
 
-## Comparison & Conclusion - Monti or Belknap (whoever doesn’t do automation of R Markdown)
+## Comparison & Conclusion - Monti
 
 ``` r
-tb = data.frame(RF = acc_rf$overall[[1]],
-                Boosting = acc_boosting$overall[[1]])
+bestMethod = function(x){
+  
+  bestm = which.min(lapply(1:length(x), function(i) x[[i]][1]))
+  
+  out = switch(bestm,
+                "Random Forest",
+                "Boosting")
+  
+  return(out)
+  
+}
 
-kable(tb, caption = "Accuracy Metric by Ensemble Method on Test Set")
+tb = data.frame(RF = metric_rf, Boosting = metric_boosting)
+
+kable(tb, caption = "Accuracy Metric by Ensemble Method on Test Set",
+      digits = 3)
 ```
+
+|          |       RF | Boosting |
+|:---------|---------:|---------:|
+| RMSE     | 5532.774 | 5641.000 |
+| Rsquared |    0.036 |    0.004 |
+| MAE      | 3022.682 | 2945.873 |
+
+Accuracy Metric by Ensemble Method on Test Set
+
+The best model is Random Forest based on RMSE metric.

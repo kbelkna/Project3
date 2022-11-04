@@ -7,96 +7,73 @@ output:
     html_preview: false
     toc: true
 params:
-  channel: list("lifestyle","entertainment","bus","socmed","tech","world")
+  channel: "lifestyle"
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, error = FALSE, message = FALSE)
 ```
 
-# Project 3
+# Report for *`r params$channel`* Channel
 
-## Report for Data Channel = `r params$channel`
+This report contains Exploratory Data Analysis (EDA) about this data channel and a modeling section applying three regression methods. 
 
-## Monti - Introduction
+## Introduction
 
-The objective of this project is to analyze data 
+The objective of this analysis is to provide a comprehensive overview about publication metrics and their relationship with the number of shares that those publications presented during the study period. These data have been collected from Mashable website, one of the largest news websites from which the content of all the `r params$channel` channel articles published in 2013 and 2014 was extracted. These data were originally collected analyzed By Fernandes et al. (2015) work, in which the authors performed classification task comparing several machine learning algorithms. In the present study, the subset of the data used by Fernandes et al.(2015) corresponding to the data channel `r params$channel` is used for regression purposes. The response variable is the number of `shares` that the papers presented after publication. In other words, we will try to predict the number of shares the papers will have before publication. To perform the regression, Random Forest, Boosting, and Multiple Linear Regression are used. More information about the methods will be provided in further sections.    
+   
+   Some metrics have been calculated based on the information obtained from Marshable website. For instance, the Latent Dirichlet Allocation (LDA) was applied to the data set to identify the 5 top relevant topics and then measure the closeness of the current article to such topic. There are 5 relevance of topic metrics according to LDA:   
+   
+   - `LDA_00`: Closeness to LDA topic 0   
+   - `LDA_01`: Closeness to LDA topic 1   
+   - `LDA_02`: Closeness to LDA topic 2   
+   - `LDA_03`: Closeness to LDA topic 3   
+   - `LDA_04`: Closeness to LDA topic 4   
 
+   Additionally, some quality metrics related to the keywords have been calculated and will be used in this analysis. These metrics represent the average number of shares for publications with worst, best, and average keywords. The classification of keywords under these groups was made by the authors of the original paper. The keyword metrics are shown below.   
+   
+   - `kw_avg_min`: Worst keyword (avg. shares)   
+   - `kw_avg_max`: Best keyword (avg. shares)   
+   - `kw_avg_avg`: Avg. keyword (avg. shares)   
 
-timedelta: Days between the article publication and the data set acquisition (non-predictive)
+   Article content metrics were also used in this study. These are general metrics about the body of the publication that can influence the number of shares of that paper. The content summary metrics are shown below.   
+   
+   -`num_videos`: Number of videos   
+   -`n_tokens_content`: Number of words in the content   
+   -`n_non_stop_unique_tokens`: Rate of unique non-stop words in the content   
+   -`num_hrefs`: Number of links   
+   -`num_self_hrefs`: Number of links to other articles published by Mashable   
+   -`average_token_length`: Average length of the words in the content   
 
-Quality of keywords set of metrics:
+  These data were collected during 2013 and 2014 on daily basis. To represent time dependent information, a binary variable indicating whether the publication was made in a weekend or weekday, `is_weekend` is used.
 
-
-
-kw_min_min: Worst keyword (min. shares)
-kw_max_min: Worst keyword (max. shares)
-kw_avg_min: Worst keyword (avg. shares)
-kw_min_max: Best keyword (min. shares)
-kw_max_max: Best keyword (max. shares)
-kw_avg_max: Best keyword (avg. shares)
-kw_min_avg: Avg. keyword (min. shares)
-kw_max_avg: Avg. keyword (max. shares)
-kw_avg_avg: Avg. keyword (avg. shares)
-
-Mashable is one of the largest news websites from which the content of all the articles published in 2013 and 2014 was extracted.
-
-LDA means Latent Dirichlet Allocation algorithm and this algorithm was applied to the data set to Marshable texts (known before publication) to identify the 5 top relevant topics and then measure the closeness of the current article to such topic.
-
-# Relevance of topic metrics (5 top topics according to LDA).
-
-LDA_00: Closeness to LDA topic 0
-LDA_01: Closeness to LDA topic 1
-LDA_02: Closeness to LDA topic 2
-LDA_03: Closeness to LDA topic 3
-LDA_04: Closeness to LDA topic 4
-
-Day of week on which papers were published
-
-weekday_is_monday: Was the article published on a Monday?
-weekday_is_tuesday: Was the article published on a Tuesday?
-weekday_is_wednesday: Was the article published on a Wednesday?
-weekday_is_thursday: Was the article published on a Thursday?
-weekday_is_friday: Was the article published on a Friday?
-weekday_is_saturday: Was the article published on a Saturday?
-weekday_is_sunday: Was the article published on a Sunday?
-
-article content summary metrics:
-
-n_tokens_title: Number of words in the title
-n_tokens_content: Number of words in the content
-n_unique_tokens: Rate of unique words in the content
-n_non_stop_words: Rate of non-stop words in the content
-n_non_stop_unique_tokens: Rate of unique non-stop words in the content
-num_hrefs: Number of links
-num_self_hrefs: Number of links to other articles published by Mashable
-num_imgs: Number of images
-num_videos: Number of videos
-average_token_length: Average length of the words in the content
-num_keywords: Number of keywords in the metadata
+## Required Packages
 
 Before we can begin our analysis, we must load in the following packages:
 
-```{r libraries}
+```{r packages}
 
 library(tidyverse)
 library(caret)
-library(randomForest)
 library(knitr)
-
+library(corrplot)
 
 ```
 
+`Tidyverse` is used for data management and plotting through dplyr and ggplot packages. `Caret` package is used for data splitting and modeling. `Knitr` package is used for nice printing of tables. `Corrplot` is used for nice correlation plots assisting in visualization.
+
 ## Read in the Data
 
-Using the data file `OnlineNewsPopularity.csv`, we will read in the data and add a new column corresponding to the type of data channel from which the data was classified. The new variable will be called `dataChannel`. Note that there are some rows that are unclassified according to the six channels of interest and those are indicated by `other`.
-
-Once the data column is created, we can easily subset the data using the `filter` function to create a new data set for each data channel. We removed the original `data_channel_is_*` columns as well as two non-predictive columns `url` and `timedelta`.
+Using the data file `OnlineNewsPopularity.csv`, we will read in the data and add a new column corresponding to the type of data channel from which the data was classified. The new variable will be called `dataChannel`. Note that there are some rows that are unclassified according to the six channels of interest and those are indicated by `other`.   
+  
+  Once the data column is created, we can easily subset the data using the `filter` function to create a new data set for each data channel. We removed the original `data_channel_is_*` columns as well as two non-predictive columns `url` and `timedelta`.
 
 ```{r dataImport}
 
+# reading in the data set
 rawData <- read_csv("../OnlineNewsPopularity.csv")
 
+# creating new variable to have more comprehensive names for data channels.
 rawDataChannel <- rawData %>%
   mutate(dataChannel = ifelse(data_channel_is_lifestyle == 1, "lifestyle", 
                               ifelse(data_channel_is_entertainment == 1, "entertainment", 
@@ -109,7 +86,7 @@ rawDataChannel <- rawData %>%
          -data_channel_is_bus, -data_channel_is_socmed, -data_channel_is_tech,
          -data_channel_is_world, -url, -timedelta)
 
-
+# assigning channel data to R objects.
 lifestyleData <- rawDataChannel %>%
   filter(dataChannel == "lifestyle")
 
@@ -133,12 +110,13 @@ worldData <- rawDataChannel %>%
 
 ## Select Data for Appropriate Data Channel
 
-To select the appropriate data channel based on the `params$channel`, we created a function `selectData` which would return the appropriate data set and assign it to the data set `activeData`. This will be the file we will use for the remainder of the report.
-
-To select the appropriate data channel based on the `params$channel`, we created a function `selectData` which would return the appropriate dataset and assign it to the dataset `activeData`. This will be the file we will use for the remainder of the report.
+To select the appropriate data channel based on the `params$channel`, we created a function `selectData` which would return the appropriate data set and assign it to the data set `activeData`. This will be the file we will use for the remainder of the report.   
+  
+  To select the appropriate data channel based on the `params$channel`, we created a function `selectData` which would return the appropriate data set and assign it to the data set `activeData`. This will be the file we will use for the remainder of the report.
 
 ```{r selectData}
 
+# function to assign automated calls for the different data channels
 selectData <- function(dataChannel) { 
   if (dataChannel == "lifestyle"){
     return(lifestyleData)
@@ -160,42 +138,43 @@ selectData <- function(dataChannel) {
   }
 }
 
+# activating corresponding data set.
 dataChannelSelect <- params$channel
 
 activeData <- selectData(dataChannelSelect)
 
 ```
 
-## Summarizations for data channel `r params$channel`
 
-NEW TOPICS !!!!!!!!!!!!!!!!!!!!
+## Summarizations for data channel *`r params$channel`*
 
-### Subsetting Variables of Interest
+In this section, we will perform EDA for the data channel `r params$channel`
 
-Define `r D1 = 2300`.
+### Data Split
 
-```{r}
+This section splits the data set into training and test sets for the proportion of 80/20. The data summarization will be conducted on the training set. To split the data, the function `createDataPartition()`, from `caret` package, was used with the argument `p=0.8` to represent 80% of the data should be in the split. The function `set.seed(555)` was used to fix the random seed. The code below shows the creation of training and test sets.
 
-D1 = 1800
+```{r splitData}
 
-activeData$shares = as.factor(if_else(activeData$shares > D1,1,0))
+set.seed(555)
 
-activeData = activeData %>%
-  select(shares, starts_with("weekday_is_"), starts_with("kw_"),
-         starts_with("LDA_"),starts_with("n_"), starts_with("num_"), 
-         average_token_length,is_weekend)
+trainIndex <- createDataPartition(activeData$shares, p = 0.8, list = FALSE)
 
-# looking for NAs
-anyNA(activeData)
+activeTrain <- activeData[trainIndex, ]
 
+activeTest <- activeData[-trainIndex, ]
 
 ```
 
+
 ### Data manipulation for statistics
 
-```{r statsData, eval=FALSE}
+A new object is created in this section aiming to summarize publications during weekdays and weekends and create factor levels for them to match with `shares` variable. The functions `ifelse()` was used to vectorize the IF-ELSE statements associated to `mutate()` which took care of attaching the new variable to the data set. The function `factor()` was used to explicitly coerce the days of week into levels of the newly created categorical variable "Day".
 
-statsData <- activeData %>%
+```{r statsData}
+
+# IF-ELSE statements
+statsData <- activeTrain %>%
   mutate(Day = ifelse(weekday_is_monday == 1, "Monday", 
                       ifelse(weekday_is_tuesday == 1, "Tuesday", 
                       ifelse(weekday_is_wednesday == 1, "Wednesday", 
@@ -206,26 +185,26 @@ statsData <- activeData %>%
                              "missingdata")))))))) %>%
   mutate(Weekend = ifelse(is_weekend == 1, "Yes", "No"))
 
+# Assigning factor levels
 statsData$Day <- factor(statsData$Day, 
                 levels = c("Monday", "Tuesday", "Wednesday", "Thursday", 
                            "Friday", "Saturday", "Sunday"))
 
 ```
 
-### Belknap - Summary Stats
+### Belknap - Summary Statistics
 
-The following table gives us information about the summary statistics for the number of shares for articles in the data channel `r params$channel`.
+The following table gives us information about the summary statistics for the number of shares for articles in the data channel `r params$channel`. The `summary()` function was used to extract these metrics.
 
 ```{r summaryStats}
 
-table(activeData$shares)
+summary(activeTrain$shares)
 
 ```
 
-The following table gives us information about the average, median, and standard deviation for the number of shares based on whether the post was made on a weekend or a weekday.
+The following table gives us information about the average, median, and standard deviation for the number of shares based on whether the post was made on a weekend or a weekday. The variable "weekend" was grouped, via `grouped_by()`, and for each level the sum, average, median, and standard deviation of shares were calculated via `sum()`, `mean()`, `meadian()`, `sd()`, and `summarise()` functions. The summary table is shown below.
 
-
-```{r table1, eval=FALSE}
+```{r table1}
 
 statsData %>% 
   group_by(Weekend) %>%
@@ -233,30 +212,80 @@ statsData %>%
 
 ```
 
-Likewise, this table gives us information about the number of shares by the day of the week. 
+Likewise, this table gives us information about the number of shares by the day of the week. The same functions were used here, by applied to levels of variable "Day". Also, the quantities maximum `max()` and minimum `min()` number of shares by levels of "Day" were calculated.
 
-
-```{r table2, eval=FALSE}
+```{r table2}
 
 statsData %>% 
   group_by(Day) %>%
   arrange(Day) %>%
-  summarise(sumShares = sum(shares), avgShares = mean(shares), medShares = median(shares), sdShares = sd(shares), maxShares = max(shares))
+  summarise(sumShares = sum(shares), avgShares = mean(shares), medShares = median(shares), sdShares = sd(shares), maxShares = max(shares),
+            minShares = min(shares))
 
 ```
 
 
+### Monti - Summary Statistics
 
-### Monti - Summary Stats
+```{r}
+
+# two-way contingency table between shares and Days
+
+
+
+```
+
+
+```{r}
+
+# correlation matrix
+
+
+
+```
 
 
 ### Monti - Graphs (3)
+
+```{r}
+
+# bivariate correlation plot
+
+
+
+```
+
+
+```{r}
+
+# relationship between shares and LDA levels (facet_wrap+smooth)
+
+
+
+```
+
+```{r}
+
+# relationship between shares and keyword metrics (color)
+
+
+
+```
+
+```{r}
+
+# relationship between shares and content metrics (facet_wrap+smooth)
+
+
+
+```
+
 
 ### Belknap - Graphs (3)
 
 The following graph shows the number of shares compared to the number of words in the title. The output is colored by the day of the week. 
 
-```{r titlewordcountGraph, eval=FALSE}
+```{r titlewordcountGraph}
 
 titlewordcountGraph <- ggplot(statsData, aes(x = n_tokens_title, y = shares))
 titlewordcountGraph + geom_point(aes(color = Day)) + 
@@ -268,8 +297,7 @@ titlewordcountGraph + geom_point(aes(color = Day)) +
 
 The following plot shows the number of shares by the rate of positive words in the article. A positive trend would indicate that articles with more positive words are shared more often than articles with negative words.
 
-
-```{r positivewordrateGraph, eval=FALSE}
+```{r positivewordrateGraph}
 
 positivewordrateGraph <- ggplot(statsData, aes(x = rate_positive_words, y = shares))
 positivewordrateGraph + geom_point(aes(color = Day)) + 
@@ -280,7 +308,6 @@ positivewordrateGraph + geom_point(aes(color = Day)) +
 ```
 
 The following plot shows the total number of shares as related to the parameter title subjectivity. A positive trend would indicate that articles are shared more often when the title is subjective. A negative trend would indicate that articles are shared more often when the title is less subjective.
-
 
 ```{r titleSubjectivityGraph, eval=FALSE}
 
@@ -293,7 +320,27 @@ titleSubjectivityGraph + geom_point(aes(color = n_tokens_title)) +
 
 ```
 
+### Subsetting Variables for Modeling
 
+```{r choseVars}
+
+dfTrain = activeTrain %>%
+  select(shares, starts_with("LDA_"), average_token_length,
+         is_weekend, n_tokens_content, n_non_stop_unique_tokens, num_hrefs,
+         num_self_hrefs, num_videos, average_token_length, kw_avg_min, 
+         kw_avg_max, kw_avg_avg, is_weekend)
+
+dfTest = activeTest %>%
+  select(shares, starts_with("LDA_"), average_token_length,
+         is_weekend, n_tokens_content, n_non_stop_unique_tokens, num_hrefs,
+         num_self_hrefs, num_videos, average_token_length, kw_avg_min, 
+         kw_avg_max, kw_avg_avg, is_weekend)
+
+# looking for NAs
+anyNA(dfTrain)
+anyNA(dfTest)
+
+```
 
 
 
@@ -301,26 +348,33 @@ titleSubjectivityGraph + geom_point(aes(color = n_tokens_title)) +
 
 ## Modeling
 
-### Data Split
-
-Prior to conducting regression analysis, we split the data into a training set (70%) and a test set (30%).
-
-```{r splitData}
-
-set.seed(555)
-
-trainIndex <- createDataPartition(activeData$shares, p = 0.7, list = FALSE)
-
-
-activeTrain <- activeData[trainIndex, ]
-
-activeTest <- activeData[-trainIndex, ]
-
-```
+In this section, we will perform regression for prediction purposes for the data channel `r params$channel`.
 
 ### Belknap - Linear Regression Model Explanation
 
 ### Monti - Linear Regression Model
+
+```{r}
+
+LASSO = train(shares~., data = dfTrain,
+              method="glmnet",
+              preProcess = c("center","scale"),
+              tuneGrid = expand.grid(alpha = 1, lambda = seq(0,10,0.1)),
+              trControl = trainControl(method="CV",number=5))
+
+plot(LASSO)
+
+coef(LASSO$finalModel, LASSO$bestTune$lambda)
+
+```
+
+
+```{r}
+postResample(pred = predict(LASSO, newdata = dfTest), obs = dfTest$shares)
+
+```
+
+
 
 ### Belknap - Linear Regression Model
 
@@ -330,34 +384,44 @@ activeTest <- activeData[-trainIndex, ]
 
 ### Belknap - Random Forest Model & Explanation
 
-NEEDS MORE WORK.
-
-
-
-NOW RF Works
-
 ```{r RF}
 
 train.control = trainControl(method = "cv", number = 5)
 
 rfFit <- train(shares~.,
-               data = activeTrain,
+               data = dfTrain,
                method = "rf",
                trControl = train.control,
                preProcess = c("center","scale"),
                tuneGrid = data.frame(mtry = 1:5))
 
+rfFit$bestTune$mtry
+
+```
+
+
+
+```{r}
+
 plot(rfFit)
 
-rfFit$bestTune$mtry
+```
+
+
+```{r}
 
 rfFit$results
 
+```
+
+
+```{r}
+
 RF_pred <- predict(rfFit, newdata = activeTest)
 
-acc_rf = confusionMatrix(RF_pred, activeTest$shares)
+metric_rf = postResample(RF_pred, activeTest$shares)
 
-acc_rf
+metric_rf
 
 ```
 
@@ -372,40 +436,66 @@ tunG = expand.grid(n.trees = seq(25,200,25),
                       n.minobsinnode = 10)
 
 gbmFit <- train(shares~.,
-               data = activeTrain, 
-               method = "gbm", 
+               data = dfTrain,
+               method = "gbm",
                preProcess = c("center","scale"),
                trControl = train.control,
                tuneGrid = tunG,
                verbose = FALSE
                )
 
+
 gbmFit$bestTune$n.trees
+
 gbmFit$bestTune$interaction.depth
 
-gbmFit$results
+```
+
+```{r}
 
 plot(gbmFit)
 
+```
+
+```{r}
+gbmFit$results
+
+```
+
+
+```{r}
 gbm_pred <- predict(gbmFit, newdata = activeTest)
 
-acc_boosting = confusionMatrix(gbm_pred, activeTest$shares)
+metric_boosting = postResample(gbm_pred, activeTest$shares)
 
-acc_boosting
+metric_boosting
+
+```
+
+
+## Comparison & Conclusion - Monti
+
+```{r comparison}
+
+bestMethod = function(x){
+  
+  bestm = which.min(lapply(1:length(x), function(i) x[[i]][1]))
+  
+  out = switch(bestm,
+                "Random Forest",
+                "Boosting")
+  
+  return(out)
+  
+}
+
+tb = data.frame(RF = metric_rf, Boosting = metric_boosting)
+
+kable(tb, caption = "Accuracy Metric by Ensemble Method on Test Set",
+      digits = 3)
 
 ```
 
+The best model is `r bestMethod(tb)` based on RMSE metric.
 
-
-## Comparison & Conclusion - Monti or Belknap (whoever doesn't do automation of R Markdown)
-
-```{r eval=FALSE}
-
-tb = data.frame(RF = acc_rf$overall[[1]],
-                Boosting = acc_boosting$overall[[1]])
-
-kable(tb, caption = "Accuracy Metric by Ensemble Method on Test Set")
-
-
-```
 
