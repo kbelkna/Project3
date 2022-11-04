@@ -33,7 +33,7 @@ The analysis for [Tech articles is available here](tech.html).
 
 The analysis for [World articles is available here](world.html).
 
-## Code to Run All Analysis
+## Code to Run Analysis for All Data Channels
 
 This section shows the R code used to run all analysis listed above.
 
