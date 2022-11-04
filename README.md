@@ -1,7 +1,7 @@
 # Project 3
-================
-Kara Belknap & Cassio Monti
-2022-10-29
+================    
+  Kara Belknap & Cassio Monti   
+  2022-10-29
 
 ## Purpose of the Repository
 
