@@ -9,12 +9,11 @@ The purpose of this repository is to provide EDA and modeling for different data
 
 ## List of Packages
 
-The packages listed in this section are used throughout the analysis. `Tidyverse` is used for data management and plotting through `dplyr` and `ggplot` packages. `Caret` and `gbm` packages are used for data splitting and modeling. `Knitr` package is used for nice printing of tables. `GGally` is used for nice correlation and exploratory plots assisting in the visualization.
+The packages listed in this section are used throughout the analysis. `Tidyverse` is used for data management and plotting through `dplyr` and `ggplot` packages. `Caret` package is used for data splitting and modeling. `Knitr` package is used for nice printing of tables. `GGally` is used for nice correlation and exploratory plots assisting in the visualization.
 
 ```{r}
 library(tidyverse)
 library(caret)
-library(gbm)
 library(knitr)
 library(GGally)
 ```
