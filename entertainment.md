@@ -14,9 +14,9 @@ Kara Belknap & Cassio Monti
     -   <a href="#select-data-for-appropriate-data-channel"
         id="toc-select-data-for-appropriate-data-channel">Select Data for
         Appropriate Data Channel</a>
-    -   <a href="#summarizations-for-data-channel-entertainment"
-        id="toc-summarizations-for-data-channel-entertainment">Summarizations
-        for data channel <em>entertainment</em></a>
+    -   <a href="#summarizations-for-the-data-channel-entertainment"
+        id="toc-summarizations-for-the-data-channel-entertainment">Summarizations
+        for the Data Channel <em>entertainment</em></a>
         -   <a href="#data-split" id="toc-data-split">Data Split</a>
         -   <a href="#data-manipulation-for-statistics"
             id="toc-data-manipulation-for-statistics">Data manipulation for
@@ -25,8 +25,8 @@ Kara Belknap & Cassio Monti
             id="toc-belknap---summary-statistics">Belknap - Summary Statistics</a>
         -   <a href="#monti---summary-statistics"
             id="toc-monti---summary-statistics">Monti - Summary Statistics</a>
-        -   <a href="#monti---graphs-3" id="toc-monti---graphs-3">Monti - Graphs
-            (3)</a>
+        -   <a href="#monti---graphs-5" id="toc-monti---graphs-5">Monti - Graphs
+            (5)</a>
         -   <a href="#belknap---graphs-3" id="toc-belknap---graphs-3">Belknap -
             Graphs (3)</a>
         -   <a href="#subsetting-variables-for-modeling"
@@ -51,6 +51,7 @@ Kara Belknap & Cassio Monti
     -   <a href="#comparison--conclusion---monti"
         id="toc-comparison--conclusion---monti">Comparison &amp; Conclusion -
         Monti</a>
+    -   <a href="#reference-list" id="toc-reference-list">Reference List</a>
 
 # Report for *entertainment* Channel
 
@@ -64,20 +65,26 @@ about publication metrics and their relationship with the number of
 shares that those publications presented during the study period. These
 data have been collected from Mashable website, one of the largest news
 websites from which the content of all the entertainment channel
-articles published in 2013 and 2014 was extracted. These data were
-originally collected analyzed By Fernandes et al. (2015) work, in which
-the authors performed classification task comparing several machine
-learning algorithms. In the present study, the subset of the data used
-by Fernandes et al.(2015) corresponding to the data channel
-entertainment is used for regression purposes. The response variable is
-the number of `shares` that the papers presented after publication. In
-other words, we will try to predict the number of shares the papers will
-have before publication. To perform the regression, Random Forest,
-Boosting, and Multiple Linear Regression are used. More information
-about the methods will be provided in further sections.
+articles published in 2013 and 2014 was extracted. The full data
+description can be found
+[here](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity).
+These data were originally collected and analyzed By Fernandes et
+al. (2015), in which the authors performed classification task comparing
+several machine learning algorithms. In the present study, a subset of
+the data used by Fernandes et al.(2015) corresponding to the data
+channel entertainment is used for regression purposes. The response
+variable is the number of `shares` that the papers presented after
+publication. In other words, we will try to predict the number of shares
+that the papers will have before publication and evaluate the prediction
+of each selected model based on some common metrics, such as RMSE (Root
+Mean Squared Error), Rsquared (Coefficient of Determination), and MAE
+(Mean Absolute Error) applied to the test set. To perform the
+regression, the methods: Random Forest, Boosting, Multiple Linear
+Regression, and LASSO regression will be used. More information about
+the methods will be corresponding in further sections.
 
 Some metrics have been calculated based on the information obtained from
-Marshable website. For instance, the Latent Dirichlet Allocation (LDA)
+Mashable website. For instance, the Latent Dirichlet Allocation (LDA)
 was applied to the data set to identify the 5 top relevant topics and
 then measure the closeness of the current article to such topic. There
 are 5 relevance of topic metrics according to LDA:
@@ -125,14 +132,14 @@ packages:
 ``` r
 library(tidyverse)
 library(caret)
-library(PerformanceAnalytics)
+library(GGally)
 library(knitr)
 ```
 
 `Tidyverse` is used for data management and plotting through dplyr and
 ggplot packages. `Caret` package is used for data splitting and
 modeling. `knitr` package is used to provide nice looking tables.
-`PerformanceAnalytics` is used for nice correlation plots assisting in
+`GGally` is used for nice correlation and exploratory plots assisting in
 the visualization.
 
 ## Read in the Data
@@ -227,17 +234,17 @@ dataChannelSelect <- params$channel
 activeData <- selectData(dataChannelSelect)
 ```
 
-## Summarizations for data channel *entertainment*
+## Summarizations for the Data Channel *entertainment*
 
 In this section, we will perform EDA for the data channel entertainment
 
 ### Data Split
 
 This section splits the data set into training and test sets for the
-proportion of 70/30. The data summarization will be conducted on the
+proportion of 70/30. The data summarizing will be conducted on the
 training set. To split the data, the function `createDataPartition()`,
 from `caret` package, was used with the argument `p=0.7` to represent
-80% of the data should be in the split. The function `set.seed(555)` was
+70% of the data should be in the split. The function `set.seed(555)` was
 used to fix the random seed. The code below shows the creation of
 training and test sets.
 
@@ -304,14 +311,16 @@ shown below.
 ``` r
 statsData %>% 
   group_by(Weekend) %>%
-  summarise(sumShares = sum(shares), avgShares = mean(shares), medShares = median(shares), sdShares = sd(shares))
+  summarise(sumShares = sum(shares), avgShares = mean(shares), medShares = median(shares), sdShares = sd(shares)) %>% 
+  kable(caption = "Statistics for Shares for Weekend or Weekdays") 
 ```
 
-    ## # A tibble: 2 × 5
-    ##   Weekend sumShares avgShares medShares sdShares
-    ##   <chr>       <dbl>     <dbl>     <dbl>    <dbl>
-    ## 1 No       12476151     2883.      1100    8133.
-    ## 2 Yes       2315889     3772.      1700    6189.
+| Weekend | sumShares | avgShares | medShares | sdShares |
+|:--------|----------:|----------:|----------:|---------:|
+| No      |  12476151 |  2883.326 |      1100 | 8132.781 |
+| Yes     |   2315889 |  3771.806 |      1700 | 6189.207 |
+
+Statistics for Shares for Weekend or Weekdays
 
 Likewise, this table gives us information about the number of shares by
 the day of the week. The same functions were used here, by applied to
@@ -323,19 +332,21 @@ statsData %>%
   group_by(Day) %>%
   arrange(Day) %>%
   summarise(sumShares = sum(shares), avgShares = mean(shares), medShares = median(shares), sdShares = sd(shares), maxShares = max(shares),
-            minShares = min(shares))
+            minShares = min(shares)) %>% 
+  kable(caption = "Statistics for Shares Across Days of Week")
 ```
 
-    ## # A tibble: 7 × 7
-    ##   Day       sumShares avgShares medShares sdShares maxShares minShares
-    ##   <fct>         <dbl>     <dbl>     <dbl>    <dbl>     <dbl>     <dbl>
-    ## 1 Monday      2859993     2927.      1100    7384.    112600        59
-    ## 2 Tuesday     2388631     2739.      1100    5950.     63300        47
-    ## 3 Wednesday   2653011     2909.      1100    9164.    138700        49
-    ## 4 Thursday    2696500     3082.      1100   10687.    197600        57
-    ## 5 Friday      1878016     2718.      1200    6102.     82200        82
-    ## 6 Saturday     862980     3398.      1600    5792.     57500       183
-    ## 7 Sunday      1452909     4036.      1800    6450.     69500       171
+| Day       | sumShares | avgShares | medShares |  sdShares | maxShares | minShares |
+|:----------|----------:|----------:|----------:|----------:|----------:|----------:|
+| Monday    |   2859993 |  2927.321 |      1100 |  7383.656 |    112600 |        59 |
+| Tuesday   |   2388631 |  2739.256 |      1100 |  5950.416 |     63300 |        47 |
+| Wednesday |   2653011 |  2909.003 |      1100 |  9163.614 |    138700 |        49 |
+| Thursday  |   2696500 |  3081.714 |      1100 | 10686.908 |    197600 |        57 |
+| Friday    |   1878016 |  2717.823 |      1200 |  6101.696 |     82200 |        82 |
+| Saturday  |    862980 |  3397.559 |      1600 |  5791.844 |     57500 |       183 |
+| Sunday    |   1452909 |  4035.858 |      1800 |  6449.736 |     69500 |       171 |
+
+Statistics for Shares Across Days of Week
 
 ### Monti - Summary Statistics
 
@@ -355,30 +366,32 @@ A second discrete analysis performed here is the two-way contingency
 table related to the discretization of the response variable if we
 divided `shares` into two categories. The function `cut()` was used for
 the end. In this case, we count the frequency of the number of
-publications in days of week with the two levels of response variable.
-These levels represent smaller number of shares (on the left) and larger
-number of shares (on the right). The table below shows this counting.
+publications in the weekend versus working days with the two levels of
+response variable. These levels represent smaller number of shares (on
+the left) and larger number of shares (on the right). The table below
+shows this counting. In the table below, 0 (zero) represents working
+days and 1 (one) represents weekends.
 
 ``` r
-table(statsData$Day, cut(statsData$shares, breaks = 2))
+table(activeTrain$is_weekend, cut(activeTrain$shares, breaks = 2)) %>%
+  kable(caption = "Frequency of Shares in Weekend vs in Working Days")
 ```
 
-    ##            
-    ##             (-151,9.88e+04] (9.88e+04,1.98e+05]
-    ##   Monday                976                   1
-    ##   Tuesday               872                   0
-    ##   Wednesday             909                   3
-    ##   Thursday              873                   2
-    ##   Friday                691                   0
-    ##   Saturday              254                   0
-    ##   Sunday                360                   0
+|     | (-151,9.88e+04\] | (9.88e+04,1.98e+05\] |
+|:----|-----------------:|---------------------:|
+| 0   |             4321 |                    6 |
+| 1   |              614 |                    0 |
 
-An important EDA analysis for regression tasks is the calculation of
-correlation matrix. The function `cor()` is used in this section to
-return the top 10 most correlated potential predictor variables with the
-response variable `shares`. The code below presents the process of
-obtaining these variables and their respective correlations with the
-response variable.
+Frequency of Shares in Weekend vs in Working Days
+
+An important EDA analysis for regression tasks is the correlation
+matrix. The function `cor()` is used in this section to return the top
+10 most correlated potential predictor variables with the response
+variable `shares`. The code below presents the process of obtaining
+these variables and their respective correlations with the response
+variable. The correlations are clearly small for this case, which may
+difficult the modeling process and produce low quality of prediction
+metrics.
 
 ``` r
 var_sel = select(activeTrain,starts_with("LDA_"), average_token_length,
@@ -433,8 +446,19 @@ The variables that present most correlation with the response variable
 `shares` are LDA_00, LDA_01, LDA_02, LDA_03, LDA_04, is_weekend,
 num_hrefs, kw_avg_min, kw_avg_max, kw_avg_avg. These variables will be
 studied in more depth via PCA to understand the orientation of the most
-variable potential predictors. The code below presents the PCA analysis
-as part of the EDA.
+important potential predictors. The code below presents the PCA analysis
+as part of the EDA. The 10 PCs displayed in the table below correspond
+to the most variable combination of the 10 predictors, which the PC1 has
+the most variation in the data, PC2 presents the second most variation
+and so on. The coefficients associated to each variable are the loadings
+and they give the idea of importance of that particular variable to the
+variance of the 10 predictor variables. The negative values only mean
+that the orientation of the weights are opposite in the same PC. Since
+the first PC has the largest variability, it is possible to say that the
+variables with more weights in PC1 are the most important variables for
+the variance of the predictors. This variables are supposed to present
+large influence on the explanation of the variance of the response
+variable. The table below show these numbers.
 
 ``` r
 id = which(colnames(activeTrain) %in% var_cor)
@@ -444,7 +468,7 @@ PC = prcomp(activeTrain[,id], center = TRUE, scale = TRUE)
 
 pc_directions=as.data.frame(PC$rotation)
 
-kable(pc_directions, caption="PCs for EDA", digits = 3)
+kable(pc_directions, caption="Principal Components for EDA", digits = 3)
 ```
 
 |            |    PC1 |    PC2 |    PC3 |    PC4 |    PC5 |    PC6 |    PC7 |    PC8 |    PC9 |  PC10 |
@@ -460,12 +484,24 @@ kable(pc_directions, caption="PCs for EDA", digits = 3)
 | LDA_03     | -0.607 | -0.172 | -0.213 |  0.188 | -0.009 |  0.035 |  0.187 | -0.193 |  0.009 | 0.669 |
 | LDA_04     |  0.129 | -0.032 | -0.438 |  0.136 | -0.574 | -0.020 | -0.470 |  0.433 | -0.030 | 0.181 |
 
-PCs for EDA
+Principal Components for EDA
 
-### Monti - Graphs (3)
+``` r
+id2 = which(abs(pc_directions$PC1) %in% 
+             sort(abs(pc_directions$PC1),dec= T)[1:3])
+```
+
+It is possible to see that the three most important variables in PC1 are
+kw_avg_max, LDA_01, LDA_03 from the table above. These variables are
+considered the most important variables in terms of variance of the
+predictor variables. Although the metrics for prediction are expected to
+be poor, these variables are expected to show the most influence to the
+explanation of the variance of the response `shares`.
+
+### Monti - Graphs (5)
 
 The plot below presents histograms, scatter plots, and correlations in a
-bivariate structure of the top 5 variables chosen the correlation
+bivariate structure of the top 5 variables chosen in the correlation
 analysis. Notice the shape of the distributions and the values of the
 correlations for the first column, which the one related to the response
 variable `shares`.
@@ -473,16 +509,16 @@ variable `shares`.
 ``` r
 # bivariate correlation plot
 cor_data <- select(activeTrain,shares,var_id[1:5])
-chart.Correlation(cor_data, histogram=TRUE)
+ggpairs(cor_data)
 ```
 
 ![](entertainment_files/figure-gfm/correlplot-1.png)<!-- -->
 
 The biplot below presents the PC1 and PC2 from the PCA analysis. The
 function `ggplot()` was used to create the plot and the segments created
-via `geom_segment()` were rescaled so that we could better see the
+via `geom_segment()` were re-scaled so that we could better see the
 variable names. The most variation in the data is contained in the PC1,
-hence, the most important variables in the data approximately are
+hence, the most important variables in the data are approximately
 oriented towards the axis of PC1 and, therefore, may be good predictors
 for the `shares` response. Likewise, for PC2, which contains the second
 most variability in the data set, the variables that are oriented
@@ -496,7 +532,7 @@ pc_df<-data.frame(PC$x)
 ggplot(pc_directions)+
   geom_point(data = pc_df, mapping = aes(x=PC1, y=PC2))+
   geom_segment(aes(x = 0, y = 0, yend = 50 * PC2, xend = 50 * PC1))+
-  geom_label(mapping = aes(, x = 51 * PC1, y = 51 * PC2, label = row.names(pc_directions)))
+  geom_label(mapping = aes(x = 51 * PC1, y = 51 * PC2, label = row.names(pc_directions)))
 ```
 
 ![](entertainment_files/figure-gfm/biplot-1.png)<!-- -->
@@ -641,7 +677,8 @@ dfTest = activeTest %>%
 
 In this section, we will perform regression for prediction purposes for
 the data channel entertainment. All models were fitted using 5-fold
-Cross-Validation via `train()` function from `caret` package.
+Cross-Validation via `train()` function from `caret` package. All
+variables were scaled and centered as well.
 
 ### Belknap - Linear Regression Model Explanation
 
@@ -650,15 +687,19 @@ Cross-Validation via `train()` function from `caret` package.
 ### Monti - Linear Regression Model (LASSO Regression)
 
 The linear regression chosen for this next model is based on penalized
-regression via LASSO method. This method has a particular advantage of
-having a triangular shape of parameters search space so that it allows
-the estimated coefficients to be zero. Hence, LASSO regression is also a
+regression via LASSO regression. This method has a particular advantage
+of having a triangular shape of parameters search space so that it
+allows the estimated coefficients to be zero. This is due to LASSO
+optimization that has in the loss function the penalty associating the
+sum of the absolute value of the parameters multiplied by `lambda`, the
+penalty term (hyperparameter). Hence, LASSO regression is also a
 variable selection method. In this application, we will test the
 prediction capability of LASSO regression only. It was tested a sequence
-of values for the Regularization Parameter (lambda), a tuning parameter,
-from 0 to 10 by 1 via `seq(0,10,1)` assigned to the `tuneGrid =`argument
-in the `train()` function from `caret` package. The code below presents
-the estimated coefficients for the best hyperparameter.
+of values for the Regularization Parameter (`lambda`), a tuning
+parameter, from 0 to 10 by 1 via `seq(0,10,1)` assigned to the
+`tuneGrid =`argument in the `train()` function from `caret` package. The
+code below presents the estimated coefficients for the best
+hyperparameter.
 
 ``` r
 LASSO = train(shares~., data = dfTrain,
@@ -689,7 +730,7 @@ coef(LASSO$finalModel, LASSO$bestTune$lambda)
     ## kw_avg_max                  9.577283
     ## kw_avg_avg               1429.643984
 
-The best lambda for this model is 10 and this value can be seen in the
+The best `lambda` for this model is 10 and this value can be seen in the
 table below which summarizes all the metrics for the 5-fold
 cross-validation.
 
@@ -716,8 +757,8 @@ kable(lasso_out, caption = "Output Training Metrics for LASSO",
 
 Output Training Metrics for LASSO
 
-The plot below shows the RMSE by Regularization Parameter (lambda). It
-is easy to see that RMSE is minimized when $\lambda$ = 10.
+The plot below shows the RMSE by Regularization Parameter (`lambda`). It
+is easy to see that RMSE is minimized when `lambda` = 10.
 
 ``` r
 plot(LASSO)
@@ -728,8 +769,8 @@ plot(LASSO)
 The validation step for LASSO regression is applied on the test set
 after predicting the response variable for unseen data (test set). By
 using `predict()` and `postResample()` functions, the metrics RMSE (Root
-Means Squared Error), R2 (Coefficient of Determination), and MAE (Mean
-Absolute Error) are calculated and displayed below.
+Means Squared Error), Rsquared (Coefficient of Determination), and MAE
+(Mean Absolute Error) are calculated and displayed below.
 
 ``` r
 metric_LASSO = postResample(pred = predict(LASSO, newdata = dfTest),
@@ -873,13 +914,32 @@ metric_rf
 
 ### Monti - Boosted Tree Model & Explanation
 
-(add some thoughts here)
+In this section the Ensemble Learning algorithm Boosting will be
+trained. Boosted tree method is one of the Tree based models most used
+in data science because it presents a fitting strategy improves
+sequentially throughout the iterations. Boosting uses single trees
+fitted (each single tree has `d` splits) on the training data and
+produces predictions off of that training. The residuals of this
+prediction is, then, used as response variable for the next single tree
+training step. New predictions are done for this new model. This process
+occurs several times during `B` iterations and the predictions are
+updated during the fitting process, being driven by the shrinkage
+parameter, also called growth rate, `lambda`. These training features of
+Boosting make this method to produce a reduction in the variance of the
+predictions as well as gains in accuracy, mainly over Random Forest,
+Bagging, and single tree. The shrinkage parameter will be set as 0.1 and
+n.minobsinnode set as 10. The parameters n.tree and interaction.depth
+will be chosen based on 5-fold cross-validation. The former will be
+chosen from a sequence from 25 to 200, counting by 25. The latter will
+be chosen from a sequence from 1 to 4. The code below shows the training
+and tuning procedure and prints out the resultant values of the two
+considered hyperparameters.
 
 ``` r
 tunG = expand.grid(n.trees = seq(25,200,25),
-                      interaction.depth = 1:4,
-                      shrinkage = 0.1,
-                      n.minobsinnode = 10)
+                   interaction.depth = 1:4,
+                   shrinkage = 0.1,
+                   n.minobsinnode = 10)
 
 gbmFit <- train(shares~.,
                data = dfTrain,
@@ -889,7 +949,6 @@ gbmFit <- train(shares~.,
                tuneGrid = tunG,
                verbose = FALSE
                )
-
 
 gbmFit$bestTune$n.trees
 ```
@@ -964,7 +1023,7 @@ plot(gbmFit)
 The validation step for Boosting is applied on the test set after
 predicting the response variable for unseen data (test set). By using
 `predict()` and `postResample()` functions, the metrics RMSE (Root Means
-Squared Error), R2 (Coefficient of Determination), and MAE (Mean
+Squared Error), Rsquared (Coefficient of Determination), and MAE (Mean
 Absolute Error) are calculated and displayed below.
 
 ``` r
@@ -995,8 +1054,8 @@ bestMethod = function(x){
   out = switch(bestm,
                 "Random Forest",
                 "Boosting",
-               "LASSO Regression",
-               "Linear Regression")
+                "LASSO Regression",
+                "Multiple Linear Regression")
   
   return(out)
   
@@ -1019,6 +1078,13 @@ Accuracy Metric by Ensemble Method on Test Set
 
 After comparing all the 4 models fit throughout this analysis, the best
 model was chosen based on the RMSE value, such that the model with
-minimum RMSE is the “winner”. Therefore, the best model is Random Forest
-based on RMSE metric. The RMSE, R2 (coefficient of Determination), and
-MAE metrics for all 4 models can be seen in the table above.
+minimum RMSE is the “winner”. Therefore, the best model is **Random
+Forest** based on RMSE metric. The RMSE, coefficient of determination,
+and MAE metrics for all 4 models can be seen in the table above.
+
+## Reference List
+
+K. Fernandes, P. Vinagre and P. Cortez. A Proactive Intelligent Decision
+Support System for Predicting the Popularity of Online News. Proceedings
+of the 17th EPIA 2015 - Portuguese Conference on Artificial
+Intelligence, September, Coimbra, Portugal.
