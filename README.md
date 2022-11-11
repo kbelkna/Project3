@@ -1,7 +1,7 @@
 # Project 3
 ================    
   Kara Belknap & Cassio Monti   
-  2022-10-29
+  2022-11-11
 
 ## Purpose of the Repository
 
@@ -9,13 +9,13 @@ The purpose of this repository is to provide EDA and modeling for different data
 
 ## List of Packages
 
-The packages listed in this section are used throughout the analysis. `Tidyverse` is used for data management and plotting through `dplyr` and `ggplot` packages. `Caret` package is used for data splitting and modeling. `Knitr` package is used for nice printing of tables. `PerformanceAnalytics` is used for nice correlation plots assisting in visualization.
+The packages listed in this section are used throughout the analysis. `Tidyverse` is used for data management and plotting through `dplyr` and `ggplot` packages. `Caret` package is used for data splitting and modeling. `Knitr` package is used for nice printing of tables. `GGally` is used for nice correlation and exploratory plots assisting in the visualization.
 
 ```{r}
 library(tidyverse)
 library(caret)
 library(knitr)
-library(PerformanceAnalytics)
+library(GGally)
 ```
 ## Links to the Analysis for Data Channels
 
