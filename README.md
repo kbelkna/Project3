@@ -27,7 +27,7 @@ The analysis for [Entertainment articles is available here](entertainment.html).
 
 The analysis for [Business articles is available here](bus.html).
 
-The analysis for [SocMed articles is available here](socmed.html).
+The analysis for [Social Media articles is available here](socmed.html).
 
 The analysis for [Tech articles is available here](tech.html).
 
