@@ -14,14 +14,14 @@ params:
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, error = FALSE, message = FALSE)
 ```
 
-# Report for *`r params$channel`* Channel
+# Report for the *`r params$channel`* Data Channel
 
-This report contains Exploratory Data Analysis (EDA) about this data channel and a modeling section applying three regression methods. 
+This report contains Exploratory Data Analysis (EDA) about the `r params$channel` data channel and a modeling section applying three regression methods which attempt to predict trends about article sharing on the Mashable website. 
 
 
 ## Introduction
 
-The objective of this analysis is to provide a comprehensive overview about publication metrics and their relationship with the number of shares that those publications presented during the study period. These data have been collected from Mashable website, one of the largest news websites from which the content of all the `r params$channel` channel articles published in 2013 and 2014 was extracted. The full data description can be found [here](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity). These data were originally collected and analyzed By Fernandes et al. (2015), in which the authors performed classification task comparing several machine learning algorithms. In the present study, a subset of the data used by Fernandes et al.(2015) corresponding to the data channel `r params$channel` is used for regression purposes. The response variable is the number of `shares` that the papers presented after publication. In other words, we will try to predict the number of shares that the papers will have before publication and evaluate the prediction of each selected model based on some common metrics, such as RMSE (Root Mean Squared Error), Rsquared (Coefficient of Determination), and MAE (Mean Absolute Error) applied to the test set. To perform the regression, the methods: Random Forest, Boosting, Multiple Linear Regression, and LASSO regression will be used. More information about the methods will be corresponding in further sections.    
+The objective of this analysis is to provide a comprehensive overview about publication metrics and their relationship with the number of shares that those publications presented during the study period. These data have been collected from Mashable website, one of the largest news websites from which the content of all the `r params$channel` channel articles published in 2013 and 2014 was extracted. The full data description can be found [here](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity). These data were originally collected and analyzed by Fernandes et al. (2015), in which the authors performed classification task comparing several machine learning algorithms. In the present study, a subset of the data used by Fernandes et al.(2015) corresponding to the data channel `r params$channel` is used for regression purposes. The response variable is the number of `shares` that the papers presented after publication. In other words, we will try to predict the number of shares that the papers will have before publication and evaluate the prediction of each selected model based on some common metrics, such as RMSE (Root Mean Squared Error), $R^2$ (Coefficient of Determination), and MAE (Mean Absolute Error) applied to the test set. To perform the regression, the methods Random Forest, Boosting, Multiple Linear Regression, and LASSO regression will be used. More information about the methods will be corresponding in further sections.    
    
    Some metrics have been calculated based on the information obtained from Mashable website. For instance, the Latent Dirichlet Allocation (LDA) was applied to the data set to identify the 5 top relevant topics and then measure the closeness of the current article to such topic. There are 5 relevance of topic metrics according to LDA:   
    
@@ -39,17 +39,18 @@ The objective of this analysis is to provide a comprehensive overview about publ
 
    Article content metrics were also used in this study. These are general metrics about the body of the publication that can influence the number of shares of that paper. The content summary metrics are shown below.   
    
-   -`num_videos`: Number of videos   
-   -`n_tokens_content`: Number of words in the content   
-   -`n_non_stop_unique_tokens`: Rate of unique non-stop words in the content   
-   -`num_hrefs`: Number of links   
-   -`num_self_hrefs`: Number of links to other articles published by Mashable   
-   -`average_token_length`: Average length of the words in the content   
+   - `num_videos`: Number of videos   
+   - `n_tokens_content`: Number of words in the content   
+   - `n_non_stop_unique_tokens`: Rate of unique non-stop words in the content   
+   - `num_hrefs`: Number of links   
+   - `num_self_hrefs`: Number of links to other articles published by Mashable   
+   - `average_token_length`: Average length of the words in the content   
 
   These data were collected during 2013 and 2014 on daily basis. To represent time dependent information, a binary variable indicating whether the publication was made in a weekend or weekday, `is_weekend` is used.
   
+## Data Import and Manipulation
 
-## Required Packages
+### Required Packages
 
 Before we can begin our analysis, we must load in the following packages:
 
@@ -62,11 +63,11 @@ library(knitr)
 
 ```
 
-`Tidyverse` is used for data management and plotting through dplyr and ggplot packages. `Caret` package is used for data splitting and modeling. `knitr` package is used to provide nice looking tables. `GGally` is used for nice correlation and exploratory plots assisting in the visualization.
+`Tidyverse` is used for data management and plotting through dplyr and ggplot packages. `Caret` package is used for data splitting and modeling.  `GGally` is used for nice correlation and exploratory plots assisting in the visualization. `knitr` package is used to provide nice looking tables.
 
-## Read in the Data
+### Read in the Data
 
-Using the data file `OnlineNewsPopularity.csv`, we will read in the data and add a new column corresponding to the type of data channel from which the data was classified. The new variable will be called `dataChannel`. Note that there are some rows that are unclassified according to the six channels of interest and those are indicated by `other`.   
+Using the data file `OnlineNewsPopularity.csv`, we will read in the data and add a new column corresponding to the type of data channel from which the data was classified. The new variable will be called `dataChannel`. Note that there are some rows that are unclassified according to the six channels of interest and those are indicated by `other`. The data indicated by `other` was excluded from all reports since the data had not been assigned to one of our channels of interest.  
   
   Once the data column is created, we can easily subset the data using the `filter` function to create a new data set for each data channel. We removed the original `data_channel_is_*` columns as well as two non-predictive columns `url` and `timedelta`.
 
@@ -109,13 +110,10 @@ worldData <- rawDataChannel %>%
 
 ```
 
-
-## Select Data for Appropriate Data Channel
+### Select Data for Appropriate Data Channel
 
 To select the appropriate data channel based on the `params$channel`, we created a function `selectData` which would return the appropriate data set and assign it to the data set `activeData`. This will be the file we will use for the remainder of the report.   
   
-  To select the appropriate data channel based on the `params$channel`, we created a function `selectData` which would return the appropriate data set and assign it to the data set `activeData`. This will be the file we will use for the remainder of the report.
-
 ```{r selectData}
 
 # function to assign automated calls for the different data channels
@@ -148,11 +146,13 @@ activeData <- selectData(dataChannelSelect)
 ```
 
 
-## Summarizations for the Data Channel *`r params$channel`*
+## Summarizations for the *`r params$channel`* Data Channel 
 
-In this section, we will perform EDA for the data channel `r params$channel`
+In this section, we will perform EDA for the data channel `r params$channel`.
 
-### Data Split
+### Data Manipulation for EDA
+
+#### Data Split
 
 This section splits the data set into training and test sets for the proportion of 70/30. The data summarizing will be conducted on the training set. To split the data, the function `createDataPartition()`, from `caret` package, was used with the argument `p=0.7` to represent 70% of the data should be in the split. The function `set.seed(555)` was used to fix the random seed. The code below shows the creation of training and test sets.
 
@@ -169,7 +169,7 @@ activeTest <- activeData[-trainIndex, ]
 ```
 
 
-### Data manipulation for statistics
+#### Data manipulation for statistics
 
 A new object is created in this section aiming to summarize publications during weekdays and weekends and create factor levels for them to match with `shares` variable. The functions `ifelse()` was used to vectorize the IF-ELSE statements associated to `mutate()` which took care of attaching the new variable to the data set. The function `factor()` was used to explicitly coerce the days of week into levels of the newly created categorical variable "Day".
 
@@ -194,7 +194,9 @@ statsData$Day <- factor(statsData$Day,
 
 ```
 
-### Belknap - Summary Statistics
+###  EDA: Summary Statistics
+
+#### Summary Statistics, Number of Articles Shared
 
 The following table gives us information about the summary statistics for the number of shares for articles in the data channel `r params$channel`. The `summary()` function was used to extract these metrics.
 
@@ -203,6 +205,8 @@ The following table gives us information about the summary statistics for the nu
 summary(activeTrain$shares)
 
 ```
+
+#### Summary Statistics, Number of Articles Shared, Weekend vs. Weekday
 
 The following table gives us information about the average, median, and standard deviation for the number of shares based on whether the post was made on a weekend or a weekday. The variable "weekend" was grouped, via `grouped_by()`, and for each level the sum, average, median, and standard deviation of shares were calculated via `sum()`, `mean()`, `meadian()`, `sd()`, and `summarise()` functions. The summary table is shown below.
 
@@ -214,6 +218,8 @@ statsData %>%
   kable(caption = "Statistics for Shares for Weekend or Weekdays") 
 
 ```
+
+#### Summary Statistics, Articles Shared by Day of Week
 
 Likewise, this table gives us information about the number of shares by the day of the week. The same functions were used here, by applied to levels of variable "Day". Also, the quantities maximum `max()` and minimum `min()` number of shares by levels of "Day" were calculated.
 
@@ -229,10 +235,9 @@ statsData %>%
 ```
 
 
-### Monti - Summary Statistics
+#### Total Articles Shared by Day of Week
 
-
-First, we will analyse the frequency of occurrence of publications on each day of the week. The one-way contingency table below presents those frequencies.
+Next, we will analyse the frequency of occurrence of publications on each day of the week. The one-way contingency table below presents those frequencies.
 
 ```{r}
 
@@ -240,7 +245,9 @@ table(statsData$Day)
 
 ```
 
-A second discrete analysis performed here is the two-way contingency table related to the discretization of the response variable if we divided `shares` into two categories. The function `cut()` was used for the end. In this case, we count the frequency of the number of publications in the weekend versus working days with the two levels of response variable. These levels represent smaller number of shares (on the left) and larger number of shares (on the right). The table below shows this counting. In the table below, 0 (zero) represents working days and 1 (one) represents weekends.
+#### Contingency Table
+
+Another discrete analysis performed here is the two-way contingency table related to the discretization of the response variable if we divided `shares` into two categories. The function `cut()` was used for the end. In this case, we count the frequency of the number of publications in the weekend versus working days with the two levels of response variable. These levels represent smaller number of shares (on the left) and larger number of shares (on the right). The table below shows this counting. In the table below, 0 (zero) represents working days and 1 (one) represents weekends.
 
 ```{r}
 
@@ -248,6 +255,8 @@ table(activeTrain$is_weekend, cut(activeTrain$shares, breaks = 2)) %>%
   kable(caption = "Frequency of Shares in Weekend vs in Working Days")
 
 ```
+
+#### Correlation Matrix
 
 An important EDA analysis for regression tasks is the correlation matrix. The function `cor()` is used in this section to return the top 10 most correlated potential predictor variables with the response variable `shares`. The code below presents the process of obtaining these variables and their respective correlations with the response variable. The correlations are clearly small for this case, which may difficult the modeling process and produce low quality of prediction metrics.
 
@@ -287,6 +296,8 @@ kable(tbcor, caption = "Top 10 Response Correlated Variables")
 
 ```
 
+#### Principal Components Analysis (PCA)
+
 The variables that present most correlation with the response variable `shares` are `r var_cor`. These variables will be studied in more depth via PCA to understand the orientation of the most important potential predictors. The code below presents the PCA analysis as part of the EDA. The `r length(var_cor)` PCs displayed in the table below correspond to the most variable combination of the `r length(var_cor)` predictors, which the PC1 has the most variation in the data, PC2 presents the second most variation and so on. The coefficients associated to each variable are the loadings and they give the idea of importance of that particular variable to the variance of the `r length(var_cor)` predictor variables. The negative values only mean that the orientation of the weights are opposite in the same PC. Since the first PC has the largest variability, it is possible to say that the variables with more weights in PC1 are the most important variables for the variance of the predictors. This variables are supposed to present large influence on the explanation of the variance of the response variable. The table below show these numbers.
 
 ```{r PCA}
@@ -306,7 +317,9 @@ id2 = which(abs(pc_directions$PC1) %in%
 
 It is possible to see that the three most important variables in PC1 are `r row.names(pc_directions)[id2]` from the table above. These variables are considered the most important variables in terms of variance of the predictor variables. Although the metrics for prediction are expected to be poor, these variables are expected to show the most influence to the explanation of the variance of the response `shares`.
 
-### Monti - Graphs (5)
+### EDA: Graphical Analysis
+
+#### Correlation Plot
 
 The plot below presents histograms, scatter plots, and correlations in a bivariate structure of the top 5 variables chosen in the correlation analysis. Notice the shape of the distributions and the values of the correlations for the first column, which the one related to the response variable `shares`.
 
@@ -317,6 +330,8 @@ cor_data <- select(activeTrain,shares,var_id[1:5])
 ggpairs(cor_data)
 
 ```
+
+#### PCA: Biplot
 
 The biplot below presents the PC1 and PC2 from the PCA analysis. The function `ggplot()` was used to create the plot and the segments created via `geom_segment()` were re-scaled so that we could better see the variable names. The most variation in the data is contained in the PC1, hence, the most important variables in the data are approximately oriented towards the axis of PC1 and, therefore, may be good predictors for the `shares` response. Likewise, for PC2, which contains the second most variability in the data set, the variables that are oriented approximately towards the axis of PC2 are the second most important variables.
 
@@ -331,6 +346,8 @@ ggplot(pc_directions)+
   geom_label(mapping = aes(x = 51 * PC1, y = 51 * PC2, label = row.names(pc_directions)))
 
 ```
+
+#### Scatter Plots by LDA Value
 
 The scatter plots below show the different levels of the variables related to the LDA metrics, from 0 to 4, and graphs the relationship with the response variable `shares`. The function `ggplot()` is used to create the plot frame and `geom_point()`, `geom_smooth`, and `facert_wrap()` function are used to plot the scatter points, the smooth GAM (Generalized Additive Models) lines, and split the data by LDA type, respectively. It is possible to see the behavior of the response variable in relation to each LDA types.
 
@@ -348,6 +365,8 @@ labs(x = "LDA Values", y = "Shares", title = "Shares by LDA Types")
 
 ```
 
+#### Scatter Plots by Keyword Metrics
+
 The scatter plots below show the different types of the variables related to the Keyword metrics and graphs the relationship with the response variable `shares`. The function `ggplot()` is used to create the plot frame and `geom_point()`, `geom_smooth`, and `facert_wrap()` function are used to plot the scatter points, the smooth GAM (Generalized Additive Models) lines, and split the data by keyword type, respectively. It is possible to see the behavior of the response variable in relation to each of the 3 keyword metric types.
 
 ```{r keywordplot}
@@ -364,7 +383,9 @@ labs(x = "Keyword Metric Values", y = "Shares", title = "Shares by Keyword Metri
 
 ```
 
-Finally, the scatter plots below show the different types of the variables related to the Content metrics and graphs the relationship with the response variable `shares`. The function `ggplot()` is used to create the plot frame and `geom_point()`, `geom_smooth`, and `facert_wrap()` function are used to plot the scatter points, the smooth GAM (Generalized Additive Models) lines, and split the data by content type, respectively. It is possible to see the behavior of the response variable in relation to each of the 4 content metric types.
+#### Scatter Plots by Content Metrics
+
+The scatter plots below show the different types of the variables related to the Content metrics and graphs the relationship with the response variable `shares`. The function `ggplot()` is used to create the plot frame and `geom_point()`, `geom_smooth`, and `facert_wrap()` function are used to plot the scatter points, the smooth GAM (Generalized Additive Models) lines, and split the data by content type, respectively. It is possible to see the behavior of the response variable in relation to each of the 4 content metric types.
 
 ```{r Contentplot}
 
@@ -381,8 +402,7 @@ labs(x = "Content Metric Values", y = "Shares", title = "Shares by Content Metri
 
 ```
 
-
-### Belknap - Graphs (3)
+#### Scatter Plot of Title Words 
 
 The following graph shows the number of shares compared to the number of words in the title. The output is colored by the day of the week. 
 
@@ -396,6 +416,8 @@ titlewordcountGraph + geom_point(aes(color = Day)) +
 
 ```
 
+#### Scatter Plot of Positive Words
+
 The following plot shows the number of shares by the rate of positive words in the article. A positive trend would indicate that articles with more positive words are shared more often than articles with negative words.
 
 ```{r positivewordrateGraph}
@@ -408,9 +430,11 @@ positivewordrateGraph + geom_point(aes(color = Day)) +
 
 ```
 
+#### Scatter Plot of Title Subjectivity
+
 The following plot shows the total number of shares as related to the parameter title subjectivity. A positive trend would indicate that articles are shared more often when the title is subjective. A negative trend would indicate that articles are shared more often when the title is less subjective.
 
-```{r titleSubjectivityGraph, eval=FALSE}
+```{r titleSubjectivityGraph}
 
 titleSubjectivityGraph <- ggplot(statsData, aes(x = title_subjectivity, y = shares))
 titleSubjectivityGraph + geom_point(aes(color = n_tokens_title)) + 
@@ -421,7 +445,13 @@ titleSubjectivityGraph + geom_point(aes(color = n_tokens_title)) +
 
 ```
 
-### Subsetting Variables for Modeling
+## Modeling
+
+In this section, we will perform regression for prediction purposes for the data channel `r params$channel`. All models were fitted using 5-fold Cross-Validation via `train()` function from `caret` package. All variables were scaled and centered as well.
+
+### Data Manipulation for Modeling
+
+#### Subsetting Variables for Modeling
 
 The variables selected below are those described in the introduction of this study and will be used in the modeling section. The function `select()` was used to subset the corresponding variables from the training and test sets and two new objects are created specially for the modeling section, `dfTrain` and `dfTest`.
 
@@ -441,16 +471,72 @@ dfTest = activeTest %>%
 
 ```
 
+### Linear Regression Modeling
 
-## Modeling
+Linear regression is a modeling technique by which one attempts to model a response variable (in this case `shares`) with one or more explanatory variables using a straight line. If there is only one explanatory variable, you would call this simple linear regression. Using more than one explanatory variable is called multiple linear regression. For the purposes of this report, we will be looking at multiple linear regression (MLR).
 
-In this section, we will perform regression for prediction purposes for the data channel `r params$channel`. All models were fitted using 5-fold Cross-Validation via `train()` function from `caret` package. All variables were scaled and centered as well.
+The basic formula that is used for multiple linear regression is 
 
-### Belknap - Linear Regression Model Explanation
+$$ 
+Y_i = \beta_0 + \beta_{1}x_{1i} + \beta_{2}x_{2i} + ... + \beta_{n}x_{ni} + E_i
+$$
+Here:   
+   - $Yi$ is our response variable for the $i^{th}$ observation   
+   - $x_{i}$ is the value of our explanatory variable for the $i^{th} observation for each explanatory variable (1-n)   
+   - $\beta_0$ is the y intercept   
+   - $\beta_{1,...,n)$ is the regression coefficient corresponding to the explanatory variable of interest (1-n)   
+   - $E_i$ is an error parameter   
 
-(add some thoughts here)
+The goal of linear regression is to model the fit by minimizing the sum of squared errors. 
 
-### Monti - Linear Regression Model (LASSO Regression)
+$$
+SSE = \sum_{i=1}^n(y_{i} - \hat{y}_{i})^2
+$$
+Here:   
+   - $y_i$ is the actual value   
+   - $\hat{y}_{i}$ is the predicted value   
+
+In R, MLR is generally done with the function `lm`. There are also a variety of other methods that fall under the umbrella of MLR, namely LASSO regression which we will explore as part of this analysis.
+
+
+#### Linear Regression Model #1: Multiple Linear Regression Using `lm`
+
+Here, modeling for linear regression is done with the `caret` package using the method `lm`. The `summary` function gives us the regression coefficients.
+
+```{r linearTrain}
+
+lmFit = train(shares~., data = dfTrain,
+              method="lm",
+              preProcess = c("center","scale"),
+              trControl = trainControl(method="CV",number=5))
+
+summary(lmFit)
+
+```
+
+The following table shows the output training metrics for this linear regression. 
+
+```{r linearTrainResult}
+
+lm_out = data.frame(lmFit$results)
+
+kable(lm_out, caption = "Output Training Metrics for Linear Regression",
+      digits = 3)
+
+```
+
+The following shows the RMSE, $R^2$, and MAE values for the model as it performed on predicting the test set.
+
+```{r lineartest}
+
+metric_lm = postResample(pred = predict(lmFit, newdata = dfTest), 
+                         obs = dfTest$shares)
+
+metric_lm
+
+```
+
+#### Linear Regression Model #2: LASSO Regression using `glmnet`
 
 The linear regression chosen for this next model is based on penalized regression via LASSO regression. This method has a particular advantage of having a triangular shape of parameters search space so that it allows the estimated coefficients to be zero. This is due to LASSO optimization that has in the loss function the penalty associating the sum of the absolute value of the parameters multiplied by `lambda`, the penalty term (hyperparameter). Hence, LASSO regression is also a variable selection method. In this application, we will test the prediction capability of LASSO regression only. It was tested a sequence of values for the Regularization Parameter (`lambda`), a tuning parameter, from 0 to 10 by 1 via `seq(0,10,1)` assigned to the `tuneGrid = `argument in the `train()` function from `caret` package. The code below presents the estimated coefficients for the best hyperparameter.
 
@@ -496,46 +582,22 @@ metric_LASSO
 
 ```
 
-### Belknap - Linear Regression Model
+### Tree-Based Modeling
 
-(add some thoughts here)
+The next two models, Random Forest and Boosted Tree, are both types of tree-based modeling methods. Generally speaking, in a tree-based modeling method, the predictor space is split into regions, with different predictions for each region. In the case of regression trees where the goal is to predict a continuous response, the mean of observations for a given region is typically used to make the predictions. 
 
-```{r linearTrain}
+To make the predictions, the trees are split using recursive binary splitting. For every possible value of each predictor, find the residual sum of squares (RSS) and try to minimize that. The process is repeated with each split. Often, trees are grown very large and need to be cut back using cost complexity pruning. This ensures that the model is not overfit and will work well on prediction of new data.
 
-lmFit = train(shares~., data = dfTrain,
-              method="lm",
-              preProcess = c("center","scale"),
-              trControl = trainControl(method="CV",number=5))
+#### Random Forest Model
 
-summary(lmFit)
+In this section, we attempt to model the data using a Random Forest model, which is a type of ensemble learning which averages multiple tree models in order to lower the variance of the final model and thus improve our prediction.
 
-```
+In a random forest model, we first begin by creating multiple trees from bootstrap samples. A random subset of predictors is used to create each bootstrap sample. The predictors are selected randomly to prevent the trees from being correlated. If the random subset was not used (as in another tree based method called bagging), the trees would likely all choose the same predictors for the first split. Choosing the splits randomly avoids this correlation. The number of predictors is specified by `mtry`. The maximum number of predictors for a regression model is generally chosen to be the total number of predictors divided by 3. Once the bootstrap sample statistics are collected, they are averaged and used to select a final model. 
 
-(add some thoughts here)
+Random forest models use "out of bag" error to test the data using samples from the original data set that were not included in a particular bootstrap data set. 
 
-```{r linearTrainResult}
+For the random forest model, we will use the `train` function from the `caret` package. We set the `mtry` to select 1-5 predictors. 
 
-lm_out = data.frame(lmFit$results)
-
-kable(lm_out, caption = "Output Training Metrics for Linear Regression",
-      digits = 3)
-
-```
-
-
-```{r lineartest}
-
-metric_lm = postResample(pred = predict(lmFit, newdata = dfTest), 
-                         obs = dfTest$shares)
-
-metric_lm
-
-```
-
-
-### Belknap - Random Forest Model & Explanation
-
-(add some thoughts here about RF)
 
 ```{r RFtrain}
 
@@ -552,7 +614,9 @@ rfFit$bestTune$mtry
 
 ```
 
-(add some thoughts here)
+The best `mtry` for this particular model was `r rfFit$bestTune$mtry`.
+
+The following plot shows the RMSE values for each of the tune. The objective in random forest modeling is to choose the model with the lowest RMSE. 
 
 ```{r RFplot}
 
@@ -560,7 +624,7 @@ plot(rfFit)
 
 ```
 
-(add some thoughts here)
+The following table shows training metrics for the random forest model. Again, the best model is the one that minimizes RMSE.
 
 ```{r RFresults}
 
@@ -571,7 +635,7 @@ kable(rf_out, caption = "Output Training Metrics for Random Forest",
 
 ```
 
-(add some thoughts here)
+Now we will run a prediction on our test data split that we obtained when we split the data based on a 70/30 split. The table shows the RMSE value for the test data set, which is an indication of how well our model worked to predict data that was not included when training the original model. We can compare this model against other models to find the model with the lowest RMSE.
 
 ```{r RFTest}
 
@@ -583,8 +647,7 @@ metric_rf
 
 ```
 
-
-### Monti - Boosted Tree Model & Explanation
+#### Boosted Tree Model 
 
 In this section the Ensemble Learning algorithm Boosting will be trained. Boosted tree method is one of the Tree based models most used in data science because it presents a fitting strategy improves sequentially throughout the iterations. Boosting uses single trees fitted (each single tree has `d` splits) on the training data and produces predictions off of that training. The residuals of this prediction is, then, used as response variable for the next single tree training step. New predictions are done for this new model. This process occurs several times during `B` iterations and the predictions are updated during the fitting process, being driven by the shrinkage parameter, also called growth rate, `lambda`. These training features of Boosting make this method to produce a reduction in the variance of the predictions as well as gains in accuracy, mainly over Random Forest, Bagging, and single tree. The shrinkage parameter will be set as 0.1 and n.minobsinnode set as 10. The parameters n.tree and interaction.depth will be chosen based on 5-fold cross-validation. The former will be chosen from a sequence from 25 to 200, counting by 25. The latter will be chosen from a sequence from 1 to 4. The code below shows the training and tuning procedure and prints out the resultant values of the two considered hyperparameters.
 
@@ -616,8 +679,11 @@ The best n.trees and interaction.depth parameters for this model are `r gbmFit$b
 
 gbm_out = data.frame(gbmFit$results)
 
+gbm_out <- gbm_out %>%
+  arrange(RMSE)
+
 kable(gbm_out, caption = "Output Training Metrics for Boosting",
-      digits = 3)
+      digits = 3, row.names = FALSE)
 
 ```
 
@@ -641,7 +707,7 @@ metric_boosting
 
 ```
 
-## Comparison & Conclusion - Monti
+## Model Comparison & Conclusion
 
 For the overall comparison among all 4 created models in previous sections, the test set was used for predictions and some quality of fit metrics were calculated based on these prediction on unseen data. The code below shows the function that returns the name of the best model based on RMSE values estimated on the test set. The code below displays the table comparing all 4 models.
 
