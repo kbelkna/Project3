@@ -3,59 +3,46 @@ Project 3
 Kara Belknap & Cassio Monti
 2022-11-5
 
--   <a href="#report-for-tech-channel"
-    id="toc-report-for-tech-channel">Report for <em>tech</em> Channel</a>
+-   <a href="#report-for-the-tech-data-channel"
+    id="toc-report-for-the-tech-data-channel">Report for the <em>tech</em>
+    Data Channel</a>
     -   <a href="#introduction" id="toc-introduction">Introduction</a>
-    -   <a href="#required-packages" id="toc-required-packages">Required
-        Packages</a>
-    -   <a href="#read-in-the-data" id="toc-read-in-the-data">Read in the
-        Data</a>
-    -   <a href="#select-data-for-appropriate-data-channel"
-        id="toc-select-data-for-appropriate-data-channel">Select Data for
-        Appropriate Data Channel</a>
-    -   <a href="#summarizations-for-the-data-channel-tech"
-        id="toc-summarizations-for-the-data-channel-tech">Summarizations for the
-        Data Channel <em>tech</em></a>
-        -   <a href="#data-split" id="toc-data-split">Data Split</a>
-        -   <a href="#data-manipulation-for-statistics"
-            id="toc-data-manipulation-for-statistics">Data manipulation for
-            statistics</a>
-        -   <a href="#belknap---summary-statistics"
-            id="toc-belknap---summary-statistics">Belknap - Summary Statistics</a>
-        -   <a href="#monti---summary-statistics"
-            id="toc-monti---summary-statistics">Monti - Summary Statistics</a>
-        -   <a href="#monti---graphs-5" id="toc-monti---graphs-5">Monti - Graphs
-            (5)</a>
-        -   <a href="#belknap---graphs-3" id="toc-belknap---graphs-3">Belknap -
-            Graphs (3)</a>
-        -   <a href="#subsetting-variables-for-modeling"
-            id="toc-subsetting-variables-for-modeling">Subsetting Variables for
-            Modeling</a>
+    -   <a href="#data-import-and-manipulation"
+        id="toc-data-import-and-manipulation">Data Import and Manipulation</a>
+        -   <a href="#required-packages" id="toc-required-packages">Required
+            Packages</a>
+        -   <a href="#read-in-the-data" id="toc-read-in-the-data">Read in the
+            Data</a>
+        -   <a href="#select-data-for-appropriate-data-channel"
+            id="toc-select-data-for-appropriate-data-channel">Select Data for
+            Appropriate Data Channel</a>
+    -   <a href="#summarizations-for-the-tech-data-channel"
+        id="toc-summarizations-for-the-tech-data-channel">Summarizations for the
+        <em>tech</em> Data Channel</a>
+        -   <a href="#data-manipulation-for-eda"
+            id="toc-data-manipulation-for-eda">Data Manipulation for EDA</a>
+        -   <a href="#eda-summary-statistics" id="toc-eda-summary-statistics">EDA:
+            Summary Statistics</a>
+        -   <a href="#eda-graphical-analysis" id="toc-eda-graphical-analysis">EDA:
+            Graphical Analysis</a>
     -   <a href="#modeling" id="toc-modeling">Modeling</a>
-        -   <a href="#belknap---linear-regression-model-explanation"
-            id="toc-belknap---linear-regression-model-explanation">Belknap - Linear
-            Regression Model Explanation</a>
-        -   <a href="#monti---linear-regression-model-lasso-regression"
-            id="toc-monti---linear-regression-model-lasso-regression">Monti - Linear
-            Regression Model (LASSO Regression)</a>
-        -   <a href="#belknap---linear-regression-model"
-            id="toc-belknap---linear-regression-model">Belknap - Linear Regression
-            Model</a>
-        -   <a href="#belknap---random-forest-model--explanation"
-            id="toc-belknap---random-forest-model--explanation">Belknap - Random
-            Forest Model &amp; Explanation</a>
-        -   <a href="#monti---boosted-tree-model--explanation"
-            id="toc-monti---boosted-tree-model--explanation">Monti - Boosted Tree
-            Model &amp; Explanation</a>
-    -   <a href="#comparison--conclusion---monti"
-        id="toc-comparison--conclusion---monti">Comparison &amp; Conclusion -
-        Monti</a>
+        -   <a href="#data-manipulation-for-modeling"
+            id="toc-data-manipulation-for-modeling">Data Manipulation for
+            Modeling</a>
+        -   <a href="#linear-regression-modeling"
+            id="toc-linear-regression-modeling">Linear Regression Modeling</a>
+        -   <a href="#tree-based-modeling" id="toc-tree-based-modeling">Tree-Based
+            Modeling</a>
+    -   <a href="#model-comparison--conclusion"
+        id="toc-model-comparison--conclusion">Model Comparison &amp;
+        Conclusion</a>
     -   <a href="#reference-list" id="toc-reference-list">Reference List</a>
 
-# Report for *tech* Channel
+# Report for the *tech* Data Channel
 
-This report contains Exploratory Data Analysis (EDA) about this data
-channel and a modeling section applying three regression methods.
+This report contains Exploratory Data Analysis (EDA) about the tech data
+channel and a modeling section applying three regression methods which
+attempt to predict trends about article sharing on the Mashable website.
 
 ## Introduction
 
@@ -67,7 +54,7 @@ websites from which the content of all the tech channel articles
 published in 2013 and 2014 was extracted. The full data description can
 be found
 [here](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity).
-These data were originally collected and analyzed By Fernandes et
+These data were originally collected and analyzed by Fernandes et
 al. (2015), in which the authors performed classification task comparing
 several machine learning algorithms. In the present study, a subset of
 the data used by Fernandes et al.(2015) corresponding to the data
@@ -76,9 +63,9 @@ the number of `shares` that the papers presented after publication. In
 other words, we will try to predict the number of shares that the papers
 will have before publication and evaluate the prediction of each
 selected model based on some common metrics, such as RMSE (Root Mean
-Squared Error), Rsquared (Coefficient of Determination), and MAE (Mean
+Squared Error), $R^2$ (Coefficient of Determination), and MAE (Mean
 Absolute Error) applied to the test set. To perform the regression, the
-methods: Random Forest, Boosting, Multiple Linear Regression, and LASSO
+methods Random Forest, Boosting, Multiple Linear Regression, and LASSO
 regression will be used. More information about the methods will be
 corresponding in further sections.
 
@@ -109,21 +96,23 @@ Article content metrics were also used in this study. These are general
 metrics about the body of the publication that can influence the number
 of shares of that paper. The content summary metrics are shown below.
 
-\-`num_videos`: Number of videos  
--`n_tokens_content`: Number of words in the content  
--`n_non_stop_unique_tokens`: Rate of unique non-stop words in the
-content  
--`num_hrefs`: Number of links  
--`num_self_hrefs`: Number of links to other articles published by
-Mashable  
--`average_token_length`: Average length of the words in the content
+-   `num_videos`: Number of videos  
+-   `n_tokens_content`: Number of words in the content  
+-   `n_non_stop_unique_tokens`: Rate of unique non-stop words in the
+    content  
+-   `num_hrefs`: Number of links  
+-   `num_self_hrefs`: Number of links to other articles published by
+    Mashable  
+-   `average_token_length`: Average length of the words in the content
 
 These data were collected during 2013 and 2014 on daily basis. To
 represent time dependent information, a binary variable indicating
 whether the publication was made in a weekend or weekday, `is_weekend`
 is used.
 
-## Required Packages
+## Data Import and Manipulation
+
+### Required Packages
 
 Before we can begin our analysis, we must load in the following
 packages:
@@ -137,18 +126,19 @@ library(knitr)
 
 `Tidyverse` is used for data management and plotting through dplyr and
 ggplot packages. `Caret` package is used for data splitting and
-modeling. `knitr` package is used to provide nice looking tables.
-`GGally` is used for nice correlation and exploratory plots assisting in
-the visualization.
+modeling. `GGally` is used for nice correlation and exploratory plots
+assisting in the visualization. `knitr` package is used to provide nice
+looking tables.
 
-## Read in the Data
+### Read in the Data
 
 Using the data file `OnlineNewsPopularity.csv`, we will read in the data
 and add a new column corresponding to the type of data channel from
 which the data was classified. The new variable will be called
 `dataChannel`. Note that there are some rows that are unclassified
 according to the six channels of interest and those are indicated by
-`other`.
+`other`. The data indicated by `other` was excluded from all reports
+since the data had not been assigned to one of our channels of interest.
 
 Once the data column is created, we can easily subset the data using the
 `filter` function to create a new data set for each data channel. We
@@ -192,12 +182,7 @@ worldData <- rawDataChannel %>%
   filter(dataChannel == "world")
 ```
 
-## Select Data for Appropriate Data Channel
-
-To select the appropriate data channel based on the `params$channel`, we
-created a function `selectData` which would return the appropriate data
-set and assign it to the data set `activeData`. This will be the file we
-will use for the remainder of the report.
+### Select Data for Appropriate Data Channel
 
 To select the appropriate data channel based on the `params$channel`, we
 created a function `selectData` which would return the appropriate data
@@ -233,11 +218,13 @@ dataChannelSelect <- params$channel
 activeData <- selectData(dataChannelSelect)
 ```
 
-## Summarizations for the Data Channel *tech*
+## Summarizations for the *tech* Data Channel
 
-In this section, we will perform EDA for the data channel tech
+In this section, we will perform EDA for the data channel tech.
 
-### Data Split
+### Data Manipulation for EDA
+
+#### Data Split
 
 This section splits the data set into training and test sets for the
 proportion of 70/30. The data summarizing will be conducted on the
@@ -257,7 +244,7 @@ activeTrain <- activeData[trainIndex, ]
 activeTest <- activeData[-trainIndex, ]
 ```
 
-### Data manipulation for statistics
+#### Data manipulation for statistics
 
 A new object is created in this section aiming to summarize publications
 during weekdays and weekends and create factor levels for them to match
@@ -286,7 +273,9 @@ statsData$Day <- factor(statsData$Day,
                            "Friday", "Saturday", "Sunday"))
 ```
 
-### Belknap - Summary Statistics
+### EDA: Summary Statistics
+
+#### Summary Statistics, Number of Articles Shared
 
 The following table gives us information about the summary statistics
 for the number of shares for articles in the data channel tech. The
@@ -298,6 +287,8 @@ summary(activeTrain$shares)
 
     ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
     ##      82    1100    1700    3084    3000  663600
+
+#### Summary Statistics, Number of Articles Shared, Weekend vs. Weekday
 
 The following table gives us information about the average, median, and
 standard deviation for the number of shares based on whether the post
@@ -320,6 +311,8 @@ statsData %>%
 | Yes     |   2436020 |  3730.505 |      2300 |  4973.371 |
 
 Statistics for Shares for Weekend or Weekdays
+
+#### Summary Statistics, Articles Shared by Day of Week
 
 Likewise, this table gives us information about the number of shares by
 the day of the week. The same functions were used here, by applied to
@@ -347,9 +340,9 @@ statsData %>%
 
 Statistics for Shares Across Days of Week
 
-### Monti - Summary Statistics
+#### Total Articles Shared by Day of Week
 
-First, we will analyse the frequency of occurrence of publications on
+Next, we will analyse the frequency of occurrence of publications on
 each day of the week. The one-way contingency table below presents those
 frequencies.
 
@@ -361,7 +354,9 @@ table(statsData$Day)
     ##    Monday   Tuesday Wednesday  Thursday    Friday  Saturday    Sunday 
     ##       863      1051       977       896       705       375       278
 
-A second discrete analysis performed here is the two-way contingency
+#### Contingency Table
+
+Another discrete analysis performed here is the two-way contingency
 table related to the discretization of the response variable if we
 divided `shares` into two categories. The function `cut()` was used for
 the end. In this case, we count the frequency of the number of
@@ -382,6 +377,8 @@ table(activeTrain$is_weekend, cut(activeTrain$shares, breaks = 2)) %>%
 | 1   |              653 |                    0 |
 
 Frequency of Shares in Weekend vs in Working Days
+
+#### Correlation Matrix
 
 An important EDA analysis for regression tasks is the correlation
 matrix. The function `cor()` is used in this section to return the top
@@ -441,6 +438,8 @@ kable(tbcor, caption = "Top 10 Response Correlated Variables")
 
 Top 10 Response Correlated Variables
 
+#### Principal Components Analysis (PCA)
+
 The variables that present most correlation with the response variable
 `shares` are LDA_00, LDA_04, is_weekend, n_tokens_content,
 n_non_stop_unique_tokens, num_hrefs, num_self_hrefs, num_videos,
@@ -498,7 +497,9 @@ variance of the predictor variables. Although the metrics for prediction
 are expected to be poor, these variables are expected to show the most
 influence to the explanation of the variance of the response `shares`.
 
-### Monti - Graphs (5)
+### EDA: Graphical Analysis
+
+#### Correlation Plot
 
 The plot below presents histograms, scatter plots, and correlations in a
 bivariate structure of the top 5 variables chosen in the correlation
@@ -513,6 +514,8 @@ ggpairs(cor_data)
 ```
 
 ![](tech_files/figure-gfm/correlplot-1.png)<!-- -->
+
+#### PCA: Biplot
 
 The biplot below presents the PC1 and PC2 from the PCA analysis. The
 function `ggplot()` was used to create the plot and the segments created
@@ -537,6 +540,8 @@ ggplot(pc_directions)+
 
 ![](tech_files/figure-gfm/biplot-1.png)<!-- -->
 
+#### Scatter Plots by LDA Value
+
 The scatter plots below show the different levels of the variables
 related to the LDA metrics, from 0 to 4, and graphs the relationship
 with the response variable `shares`. The function `ggplot()` is used to
@@ -558,6 +563,8 @@ labs(x = "LDA Values", y = "Shares", title = "Shares by LDA Types")
 ```
 
 ![](tech_files/figure-gfm/LDAplot-1.png)<!-- -->
+
+#### Scatter Plots by Keyword Metrics
 
 The scatter plots below show the different types of the variables
 related to the Keyword metrics and graphs the relationship with the
@@ -582,13 +589,15 @@ labs(x = "Keyword Metric Values", y = "Shares", title = "Shares by Keyword Metri
 
 ![](tech_files/figure-gfm/keywordplot-1.png)<!-- -->
 
-Finally, the scatter plots below show the different types of the
-variables related to the Content metrics and graphs the relationship
-with the response variable `shares`. The function `ggplot()` is used to
-create the plot frame and `geom_point()`, `geom_smooth`, and
-`facert_wrap()` function are used to plot the scatter points, the smooth
-GAM (Generalized Additive Models) lines, and split the data by content
-type, respectively. It is possible to see the behavior of the response
+#### Scatter Plots by Content Metrics
+
+The scatter plots below show the different types of the variables
+related to the Content metrics and graphs the relationship with the
+response variable `shares`. The function `ggplot()` is used to create
+the plot frame and `geom_point()`, `geom_smooth`, and `facert_wrap()`
+function are used to plot the scatter points, the smooth GAM
+(Generalized Additive Models) lines, and split the data by content type,
+respectively. It is possible to see the behavior of the response
 variable in relation to each of the 4 content metric types.
 
 ``` r
@@ -606,7 +615,7 @@ labs(x = "Content Metric Values", y = "Shares", title = "Shares by Content Metri
 
 ![](tech_files/figure-gfm/Contentplot-1.png)<!-- -->
 
-### Belknap - Graphs (3)
+#### Scatter Plot of Title Words
 
 The following graph shows the number of shares compared to the number of
 words in the title. The output is colored by the day of the week.
@@ -620,6 +629,8 @@ titlewordcountGraph + geom_point(aes(color = Day)) +
 ```
 
 ![](tech_files/figure-gfm/titlewordcountGraph-1.png)<!-- -->
+
+#### Scatter Plot of Positive Words
 
 The following plot shows the number of shares by the rate of positive
 words in the article. A positive trend would indicate that articles with
@@ -636,6 +647,8 @@ positivewordrateGraph + geom_point(aes(color = Day)) +
 
 ![](tech_files/figure-gfm/positivewordrateGraph-1.png)<!-- -->
 
+#### Scatter Plot of Title Subjectivity
+
 The following plot shows the total number of shares as related to the
 parameter title subjectivity. A positive trend would indicate that
 articles are shared more often when the title is subjective. A negative
@@ -651,7 +664,18 @@ titleSubjectivityGraph + geom_point(aes(color = n_tokens_title)) +
   labs(color = "Word Count in Title")
 ```
 
-### Subsetting Variables for Modeling
+![](tech_files/figure-gfm/titleSubjectivityGraph-1.png)<!-- -->
+
+## Modeling
+
+In this section, we will perform regression for prediction purposes for
+the data channel tech. All models were fitted using 5-fold
+Cross-Validation via `train()` function from `caret` package. All
+variables were scaled and centered as well.
+
+### Data Manipulation for Modeling
+
+#### Subsetting Variables for Modeling
 
 The variables selected below are those described in the introduction of
 this study and will be used in the modeling section. The function
@@ -673,18 +697,120 @@ dfTest = activeTest %>%
          kw_avg_max, kw_avg_avg, is_weekend)
 ```
 
-## Modeling
+### Linear Regression Modeling
 
-In this section, we will perform regression for prediction purposes for
-the data channel tech. All models were fitted using 5-fold
-Cross-Validation via `train()` function from `caret` package. All
-variables were scaled and centered as well.
+Linear regression is a modeling technique by which one attempts to model
+a response variable (in this case `shares`) with one or more explanatory
+variables using a straight line. If there is only one explanatory
+variable, you would call this simple linear regression. Using more than
+one explanatory variable is called multiple linear regression. For the
+purposes of this report, we will be looking at multiple linear
+regression (MLR).
 
-### Belknap - Linear Regression Model Explanation
+The basic formula that is used for multiple linear regression is
 
-(add some thoughts here)
+$$ 
+Y_i = \beta_0 + \beta_{1}x_{1i} + \beta_{2}x_{2i} + ... + \beta_{n}x_{ni} + E_i
+$$ Here:  
+- $Yi$ is our response variable for the $i^{th}$ observation  
+- $x_{i}$ is the value of our explanatory variable for the \$i^{th}
+observation for each explanatory variable (1-n)  
+- $\beta_0$ is the y intercept  
+- $\beta_{1,...,n)$ is the regression coefficient corresponding to the
+explanatory variable of interest (1-n)  
+- $E_i$ is an error parameter
 
-### Monti - Linear Regression Model (LASSO Regression)
+The goal of linear regression is to model the fit by minimizing the sum
+of squared errors.
+
+$$
+SSE = \sum_{i=1}^n(y_{i} - \hat{y}_{i})^2
+$$ Here:  
+- $y_i$ is the actual value  
+- $\hat{y}_{i}$ is the predicted value
+
+In R, MLR is generally done with the function `lm`. There are also a
+variety of other methods that fall under the umbrella of MLR, namely
+LASSO regression which we will explore as part of this analysis.
+
+#### Linear Regression Model \#1: Multiple Linear Regression Using `lm`
+
+Here, modeling for linear regression is done with the `caret` package
+using the method `lm`. The `summary` function gives us the regression
+coefficients.
+
+``` r
+lmFit = train(shares~., data = dfTrain,
+              method="lm",
+              preProcess = c("center","scale"),
+              trControl = trainControl(method="CV",number=5))
+
+summary(lmFit)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = .outcome ~ ., data = dat)
+    ## 
+    ## Residuals:
+    ##    Min     1Q Median     3Q    Max 
+    ## -14211  -1828  -1025    136 654984 
+    ## 
+    ## Coefficients: (1 not defined because of singularities)
+    ##                          Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)               3083.84     142.23  21.682  < 2e-16 ***
+    ## LDA_00                     328.63     144.19   2.279 0.022702 *  
+    ## LDA_01                      20.73     145.75   0.142 0.886916    
+    ## LDA_02                      11.57     148.64   0.078 0.937973    
+    ## LDA_03                     -23.45     145.81  -0.161 0.872256    
+    ## LDA_04                         NA         NA      NA       NA    
+    ## average_token_length       -53.73     157.50  -0.341 0.733017    
+    ## is_weekend                 153.01     143.87   1.064 0.287600    
+    ## n_tokens_content           713.38     203.78   3.501 0.000468 ***
+    ## n_non_stop_unique_tokens   -83.36     197.81  -0.421 0.673481    
+    ## num_hrefs                  478.82     198.85   2.408 0.016075 *  
+    ## num_self_hrefs            -745.43     180.81  -4.123  3.8e-05 ***
+    ## num_videos                 181.33     144.43   1.255 0.209361    
+    ## kw_avg_min                -351.38     163.85  -2.144 0.032043 *  
+    ## kw_avg_max                -389.03     169.99  -2.289 0.022148 *  
+    ## kw_avg_avg                 605.54     172.24   3.516 0.000442 ***
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 10200 on 5130 degrees of freedom
+    ## Multiple R-squared:  0.0137, Adjusted R-squared:  0.01101 
+    ## F-statistic: 5.091 on 14 and 5130 DF,  p-value: 1.341e-09
+
+The following table shows the output training metrics for this linear
+regression.
+
+``` r
+lm_out = data.frame(lmFit$results)
+
+kable(lm_out, caption = "Output Training Metrics for Linear Regression",
+      digits = 3)
+```
+
+| intercept |    RMSE | Rsquared |      MAE |  RMSESD | RsquaredSD |   MAESD |
+|:----------|--------:|---------:|---------:|--------:|-----------:|--------:|
+| TRUE      | 7701.02 |    0.012 | 2388.943 | 7615.79 |      0.004 | 313.088 |
+
+Output Training Metrics for Linear Regression
+
+The following shows the RMSE, $R^2$, and MAE values for the model as it
+performed on predicting the test set.
+
+``` r
+metric_lm = postResample(pred = predict(lmFit, newdata = dfTest), 
+                         obs = dfTest$shares)
+
+metric_lm
+```
+
+    ##         RMSE     Rsquared          MAE 
+    ## 5.022856e+03 2.789813e-02 2.305239e+03
+
+#### Linear Regression Model \#2: LASSO Regression using `glmnet`
 
 The linear regression chosen for this next model is based on penalized
 regression via LASSO regression. This method has a particular advantage
@@ -743,17 +869,17 @@ kable(lasso_out, caption = "Output Training Metrics for LASSO",
 
 | alpha | lambda |     RMSE | Rsquared |      MAE |   RMSESD | RsquaredSD |   MAESD |
 |------:|-------:|---------:|---------:|---------:|---------:|-----------:|--------:|
-|     1 |      0 | 7699.557 |    0.012 | 2387.851 | 7616.828 |      0.004 | 313.672 |
-|     1 |      1 | 7699.562 |    0.012 | 2387.847 | 7616.837 |      0.004 | 313.662 |
-|     1 |      2 | 7699.610 |    0.012 | 2387.779 | 7616.965 |      0.004 | 313.539 |
-|     1 |      3 | 7698.992 |    0.012 | 2387.257 | 7617.501 |      0.004 | 313.724 |
-|     1 |      4 | 7698.325 |    0.012 | 2386.707 | 7618.068 |      0.004 | 313.953 |
-|     1 |      5 | 7697.660 |    0.012 | 2386.163 | 7618.626 |      0.004 | 314.181 |
-|     1 |      6 | 7696.983 |    0.012 | 2385.626 | 7619.146 |      0.004 | 314.423 |
-|     1 |      7 | 7696.315 |    0.011 | 2385.093 | 7619.674 |      0.004 | 314.664 |
-|     1 |      8 | 7695.650 |    0.011 | 2384.572 | 7620.196 |      0.004 | 314.918 |
-|     1 |      9 | 7694.993 |    0.011 | 2384.055 | 7620.718 |      0.004 | 315.167 |
-|     1 |     10 | 7694.345 |    0.011 | 2383.556 | 7621.234 |      0.004 | 315.401 |
+|     1 |      0 | 7889.217 |    0.014 | 2378.517 | 7312.151 |      0.005 | 219.589 |
+|     1 |      1 | 7889.218 |    0.014 | 2378.516 | 7312.153 |      0.005 | 219.586 |
+|     1 |      2 | 7889.228 |    0.014 | 2378.471 | 7312.204 |      0.005 | 219.519 |
+|     1 |      3 | 7888.821 |    0.014 | 2378.019 | 7312.484 |      0.005 | 219.650 |
+|     1 |      4 | 7888.395 |    0.014 | 2377.542 | 7312.774 |      0.005 | 219.789 |
+|     1 |      5 | 7887.973 |    0.014 | 2377.073 | 7313.063 |      0.005 | 219.931 |
+|     1 |      6 | 7887.555 |    0.014 | 2376.617 | 7313.350 |      0.005 | 220.070 |
+|     1 |      7 | 7887.133 |    0.014 | 2376.175 | 7313.631 |      0.005 | 220.197 |
+|     1 |      8 | 7886.713 |    0.014 | 2375.731 | 7313.920 |      0.005 | 220.324 |
+|     1 |      9 | 7886.294 |    0.014 | 2375.292 | 7314.204 |      0.005 | 220.451 |
+|     1 |     10 | 7885.881 |    0.014 | 2374.859 | 7314.490 |      0.005 | 220.579 |
 
 Output Training Metrics for LASSO
 
@@ -782,80 +908,48 @@ metric_LASSO
     ##         RMSE     Rsquared          MAE 
     ## 5.020706e+03 2.780156e-02 2.301849e+03
 
-### Belknap - Linear Regression Model
+### Tree-Based Modeling
 
-(add some thoughts here)
+The next two models, Random Forest and Boosted Tree, are both types of
+tree-based modeling methods. Generally speaking, in a tree-based
+modeling method, the predictor space is split into regions, with
+different predictions for each region. In the case of regression trees
+where the goal is to predict a continuous response, the mean of
+observations for a given region is typically used to make the
+predictions.
 
-``` r
-lmFit = train(shares~., data = dfTrain,
-              method="lm",
-              preProcess = c("center","scale"),
-              trControl = trainControl(method="CV",number=5))
+To make the predictions, the trees are split using recursive binary
+splitting. For every possible value of each predictor, find the residual
+sum of squares (RSS) and try to minimize that. The process is repeated
+with each split. Often, trees are grown very large and need to be cut
+back using cost complexity pruning. This ensures that the model is not
+overfit and will work well on prediction of new data.
 
-summary(lmFit)
-```
+#### Random Forest Model
 
-    ## 
-    ## Call:
-    ## lm(formula = .outcome ~ ., data = dat)
-    ## 
-    ## Residuals:
-    ##    Min     1Q Median     3Q    Max 
-    ## -14211  -1828  -1025    136 654984 
-    ## 
-    ## Coefficients: (1 not defined because of singularities)
-    ##                          Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)               3083.84     142.23  21.682  < 2e-16 ***
-    ## LDA_00                     328.63     144.19   2.279 0.022702 *  
-    ## LDA_01                      20.73     145.75   0.142 0.886916    
-    ## LDA_02                      11.57     148.64   0.078 0.937973    
-    ## LDA_03                     -23.45     145.81  -0.161 0.872256    
-    ## LDA_04                         NA         NA      NA       NA    
-    ## average_token_length       -53.73     157.50  -0.341 0.733017    
-    ## is_weekend                 153.01     143.87   1.064 0.287600    
-    ## n_tokens_content           713.38     203.78   3.501 0.000468 ***
-    ## n_non_stop_unique_tokens   -83.36     197.81  -0.421 0.673481    
-    ## num_hrefs                  478.82     198.85   2.408 0.016075 *  
-    ## num_self_hrefs            -745.43     180.81  -4.123  3.8e-05 ***
-    ## num_videos                 181.33     144.43   1.255 0.209361    
-    ## kw_avg_min                -351.38     163.85  -2.144 0.032043 *  
-    ## kw_avg_max                -389.03     169.99  -2.289 0.022148 *  
-    ## kw_avg_avg                 605.54     172.24   3.516 0.000442 ***
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 10200 on 5130 degrees of freedom
-    ## Multiple R-squared:  0.0137, Adjusted R-squared:  0.01101 
-    ## F-statistic: 5.091 on 14 and 5130 DF,  p-value: 1.341e-09
+In this section, we attempt to model the data using a Random Forest
+model, which is a type of ensemble learning which averages multiple tree
+models in order to lower the variance of the final model and thus
+improve our prediction.
 
-(add some thoughts here)
+In a random forest model, we first begin by creating multiple trees from
+bootstrap samples. A random subset of predictors is used to create each
+bootstrap sample. The predictors are selected randomly to prevent the
+trees from being correlated. If the random subset was not used (as in
+another tree based method called bagging), the trees would likely all
+choose the same predictors for the first split. Choosing the splits
+randomly avoids this correlation. The number of predictors is specified
+by `mtry`. The maximum number of predictors for a regression model is
+generally chosen to be the total number of predictors divided by 3. Once
+the bootstrap sample statistics are collected, they are averaged and
+used to select a final model.
 
-``` r
-lm_out = data.frame(lmFit$results)
+Random forest models use “out of bag” error to test the data using
+samples from the original data set that were not included in a
+particular bootstrap data set.
 
-kable(lm_out, caption = "Output Training Metrics for Linear Regression",
-      digits = 3)
-```
-
-| intercept |     RMSE | Rsquared |      MAE |   RMSESD | RsquaredSD |   MAESD |
-|:----------|---------:|---------:|---------:|---------:|-----------:|--------:|
-| TRUE      | 7890.096 |    0.014 | 2379.451 | 7311.616 |      0.005 | 219.246 |
-
-Output Training Metrics for Linear Regression
-
-``` r
-metric_lm = postResample(pred = predict(lmFit, newdata = dfTest), 
-                         obs = dfTest$shares)
-
-metric_lm
-```
-
-    ##         RMSE     Rsquared          MAE 
-    ## 5.022856e+03 2.789813e-02 2.305239e+03
-
-### Belknap - Random Forest Model & Explanation
-
-(add some thoughts here about RF)
+For the random forest model, we will use the `train` function from the
+`caret` package. We set the `mtry` to select 1-5 predictors.
 
 ``` r
 train.control = trainControl(method = "cv", number = 5)
@@ -872,7 +966,11 @@ rfFit$bestTune$mtry
 
     ## [1] 1
 
-(add some thoughts here)
+The best `mtry` for this particular model was 1.
+
+The following plot shows the RMSE values for each of the tune. The
+objective in random forest modeling is to choose the model with the
+lowest RMSE.
 
 ``` r
 plot(rfFit)
@@ -880,7 +978,8 @@ plot(rfFit)
 
 ![](tech_files/figure-gfm/RFplot-1.png)<!-- -->
 
-(add some thoughts here)
+The following table shows training metrics for the random forest model.
+Again, the best model is the one that minimizes RMSE.
 
 ``` r
 rf_out = data.frame(rfFit$results)
@@ -899,7 +998,12 @@ kable(rf_out, caption = "Output Training Metrics for Random Forest",
 
 Output Training Metrics for Random Forest
 
-(add some thoughts here)
+Now we will run a prediction on our test data split that we obtained
+when we split the data based on a 70/30 split. The table shows the RMSE
+value for the test data set, which is an indication of how well our
+model worked to predict data that was not included when training the
+original model. We can compare this model against other models to find
+the model with the lowest RMSE.
 
 ``` r
 RF_pred <- predict(rfFit, newdata = activeTest)
@@ -912,7 +1016,7 @@ metric_rf
     ##         RMSE     Rsquared          MAE 
     ## 4.997559e+03 3.310394e-02 2.281586e+03
 
-### Monti - Boosted Tree Model & Explanation
+#### Boosted Tree Model
 
 In this section the Ensemble Learning algorithm Boosting will be
 trained. Boosted tree method is one of the Tree based models most used
@@ -969,44 +1073,47 @@ to see that these values minimize the RMSE.
 ``` r
 gbm_out = data.frame(gbmFit$results)
 
+gbm_out <- gbm_out %>%
+  arrange(RMSE)
+
 kable(gbm_out, caption = "Output Training Metrics for Boosting",
-      digits = 3)
+      digits = 3, row.names = FALSE)
 ```
 
-|     | shrinkage | interaction.depth | n.minobsinnode | n.trees |     RMSE | Rsquared |      MAE |   RMSESD | RsquaredSD |   MAESD |
-|:----|----------:|------------------:|---------------:|--------:|---------:|---------:|---------:|---------:|-----------:|--------:|
-| 1   |       0.1 |                 1 |             10 |      25 | 7956.357 |    0.002 | 2425.226 | 7423.697 |      0.002 | 259.564 |
-| 9   |       0.1 |                 2 |             10 |      25 | 7903.066 |    0.004 | 2404.118 | 7466.232 |      0.004 | 278.320 |
-| 17  |       0.1 |                 3 |             10 |      25 | 7781.121 |    0.009 | 2367.006 | 7540.197 |      0.009 | 308.609 |
-| 25  |       0.1 |                 4 |             10 |      25 | 7889.387 |    0.007 | 2398.751 | 7458.385 |      0.004 | 292.259 |
-| 2   |       0.1 |                 1 |             10 |      50 | 8115.858 |    0.002 | 2465.009 | 7345.725 |      0.002 | 251.112 |
-| 10  |       0.1 |                 2 |             10 |      50 | 7922.699 |    0.004 | 2384.219 | 7445.965 |      0.005 | 281.575 |
-| 18  |       0.1 |                 3 |             10 |      50 | 7842.065 |    0.009 | 2354.877 | 7502.027 |      0.008 | 298.730 |
-| 26  |       0.1 |                 4 |             10 |      50 | 8016.149 |    0.009 | 2412.625 | 7356.704 |      0.006 | 285.951 |
-| 3   |       0.1 |                 1 |             10 |      75 | 8140.139 |    0.002 | 2471.242 | 7328.453 |      0.002 | 241.395 |
-| 11  |       0.1 |                 2 |             10 |      75 | 8078.490 |    0.003 | 2425.173 | 7361.139 |      0.004 | 260.212 |
-| 19  |       0.1 |                 3 |             10 |      75 | 8049.652 |    0.006 | 2408.768 | 7387.756 |      0.005 | 284.380 |
-| 27  |       0.1 |                 4 |             10 |      75 | 8127.909 |    0.009 | 2423.260 | 7284.274 |      0.006 | 265.491 |
-| 4   |       0.1 |                 1 |             10 |     100 | 8093.321 |    0.002 | 2453.474 | 7347.791 |      0.002 | 246.464 |
-| 12  |       0.1 |                 2 |             10 |     100 | 8151.695 |    0.003 | 2409.053 | 7321.957 |      0.004 | 265.141 |
-| 20  |       0.1 |                 3 |             10 |     100 | 8200.849 |    0.005 | 2407.076 | 7296.466 |      0.006 | 275.155 |
-| 28  |       0.1 |                 4 |             10 |     100 | 8208.934 |    0.009 | 2412.124 | 7256.674 |      0.005 | 284.935 |
-| 5   |       0.1 |                 1 |             10 |     125 | 8137.816 |    0.002 | 2472.195 | 7328.578 |      0.002 | 243.306 |
-| 13  |       0.1 |                 2 |             10 |     125 | 8173.975 |    0.003 | 2388.696 | 7308.672 |      0.004 | 271.387 |
-| 21  |       0.1 |                 3 |             10 |     125 | 8303.653 |    0.005 | 2419.833 | 7233.908 |      0.005 | 274.831 |
-| 29  |       0.1 |                 4 |             10 |     125 | 8348.632 |    0.008 | 2437.226 | 7194.273 |      0.004 | 278.918 |
-| 6   |       0.1 |                 1 |             10 |     150 | 8165.638 |    0.002 | 2464.797 | 7315.437 |      0.002 | 238.736 |
-| 14  |       0.1 |                 2 |             10 |     150 | 8440.137 |    0.003 | 2456.488 | 7176.236 |      0.004 | 248.873 |
-| 22  |       0.1 |                 3 |             10 |     150 | 8381.909 |    0.005 | 2438.718 | 7196.526 |      0.004 | 267.755 |
-| 30  |       0.1 |                 4 |             10 |     150 | 8494.328 |    0.007 | 2452.447 | 7108.918 |      0.004 | 278.287 |
-| 7   |       0.1 |                 1 |             10 |     175 | 8180.005 |    0.002 | 2467.862 | 7304.202 |      0.002 | 234.835 |
-| 15  |       0.1 |                 2 |             10 |     175 | 8522.373 |    0.003 | 2452.516 | 7127.556 |      0.003 | 253.328 |
-| 23  |       0.1 |                 3 |             10 |     175 | 8508.550 |    0.005 | 2440.627 | 7113.122 |      0.004 | 269.052 |
-| 31  |       0.1 |                 4 |             10 |     175 | 8606.834 |    0.007 | 2480.048 | 7030.530 |      0.005 | 258.990 |
-| 8   |       0.1 |                 1 |             10 |     200 | 8171.212 |    0.002 | 2453.452 | 7304.630 |      0.002 | 239.592 |
-| 16  |       0.1 |                 2 |             10 |     200 | 8681.192 |    0.003 | 2467.318 | 7027.770 |      0.002 | 233.629 |
-| 24  |       0.1 |                 3 |             10 |     200 | 8706.250 |    0.006 | 2486.308 | 6978.420 |      0.005 | 260.256 |
-| 32  |       0.1 |                 4 |             10 |     200 | 8655.479 |    0.007 | 2477.656 | 7008.296 |      0.005 | 268.740 |
+| shrinkage | interaction.depth | n.minobsinnode | n.trees |     RMSE | Rsquared |      MAE |   RMSESD | RsquaredSD |   MAESD |
+|----------:|------------------:|---------------:|--------:|---------:|---------:|---------:|---------:|-----------:|--------:|
+|       0.1 |                 3 |             10 |      25 | 7781.121 |    0.009 | 2367.006 | 7540.197 |      0.009 | 308.609 |
+|       0.1 |                 3 |             10 |      50 | 7842.065 |    0.009 | 2354.877 | 7502.027 |      0.008 | 298.730 |
+|       0.1 |                 4 |             10 |      25 | 7889.387 |    0.007 | 2398.751 | 7458.385 |      0.004 | 292.259 |
+|       0.1 |                 2 |             10 |      25 | 7903.066 |    0.004 | 2404.118 | 7466.232 |      0.004 | 278.320 |
+|       0.1 |                 2 |             10 |      50 | 7922.699 |    0.004 | 2384.219 | 7445.965 |      0.005 | 281.575 |
+|       0.1 |                 1 |             10 |      25 | 7956.357 |    0.002 | 2425.226 | 7423.697 |      0.002 | 259.564 |
+|       0.1 |                 4 |             10 |      50 | 8016.149 |    0.009 | 2412.625 | 7356.704 |      0.006 | 285.951 |
+|       0.1 |                 3 |             10 |      75 | 8049.652 |    0.006 | 2408.768 | 7387.756 |      0.005 | 284.380 |
+|       0.1 |                 2 |             10 |      75 | 8078.490 |    0.003 | 2425.173 | 7361.139 |      0.004 | 260.212 |
+|       0.1 |                 1 |             10 |     100 | 8093.321 |    0.002 | 2453.474 | 7347.791 |      0.002 | 246.464 |
+|       0.1 |                 1 |             10 |      50 | 8115.858 |    0.002 | 2465.009 | 7345.725 |      0.002 | 251.112 |
+|       0.1 |                 4 |             10 |      75 | 8127.909 |    0.009 | 2423.260 | 7284.274 |      0.006 | 265.491 |
+|       0.1 |                 1 |             10 |     125 | 8137.816 |    0.002 | 2472.195 | 7328.578 |      0.002 | 243.306 |
+|       0.1 |                 1 |             10 |      75 | 8140.139 |    0.002 | 2471.242 | 7328.453 |      0.002 | 241.395 |
+|       0.1 |                 2 |             10 |     100 | 8151.695 |    0.003 | 2409.053 | 7321.957 |      0.004 | 265.141 |
+|       0.1 |                 1 |             10 |     150 | 8165.638 |    0.002 | 2464.797 | 7315.437 |      0.002 | 238.736 |
+|       0.1 |                 1 |             10 |     200 | 8171.212 |    0.002 | 2453.452 | 7304.630 |      0.002 | 239.592 |
+|       0.1 |                 2 |             10 |     125 | 8173.975 |    0.003 | 2388.696 | 7308.672 |      0.004 | 271.387 |
+|       0.1 |                 1 |             10 |     175 | 8180.005 |    0.002 | 2467.862 | 7304.202 |      0.002 | 234.835 |
+|       0.1 |                 3 |             10 |     100 | 8200.849 |    0.005 | 2407.076 | 7296.466 |      0.006 | 275.155 |
+|       0.1 |                 4 |             10 |     100 | 8208.934 |    0.009 | 2412.124 | 7256.674 |      0.005 | 284.935 |
+|       0.1 |                 3 |             10 |     125 | 8303.653 |    0.005 | 2419.833 | 7233.908 |      0.005 | 274.831 |
+|       0.1 |                 4 |             10 |     125 | 8348.632 |    0.008 | 2437.226 | 7194.273 |      0.004 | 278.918 |
+|       0.1 |                 3 |             10 |     150 | 8381.909 |    0.005 | 2438.718 | 7196.526 |      0.004 | 267.755 |
+|       0.1 |                 2 |             10 |     150 | 8440.137 |    0.003 | 2456.488 | 7176.236 |      0.004 | 248.873 |
+|       0.1 |                 4 |             10 |     150 | 8494.328 |    0.007 | 2452.447 | 7108.918 |      0.004 | 278.287 |
+|       0.1 |                 3 |             10 |     175 | 8508.550 |    0.005 | 2440.627 | 7113.122 |      0.004 | 269.052 |
+|       0.1 |                 2 |             10 |     175 | 8522.373 |    0.003 | 2452.516 | 7127.556 |      0.003 | 253.328 |
+|       0.1 |                 4 |             10 |     175 | 8606.834 |    0.007 | 2480.048 | 7030.530 |      0.005 | 258.990 |
+|       0.1 |                 4 |             10 |     200 | 8655.479 |    0.007 | 2477.656 | 7008.296 |      0.005 | 268.740 |
+|       0.1 |                 2 |             10 |     200 | 8681.192 |    0.003 | 2467.318 | 7027.770 |      0.002 | 233.629 |
+|       0.1 |                 3 |             10 |     200 | 8706.250 |    0.006 | 2486.308 | 6978.420 |      0.005 | 260.256 |
 
 Output Training Metrics for Boosting
 
@@ -1037,7 +1144,7 @@ metric_boosting
     ##         RMSE     Rsquared          MAE 
     ## 5058.7387897    0.0140672 2260.9025186
 
-## Comparison & Conclusion - Monti
+## Model Comparison & Conclusion
 
 For the overall comparison among all 4 created models in previous
 sections, the test set was used for predictions and some quality of fit
