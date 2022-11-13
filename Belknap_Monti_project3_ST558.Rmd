@@ -349,7 +349,7 @@ ggplot(pc_directions)+
 
 #### Scatter Plots by LDA Value
 
-The scatter plots below show the different levels of the variables related to the LDA metrics, from 0 to 4, and graphs the relationship with the response variable `shares`. The function `ggplot()` is used to create the plot frame and `geom_point()`, `geom_smooth`, and `facert_wrap()` function are used to plot the scatter points, the smooth GAM (Generalized Additive Models) lines, and split the data by LDA type, respectively. It is possible to see the behavior of the response variable in relation to each LDA types.
+The scatter plots below show the different levels of the variables related to the LDA metrics, from 0 to 4, and graphs the relationship with the response variable `shares`. The function `ggplot()` is used to create the plot frame and `geom_point()`, `geom_smooth`, and `facet_wrap()` function are used to plot the scatter points, the smooth GAM (Generalized Additive Models) lines, and split the data by LDA type, respectively. It is possible to see the behavior of the response variable in relation to each LDA types.
 
 ```{r LDAplot}
 
@@ -482,16 +482,14 @@ Y_i = \beta_0 + \beta_{1}x_{1i} + \beta_{2}x_{2i} + ... + \beta_{n}x_{ni} + E_i
 $$
 Here:   
    - $Yi$ is our response variable for the $i^{th}$ observation   
-   - $x_{i}$ is the value of our explanatory variable for the $i^{th} observation for each explanatory variable (1-n)   
+   - $x_{i}$ is the value of our explanatory variable for the $i^{th}$ observation for each explanatory variable (1-n)   
    - $\beta_0$ is the y intercept   
-   - $\beta_{1,...,n)$ is the regression coefficient corresponding to the explanatory variable of interest (1-n)   
+   - $\beta_{1,...,n}$ is the regression coefficient corresponding to the explanatory variable of interest (1-n)   
    - $E_i$ is an error parameter   
 
 The goal of linear regression is to model the fit by minimizing the sum of squared errors. 
 
-$$
-SSE = \sum_{i=1}^n(y_{i} - \hat{y}_{i})^2
-$$
+$$ SSE = \sum_{i=1}^n(y_{i} - \hat{y}_{i})^2 $$
 Here:   
    - $y_i$ is the actual value   
    - $\hat{y}_{i}$ is the predicted value   
