@@ -16,12 +16,12 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, error = FALSE, message = FAL
 
 # Report for the *`r params$channel`* Data Channel
 
-This report contains Exploratory Data Analysis (EDA) about the `r params$channel` data channel and a modeling section applying three regression methods which attempt to predict trends about article sharing on the Mashable website. 
+This report contains Exploratory Data Analysis (EDA) about the `r params$channel` data channel and a modeling section applying different regression methods which attempt to predict trends about article sharing on the Mashable website. 
 
 
 ## Introduction
 
-The objective of this analysis is to provide a comprehensive overview about publication metrics and their relationship with the number of shares that those publications presented during the study period. These data have been collected from Mashable website, one of the largest news websites from which the content of all the `r params$channel` channel articles published in 2013 and 2014 was extracted. The full data description can be found [here](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity). These data were originally collected and analyzed by Fernandes et al. (2015), in which the authors performed classification task comparing several machine learning algorithms. In the present study, a subset of the data used by Fernandes et al.(2015) corresponding to the data channel `r params$channel` is used for regression purposes. The response variable is the number of `shares` that the papers presented after publication. In other words, we will try to predict the number of shares that the papers will have before publication and evaluate the prediction of each selected model based on some common metrics, such as RMSE (Root Mean Squared Error), $R^2$ (Coefficient of Determination), and MAE (Mean Absolute Error) applied to the test set. To perform the regression, the methods Random Forest, Boosting, Multiple Linear Regression, and LASSO regression will be used. More information about the methods will be corresponding in further sections.    
+The objective of this analysis is to provide a comprehensive overview about publication metrics and their relationship with the number of shares that those publications presented during the study period. These data have been collected from Mashable website, one of the largest news websites from which the content of all the `r params$channel` channel articles published in 2013 and 2014 was extracted. The full data description can be found [here](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity). These data were originally collected and analyzed by Fernandes et al. (2015), in which the authors performed classification task comparing several machine learning algorithms. In the present study, a subset of the data used by Fernandes et al.(2015) corresponding to the data channel `r params$channel` is used for regression purposes. The response variable is the number of `shares` that the papers presented after publication. In other words, we will try to predict the number of shares that the papers will have before publication and evaluate the prediction of each selected model based on some common metrics, such as RMSE (Root Mean Squared Error), RSquared (Coefficient of Determination), and MAE (Mean Absolute Error) applied to the test set. To perform the regression, the methods Random Forest, Boosting, Multiple Linear Regression, and LASSO regression will be used. More information about the methods will be corresponding in further sections.    
    
    Some metrics have been calculated based on the information obtained from Mashable website. For instance, the Latent Dirichlet Allocation (LDA) was applied to the data set to identify the 5 top relevant topics and then measure the closeness of the current article to such topic. There are 5 relevance of topic metrics according to LDA:   
    
@@ -367,7 +367,7 @@ labs(x = "LDA Values", y = "Shares", title = "Shares by LDA Types")
 
 #### Scatter Plots by Keyword Metrics
 
-The scatter plots below show the different types of the variables related to the Keyword metrics and graphs the relationship with the response variable `shares`. The function `ggplot()` is used to create the plot frame and `geom_point()`, `geom_smooth`, and `facert_wrap()` function are used to plot the scatter points, the smooth GAM (Generalized Additive Models) lines, and split the data by keyword type, respectively. It is possible to see the behavior of the response variable in relation to each of the 3 keyword metric types.
+The scatter plots below show the different types of the variables related to the Keyword metrics and graphs the relationship with the response variable `shares`. The function `ggplot()` is used to create the plot frame and `geom_point()`, `geom_smooth`, and `facet_wrap()` function are used to plot the scatter points, the smooth GAM (Generalized Additive Models) lines, and split the data by keyword type, respectively. It is possible to see the behavior of the response variable in relation to each of the 3 keyword metric types.
 
 ```{r keywordplot}
 
@@ -385,7 +385,7 @@ labs(x = "Keyword Metric Values", y = "Shares", title = "Shares by Keyword Metri
 
 #### Scatter Plots by Content Metrics
 
-The scatter plots below show the different types of the variables related to the Content metrics and graphs the relationship with the response variable `shares`. The function `ggplot()` is used to create the plot frame and `geom_point()`, `geom_smooth`, and `facert_wrap()` function are used to plot the scatter points, the smooth GAM (Generalized Additive Models) lines, and split the data by content type, respectively. It is possible to see the behavior of the response variable in relation to each of the 4 content metric types.
+The scatter plots below show the different types of the variables related to the Content metrics and graphs the relationship with the response variable `shares`. The function `ggplot()` is used to create the plot frame and `geom_point()`, `geom_smooth`, and `facet_wrap()` function are used to plot the scatter points, the smooth GAM (Generalized Additive Models) lines, and split the data by content type, respectively. It is possible to see the behavior of the response variable in relation to each of the 4 content metric types.
 
 ```{r Contentplot}
 
@@ -399,6 +399,20 @@ cont.dat = activeTrain %>%
 ggplot(cont.dat, aes(y = shares, x = values))+
   geom_point() + geom_smooth(method = "loess")+ facet_wrap(~content)+
 labs(x = "Content Metric Values", y = "Shares", title = "Shares by Content Metric Types")
+
+```
+
+#### Box Plot of Shares for Data Channel 'r params$channel`
+
+The following box plot shows the number of shares for this data channel.  
+
+```{r boxsharesGraph}
+
+boxSharesGraph <- ggplot(statsData, aes(x = dataChannel, y = shares))
+boxSharesGraph + geom_boxplot() + 
+  ggtitle("Number of Shares for Data Channel") +
+  ylab("Number of Shares") +
+  xlab("Data Channel") 
 
 ```
 
@@ -473,29 +487,11 @@ dfTest = activeTest %>%
 
 ### Linear Regression Modeling
 
-Linear regression is a modeling technique by which one attempts to model a response variable (in this case `shares`) with one or more explanatory variables using a straight line. If there is only one explanatory variable, you would call this simple linear regression. Using more than one explanatory variable is called multiple linear regression. For the purposes of this report, we will be looking at multiple linear regression (MLR).
+Linear regression is a modeling technique by which one attempts to model a response variable (in this case `shares`) with one or more explanatory variables using a straight line. A model with only one explanatory variable is called simple linear regression (SLR). In simple linear regression, the response variable is predicted by an intercept and a regression coefficient multiplied by the value of your explanatory variable. The goal of regression is to determine the intercept and the regression coefficients. This is done by fitting a straight line across all of the data with the goal of minimizing the residuals. The model is fit by minimizing the sum of squared errors (SSE).
 
-The basic formula that is used for multiple linear regression is 
+The same concept can be applied to multiple linear regression (MLR), which has more than one explanatory variable. In this case, the goal is to determine the intercept and a regression coefficient corresponding to each explanatory variable in an attempt to minimize the sum of squared errors. 
 
-$$ 
-Y_i = \beta_0 + \beta_{1}x_{1i} + \beta_{2}x_{2i} + ... + \beta_{n}x_{ni} + E_i
-$$
-Here:   
-   - $Yi$ is our response variable for the $i^{th}$ observation   
-   - $x_{i}$ is the value of our explanatory variable for the $i^{th}$ observation for each explanatory variable (1-n)   
-   - $\beta_0$ is the y intercept   
-   - $\beta_{1,...,n}$ is the regression coefficient corresponding to the explanatory variable of interest (1-n)   
-   - $E_i$ is an error parameter   
-
-The goal of linear regression is to model the fit by minimizing the sum of squared errors. 
-
-$$ SSE = \sum_{i=1}^n(y_{i} - \hat{y}_{i})^2 $$
-Here:   
-   - $y_i$ is the actual value   
-   - $\hat{y}_{i}$ is the predicted value   
-
-In R, MLR is generally done with the function `lm`. There are also a variety of other methods that fall under the umbrella of MLR, namely LASSO regression which we will explore as part of this analysis.
-
+In R, MLR is generally done with the function `lm`. There are also a variety of other methods that fall under the umbrella of MLR. One of these methods, LASSO regression, will be explored as part of this analysis.
 
 #### Linear Regression Model #1: Multiple Linear Regression Using `lm`
 
@@ -523,7 +519,7 @@ kable(lm_out, caption = "Output Training Metrics for Linear Regression",
 
 ```
 
-The following shows the RMSE, $R^2$, and MAE values for the model as it performed on predicting the test set.
+The following shows the RMSE, RSquared, and MAE values for the model as it performed on predicting the test set.
 
 ```{r lineartest}
 
