@@ -63,9 +63,9 @@ Kara Belknap & Cassio Monti
             -   <a href="#scatter-plots-by-content-metrics"
                 id="toc-scatter-plots-by-content-metrics">Scatter Plots by Content
                 Metrics</a>
-            -   <a href="#box-plot-of-shares-for-data-channel-r-paramschannel"
-                id="toc-box-plot-of-shares-for-data-channel-r-paramschannel">Box Plot of
-                Shares for Data Channel ’r params$channel`</a>
+            -   <a href="#box-plot-of-shares-for-data-channel-bus"
+                id="toc-box-plot-of-shares-for-data-channel-bus">Box Plot of Shares for
+                Data Channel <em>bus</em></a>
             -   <a href="#scatter-plot-of-title-words"
                 id="toc-scatter-plot-of-title-words">Scatter Plot of Title Words</a>
             -   <a href="#scatter-plot-of-positive-words"
@@ -730,7 +730,7 @@ labs(x = "Content Metric Values", y = "Shares", title = "Shares by Content Metri
 
 ![](bus_files/figure-gfm/Contentplot-1.png)<!-- -->
 
-#### Box Plot of Shares for Data Channel ’r params\$channel\`
+#### Box Plot of Shares for Data Channel *bus*
 
 The following box plot shows the distribution of shares for this data
 channel. The main chunk of the data can be seen within the “box”
@@ -746,7 +746,7 @@ This stresses the importance of knowing about the subject and data set
 in order to perform statistical analysis.
 
 ``` r
-boxSharesGraph <- ggplot(statsData, aes(x = dataChannel, y = shares))
+boxSharesGraph <- ggplot(statsData, aes(y = shares))
 boxSharesGraph + geom_boxplot() + 
   ggtitle(paste("Number of Shares for Data Channel:", dataChannelSelect)) +
   ylab("Number of Shares") +

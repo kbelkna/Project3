@@ -439,13 +439,13 @@ labs(x = "Content Metric Values", y = "Shares", title = "Shares by Content Metri
 
 ```
 
-#### Box Plot of Shares for Data Channel 'r params$channel`
+#### Box Plot of Shares for Data Channel *`r params$channel`*
 
 The following box plot shows the distribution of shares for this data channel. The main chunk of the data can be seen within the "box" representing the region encompassing the first and third quartiles. For some cases, there are possible outliers in the data that make distortions to the box plot and this mentioned "box" looks thinner than usual. If this happens, then it means that the possible outliers are much larger than the main chunk of data. The outliers usually appear as individual points in the box plot. The graph below shows this pattern for the response variable `shares`. However, the data might not have outliers and the highlighted data points are in fact part of the data. This stresses the importance of knowing about the subject and data set in order to perform statistical analysis.
 
 ```{r boxsharesGraph}
 
-boxSharesGraph <- ggplot(statsData, aes(x = dataChannel, y = shares))
+boxSharesGraph <- ggplot(statsData, aes(y = shares))
 boxSharesGraph + geom_boxplot() + 
   ggtitle(paste("Number of Shares for Data Channel:", dataChannelSelect)) +
   ylab("Number of Shares") +
