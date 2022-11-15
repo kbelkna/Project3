@@ -21,18 +21,81 @@ Kara Belknap & Cassio Monti
         <em>tech</em> Data Channel</a>
         -   <a href="#data-manipulation-for-eda"
             id="toc-data-manipulation-for-eda">Data Manipulation for EDA</a>
+            -   <a href="#data-split" id="toc-data-split">Data Split</a>
+            -   <a href="#outlier-detection-and-cleaning"
+                id="toc-outlier-detection-and-cleaning">Outlier Detection and
+                Cleaning</a>
+            -   <a href="#data-manipulation-for-statistics"
+                id="toc-data-manipulation-for-statistics">Data manipulation for
+                statistics</a>
         -   <a href="#eda-summary-statistics" id="toc-eda-summary-statistics">EDA:
             Summary Statistics</a>
+            -   <a href="#summary-statistics-number-of-articles-shared"
+                id="toc-summary-statistics-number-of-articles-shared">Summary
+                Statistics, Number of Articles Shared</a>
+            -   <a
+                href="#summary-statistics-number-of-articles-shared-weekend-vs-weekday"
+                id="toc-summary-statistics-number-of-articles-shared-weekend-vs-weekday">Summary
+                Statistics, Number of Articles Shared, Weekend vs. Weekday</a>
+            -   <a href="#summary-statistics-articles-shared-by-day-of-week"
+                id="toc-summary-statistics-articles-shared-by-day-of-week">Summary
+                Statistics, Articles Shared by Day of Week</a>
+            -   <a href="#total-articles-shared-by-day-of-week"
+                id="toc-total-articles-shared-by-day-of-week">Total Articles Shared by
+                Day of Week</a>
+            -   <a href="#contingency-table" id="toc-contingency-table">Contingency
+                Table</a>
+            -   <a href="#correlation-matrix" id="toc-correlation-matrix">Correlation
+                Matrix</a>
+            -   <a href="#principal-components-analysis-pca"
+                id="toc-principal-components-analysis-pca">Principal Components Analysis
+                (PCA)</a>
         -   <a href="#eda-graphical-analysis" id="toc-eda-graphical-analysis">EDA:
             Graphical Analysis</a>
+            -   <a href="#correlation-plot" id="toc-correlation-plot">Correlation
+                Plot</a>
+            -   <a href="#pca-biplot" id="toc-pca-biplot">PCA: Biplot</a>
+            -   <a href="#scatter-plots-by-lda-value"
+                id="toc-scatter-plots-by-lda-value">Scatter Plots by LDA Value</a>
+            -   <a href="#scatter-plots-by-keyword-metrics"
+                id="toc-scatter-plots-by-keyword-metrics">Scatter Plots by Keyword
+                Metrics</a>
+            -   <a href="#scatter-plots-by-content-metrics"
+                id="toc-scatter-plots-by-content-metrics">Scatter Plots by Content
+                Metrics</a>
+            -   <a href="#box-plot-of-shares-for-data-channel-r-paramschannel"
+                id="toc-box-plot-of-shares-for-data-channel-r-paramschannel">Box Plot of
+                Shares for Data Channel ’r params$channel`</a>
+            -   <a href="#scatter-plot-of-title-words"
+                id="toc-scatter-plot-of-title-words">Scatter Plot of Title Words</a>
+            -   <a href="#scatter-plot-of-positive-words"
+                id="toc-scatter-plot-of-positive-words">Scatter Plot of Positive
+                Words</a>
+            -   <a href="#scatter-plot-of-title-subjectivity"
+                id="toc-scatter-plot-of-title-subjectivity">Scatter Plot of Title
+                Subjectivity</a>
     -   <a href="#modeling" id="toc-modeling">Modeling</a>
         -   <a href="#data-manipulation-for-modeling"
             id="toc-data-manipulation-for-modeling">Data Manipulation for
             Modeling</a>
+            -   <a href="#subsetting-variables-for-modeling"
+                id="toc-subsetting-variables-for-modeling">Subsetting Variables for
+                Modeling</a>
         -   <a href="#linear-regression-modeling"
             id="toc-linear-regression-modeling">Linear Regression Modeling</a>
+            -   <a href="#linear-regression-model-1-multiple-linear-regression-using-lm"
+                id="toc-linear-regression-model-1-multiple-linear-regression-using-lm">Linear
+                Regression Model #1: Multiple Linear Regression Using
+                <code>lm</code></a>
+            -   <a href="#linear-regression-model-2-lasso-regression-using-glmnet"
+                id="toc-linear-regression-model-2-lasso-regression-using-glmnet">Linear
+                Regression Model #2: LASSO Regression using <code>glmnet</code></a>
         -   <a href="#tree-based-modeling" id="toc-tree-based-modeling">Tree-Based
             Modeling</a>
+            -   <a href="#random-forest-model" id="toc-random-forest-model">Random
+                Forest Model</a>
+            -   <a href="#boosted-tree-model" id="toc-boosted-tree-model">Boosted Tree
+                Model</a>
     -   <a href="#model-comparison--conclusion"
         id="toc-model-comparison--conclusion">Model Comparison &amp;
         Conclusion</a>
@@ -41,8 +104,9 @@ Kara Belknap & Cassio Monti
 # Report for the *tech* Data Channel
 
 This report contains Exploratory Data Analysis (EDA) about the tech data
-channel and a modeling section applying three regression methods which
-attempt to predict trends about article sharing on the Mashable website.
+channel and a modeling section applying different regression methods
+which attempt to predict trends about article sharing on the Mashable
+website.
 
 ## Introduction
 
@@ -50,24 +114,25 @@ The objective of this analysis is to provide a comprehensive overview
 about publication metrics and their relationship with the number of
 shares that those publications presented during the study period. These
 data have been collected from Mashable website, one of the largest news
-websites from which the content of all the tech channel articles
+websites from which the content of all the **tech** channel articles
 published in 2013 and 2014 was extracted. The full data description can
 be found
 [here](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity).
-These data were originally collected and analyzed by Fernandes et
-al. (2015), in which the authors performed classification task comparing
-several machine learning algorithms. In the present study, a subset of
-the data used by Fernandes et al.(2015) corresponding to the data
-channel tech is used for regression purposes. The response variable is
-the number of `shares` that the papers presented after publication. In
-other words, we will try to predict the number of shares that the papers
-will have before publication and evaluate the prediction of each
-selected model based on some common metrics, such as RMSE (Root Mean
-Squared Error), $R^2$ (Coefficient of Determination), and MAE (Mean
-Absolute Error) applied to the test set. To perform the regression, the
-methods Random Forest, Boosting, Multiple Linear Regression, and LASSO
-regression will be used. More information about the methods will be
-corresponding in further sections.
+These data were originally collected and analyzed by [Fernandes et
+al. (2015)](#reference-list), in which the authors performed
+classification task comparing several machine learning algorithms. In
+the present study, a subset of the data used by Fernandes et al.(2015)
+corresponding to the data channel **tech** is used for regression
+purposes. The response variable is the number of `shares` that the
+papers presented after publication. In other words, we will try to
+predict the number of shares that the papers will have before
+publication and evaluate the prediction of each selected model based on
+some common metrics, such as RMSE (Root Mean Squared Error), RSquared
+(Coefficient of Determination), and MAE (Mean Absolute Error) applied to
+the test set. To perform the regression, the methods Random Forest,
+Boosting, Multiple Linear Regression, and LASSO regression will be used.
+More information about the methods will be provided in the corresponded
+sections.
 
 Some metrics have been calculated based on the information obtained from
 Mashable website. For instance, the Latent Dirichlet Allocation (LDA)
@@ -244,15 +309,46 @@ activeTrain <- activeData[trainIndex, ]
 activeTest <- activeData[-trainIndex, ]
 ```
 
+#### Outlier Detection and Cleaning
+
+In this section we will perform a very important step of EDA, the
+outlier detection and cleaning. In order to accomplish this task, we
+will use the studentized residuals from a linear regression using the
+`rstandard()` function. Linear models can also be useful for EDA when
+analyzing the residuals. This analysis is famous for looking for values
+above 2 and below -2 for the standardized residuals in the student
+distribution scale, which means that if a residual goes above 2 or below
+-2, it is considered an outlier and it is recommended to be deleted. The
+code below shows the steps to use this function and cleans the detected
+outliers from the training set.
+
+``` r
+# selecting variables of importance
+var_sel = select(activeTrain,starts_with("LDA_"), average_token_length,
+         is_weekend, n_tokens_content, n_non_stop_unique_tokens, num_hrefs,
+         num_self_hrefs, num_videos, average_token_length, kw_avg_min, 
+         kw_avg_max, kw_avg_avg, is_weekend)
+
+# fitting a MLR with all important predictors
+outlier_mod = lm(activeTrain$shares~.,data=var_sel)
+
+# finding values greater than smaller than -2
+a=(1:length(rstandard(outlier_mod)))[rstandard(outlier_mod) > 2]
+b=(1:length(rstandard(outlier_mod)))[rstandard(outlier_mod) < -2]
+
+# cleaning these values in the training set.
+activeTrain = activeTrain[-c(a,b),]
+```
+
 #### Data manipulation for statistics
 
-A new object is created in this section aiming to summarize publications
+A new created object in this section aims to summarize publications
 during weekdays and weekends and create factor levels for them to match
 with `shares` variable. The functions `ifelse()` was used to vectorize
-the IF-ELSE statements associated to `mutate()` which took care of
-attaching the new variable to the data set. The function `factor()` was
-used to explicitly coerce the days of week into levels of the newly
-created categorical variable “Day”.
+the IF-ELSE statements associated to `mutate()`, which took care of
+creating and appending the new variable to the data set. The function
+`factor()` was used to explicitly coerce the days of week into levels of
+the newly created categorical variable “Day”.
 
 ``` r
 # IF-ELSE statements
@@ -286,7 +382,7 @@ summary(activeTrain$shares)
 ```
 
     ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-    ##      82    1100    1700    3084    3000  663600
+    ##      82    1100    1700    2684    3000   27400
 
 #### Summary Statistics, Number of Articles Shared, Weekend vs. Weekday
 
@@ -305,17 +401,17 @@ statsData %>%
   kable(caption = "Statistics for Shares for Weekend or Weekdays") 
 ```
 
-| Weekend | sumShares | avgShares | medShares |  sdShares |
-|:--------|----------:|----------:|----------:|----------:|
-| No      |  13430362 |  2989.840 |      1600 | 10811.232 |
-| Yes     |   2436020 |  3730.505 |      2300 |  4973.371 |
+| Weekend | sumShares | avgShares | medShares | sdShares |
+|:--------|----------:|----------:|----------:|---------:|
+| No      |  11481762 |  2575.541 |      1600 | 2835.669 |
+| Yes     |   2218220 |  3428.470 |      2300 | 3302.885 |
 
 Statistics for Shares for Weekend or Weekdays
 
 #### Summary Statistics, Articles Shared by Day of Week
 
 Likewise, this table gives us information about the number of shares by
-the day of the week. The same functions were used here, by applied to
+the day of the week. The same functions were used here, but applied to
 levels of variable “Day”. Also, the quantities maximum `max()` and
 minimum `min()` number of shares by levels of “Day” were calculated.
 
@@ -328,15 +424,15 @@ statsData %>%
   kable(caption = "Statistics for Shares Across Days of Week")
 ```
 
-| Day       | sumShares | avgShares | medShares |  sdShares | maxShares | minShares |
-|:----------|----------:|----------:|----------:|----------:|----------:|----------:|
-| Monday    |   2442551 |  2830.302 |      1600 |  3982.259 |     51000 |       192 |
-| Tuesday   |   2955083 |  2811.687 |      1500 |  4334.198 |     67800 |       104 |
-| Wednesday |   3391555 |  3471.397 |      1600 | 21550.475 |    663600 |       181 |
-| Thursday  |   2451320 |  2735.848 |      1550 |  4060.243 |     52600 |        86 |
-| Friday    |   2189853 |  3106.174 |      1800 |  5733.835 |    104100 |        82 |
-| Saturday  |   1288201 |  3435.203 |      2200 |  3533.531 |     26900 |       343 |
-| Sunday    |   1147819 |  4128.845 |      2500 |  6409.696 |     83300 |       206 |
+| Day       | sumShares | avgShares | medShares | sdShares | maxShares | minShares |
+|:----------|----------:|----------:|----------:|---------:|----------:|----------:|
+| Monday    |   2204751 |  2575.644 |      1600 | 2669.282 |     22800 |       192 |
+| Tuesday   |   2657583 |  2548.018 |      1500 | 2870.587 |     24100 |       104 |
+| Wednesday |   2505755 |  2583.253 |      1600 | 2967.460 |     27400 |       181 |
+| Thursday  |   2230720 |  2506.427 |      1500 | 2810.540 |     24500 |        86 |
+| Friday    |   1882953 |  2693.781 |      1800 | 2830.068 |     23700 |        82 |
+| Saturday  |   1209601 |  3251.616 |      2200 | 2891.161 |     21200 |       343 |
+| Sunday    |   1008619 |  3667.705 |      2400 | 3781.801 |     24000 |       206 |
 
 Statistics for Shares Across Days of Week
 
@@ -352,42 +448,56 @@ table(statsData$Day)
 
     ## 
     ##    Monday   Tuesday Wednesday  Thursday    Friday  Saturday    Sunday 
-    ##       863      1051       977       896       705       375       278
+    ##       856      1043       970       890       699       372       275
 
 #### Contingency Table
 
 Another discrete analysis performed here is the two-way contingency
 table related to the discretization of the response variable if we
 divided `shares` into two categories. The function `cut()` was used for
-the end. In this case, we count the frequency of the number of
-publications in the weekend versus working days with the two levels of
-response variable. These levels represent smaller number of shares (on
-the left) and larger number of shares (on the right). The table below
-shows this counting. In the table below, 0 (zero) represents working
-days and 1 (one) represents weekends.
+this end. In this case, we count the frequency of the number of
+publications in the weekend versus weekdays with the two levels of
+response variable. These levels represent the number of shares between
+the minimum and average number of shares (on the left) and between the
+average and maximum number of shares (on the right). The table below
+shows the frequencies. In the table below, 0 (zero) represents weekdays
+and 1 (one) represents weekends.
 
 ``` r
-table(activeTrain$is_weekend, cut(activeTrain$shares, breaks = 2)) %>%
-  kable(caption = "Frequency of Shares in Weekend vs in Working Days")
+cutoff = cut(activeTrain$shares, 
+             breaks = c(min(activeTrain$shares), 
+                        mean(activeTrain$shares),
+                        max(activeTrain$shares)),
+             labels = c(paste0("(",round(min(activeTrain$shares),2),
+                              ", ",round(mean(activeTrain$shares),2),
+                              "]"),
+                        paste0("(",round(mean(activeTrain$shares),2),
+                              ", ",round(max(activeTrain$shares),2),
+                              "]"))
+             )
+
+
+table(activeTrain$is_weekend, cutoff) %>%
+  kable(caption = "Frequency of Shares in Weekend vs in Weekdays")
 ```
 
-|     | (-582,3.32e+05\] | (3.32e+05,6.64e+05\] |
-|:----|-----------------:|---------------------:|
-| 0   |             4491 |                    1 |
-| 1   |              653 |                    0 |
+|     | (82, 2683.64\] | (2683.64, 27400\] |
+|:----|---------------:|------------------:|
+| 0   |           3242 |              1215 |
+| 1   |            367 |               280 |
 
-Frequency of Shares in Weekend vs in Working Days
+Frequency of Shares in Weekend vs in Weekdays
 
 #### Correlation Matrix
 
 An important EDA analysis for regression tasks is the correlation
 matrix. The function `cor()` is used in this section to return the top
 10 most correlated potential predictor variables with the response
-variable `shares`. The code below presents the process of obtaining
-these variables and their respective correlations with the response
-variable. The correlations are clearly small for this case, which may
-difficult the modeling process and produce low quality of prediction
-metrics.
+variable `shares` according to Pearson’s Correlation Coefficient. The
+code below presents the process of obtaining these variables and their
+respective correlations with the response variable. The correlations are
+clearly small for this case, which may difficult the modeling process
+and produce low quality of prediction metrics.
 
 ``` r
 var_sel = select(activeTrain,starts_with("LDA_"), average_token_length,
@@ -402,7 +512,8 @@ correlation = cor(activeTrain$shares, var_sel)
 p = sort(abs(correlation), decreasing = T)
 
 # getting column ID
-var_id = which(abs(correlation) %in% p[1:10])
+var_id = unlist(lapply(1:10,
+                         function(i) which(abs(correlation) == p[i])))
 
 # collecting variable names
 var_cor = colnames(correlation)[var_id]
@@ -425,26 +536,26 @@ kable(tbcor, caption = "Top 10 Response Correlated Variables")
 
 | Variables                | Correlation |
 |:-------------------------|------------:|
-| LDA_00                   |       0.031 |
-| LDA_04                   |      -0.016 |
-| is_weekend               |       0.024 |
-| n_tokens_content         |       0.073 |
-| n_non_stop_unique_tokens |      -0.044 |
-| num_hrefs                |       0.054 |
-| num_self_hrefs           |      -0.012 |
-| num_videos               |       0.025 |
-| kw_avg_max               |      -0.009 |
-| kw_avg_avg               |       0.044 |
+| kw_avg_avg               |       0.133 |
+| is_weekend               |       0.097 |
+| n_tokens_content         |       0.086 |
+| num_hrefs                |       0.079 |
+| num_videos               |       0.051 |
+| n_non_stop_unique_tokens |      -0.049 |
+| LDA_01                   |      -0.037 |
+| LDA_02                   |       0.028 |
+| kw_avg_min               |       0.018 |
+| LDA_03                   |       0.016 |
 
 Top 10 Response Correlated Variables
 
 #### Principal Components Analysis (PCA)
 
-The variables that present most correlation with the response variable
-`shares` are LDA_00, LDA_04, is_weekend, n_tokens_content,
-n_non_stop_unique_tokens, num_hrefs, num_self_hrefs, num_videos,
-kw_avg_max, kw_avg_avg. These variables will be studied in more depth
-via PCA to understand the orientation of the most important potential
+The variables that present highest correlation with the response
+variable `shares` are kw_avg_avg, is_weekend, n_tokens_content,
+num_hrefs, num_videos, n_non_stop_unique_tokens, LDA_01, LDA_02,
+kw_avg_min, LDA_03. These variables will be studied in more depth via
+PCA to understand the orientation of the most important potential
 predictors. The code below presents the PCA analysis as part of the EDA.
 The 10 PCs displayed in the table below correspond to the most variable
 combination of the 10 predictors, which the PC1 has the most variation
@@ -454,10 +565,10 @@ the idea of importance of that particular variable to the variance of
 the 10 predictor variables. The negative values only mean that the
 orientation of the weights are opposite in the same PC. Since the first
 PC has the largest variability, it is possible to say that the variables
-with more weights in PC1 are the most important variables for the
-variance of the predictors. This variables are supposed to present large
-influence on the explanation of the variance of the response variable.
-The table below show these numbers.
+with more weights in PC1 might be the most important variables that
+contribute more with the variance of the predictors. This variables are
+expected to present large influence on the explanation of the variance
+of the response variable. The table below show these numbers.
 
 ``` r
 id = which(colnames(activeTrain) %in% var_cor)
@@ -472,16 +583,16 @@ kable(pc_directions, caption="Principal Components for EDA", digits = 3)
 
 |                          |    PC1 |    PC2 |    PC3 |    PC4 |    PC5 |    PC6 |    PC7 |    PC8 |    PC9 |   PC10 |
 |:-------------------------|-------:|-------:|-------:|-------:|-------:|-------:|-------:|-------:|-------:|-------:|
-| n_tokens_content         | -0.530 |  0.026 | -0.002 |  0.152 | -0.016 |  0.314 | -0.101 |  0.021 |  0.389 | -0.658 |
-| n_non_stop_unique_tokens |  0.464 |  0.051 |  0.023 | -0.213 |  0.122 | -0.576 | -0.012 |  0.103 |  0.435 | -0.436 |
-| num_hrefs                | -0.510 |  0.137 | -0.008 | -0.120 | -0.005 | -0.356 | -0.147 |  0.191 |  0.486 |  0.535 |
-| num_self_hrefs           | -0.468 |  0.032 |  0.034 | -0.099 | -0.075 | -0.561 |  0.287 | -0.019 | -0.540 | -0.274 |
-| num_videos               | -0.063 |  0.065 | -0.162 |  0.401 |  0.882 | -0.096 |  0.047 | -0.105 | -0.041 |  0.043 |
-| kw_avg_max               |  0.055 |  0.204 | -0.659 |  0.068 | -0.154 |  0.097 |  0.639 |  0.228 |  0.148 |  0.028 |
-| kw_avg_avg               | -0.001 |  0.235 | -0.657 | -0.161 | -0.061 | -0.066 | -0.638 | -0.141 | -0.210 | -0.086 |
-| is_weekend               | -0.101 |  0.056 |  0.019 | -0.841 |  0.398 |  0.306 |  0.158 | -0.001 | -0.033 | -0.018 |
-| LDA_00                   |  0.031 |  0.675 |  0.190 |  0.021 | -0.107 |  0.002 |  0.161 | -0.674 |  0.123 |  0.037 |
-| LDA_04                   | -0.082 | -0.646 | -0.262 | -0.089 | -0.055 | -0.109 |  0.133 | -0.645 |  0.218 |  0.058 |
+| n_tokens_content         | -0.616 |  0.089 |  0.008 | -0.044 | -0.084 |  0.006 | -0.027 |  0.016 | -0.082 | -0.772 |
+| n_non_stop_unique_tokens |  0.554 | -0.126 |  0.019 |  0.079 |  0.153 |  0.099 |  0.003 | -0.279 |  0.519 | -0.538 |
+| num_hrefs                | -0.531 | -0.066 | -0.015 |  0.046 |  0.082 | -0.010 | -0.104 | -0.407 |  0.647 |  0.331 |
+| num_videos               | -0.091 | -0.108 |  0.491 |  0.183 | -0.113 |  0.740 |  0.348 |  0.132 |  0.046 |  0.059 |
+| kw_avg_min               | -0.042 | -0.558 | -0.149 | -0.502 | -0.036 |  0.108 | -0.188 |  0.543 |  0.264 | -0.009 |
+| kw_avg_avg               | -0.052 | -0.673 |  0.039 | -0.159 |  0.054 | -0.109 |  0.305 | -0.518 | -0.377 | -0.015 |
+| is_weekend               | -0.121 | -0.101 | -0.112 |  0.270 |  0.907 |  0.110 | -0.041 |  0.192 | -0.126 | -0.010 |
+| LDA_01                   |  0.056 |  0.275 |  0.342 | -0.626 |  0.256 |  0.264 | -0.404 | -0.293 | -0.164 |  0.026 |
+| LDA_02                   |  0.019 | -0.075 | -0.612 |  0.191 | -0.201 |  0.552 | -0.382 | -0.228 | -0.197 |  0.014 |
+| LDA_03                   |  0.014 | -0.324 |  0.479 |  0.421 | -0.130 | -0.179 | -0.654 |  0.037 | -0.099 | -0.020 |
 
 Principal Components for EDA
 
@@ -491,11 +602,12 @@ id2 = which(abs(pc_directions$PC1) %in%
 ```
 
 It is possible to see that the three most important variables in PC1 are
-n_tokens_content, num_hrefs, num_self_hrefs from the table above. These
-variables are considered the most important variables in terms of
-variance of the predictor variables. Although the metrics for prediction
-are expected to be poor, these variables are expected to show the most
-influence to the explanation of the variance of the response `shares`.
+n_tokens_content, n_non_stop_unique_tokens, num_hrefs from the table
+above. These variables are considered the most important variables in
+terms of variance of the predictor variables. Although the metrics for
+prediction are expected to be poor, these variables are expected to show
+the most influence to the explanation of the variance of the response
+`shares`.
 
 ### EDA: Graphical Analysis
 
@@ -504,12 +616,11 @@ influence to the explanation of the variance of the response `shares`.
 The plot below presents histograms, scatter plots, and correlations in a
 bivariate structure of the top 5 variables chosen in the correlation
 analysis. Notice the shape of the distributions and the values of the
-correlations for the first column, which the one related to the response
-variable `shares`.
+correlations relative to the response variable `shares`.
 
 ``` r
 # bivariate correlation plot
-cor_data <- select(activeTrain,shares,var_id[1:5])
+cor_data <- cbind(select(activeTrain,shares),var_sel[,var_id[1:5]])
 ggpairs(cor_data)
 ```
 
@@ -546,10 +657,14 @@ The scatter plots below show the different levels of the variables
 related to the LDA metrics, from 0 to 4, and graphs the relationship
 with the response variable `shares`. The function `ggplot()` is used to
 create the plot frame and `geom_point()`, `geom_smooth`, and
-`facert_wrap()` function are used to plot the scatter points, the smooth
+`facet_wrap()` function are used to plot the scatter points, the smooth
 GAM (Generalized Additive Models) lines, and split the data by LDA type,
 respectively. It is possible to see the behavior of the response
-variable in relation to each LDA types.
+variable in relation to each LDA types. A common analysis using scatter
+plots is related to the pattern shown by the smooth curve fitted to the
+points. If this curve shows a flat or constant line parallel to the
+predictor axis, then the predictor has little contribution to the
+explanation of the variance of the response variable.
 
 ``` r
 LDA.dat = activeTrain %>%
@@ -569,7 +684,7 @@ labs(x = "LDA Values", y = "Shares", title = "Shares by LDA Types")
 The scatter plots below show the different types of the variables
 related to the Keyword metrics and graphs the relationship with the
 response variable `shares`. The function `ggplot()` is used to create
-the plot frame and `geom_point()`, `geom_smooth`, and `facert_wrap()`
+the plot frame and `geom_point()`, `geom_smooth`, and `facet_wrap()`
 function are used to plot the scatter points, the smooth GAM
 (Generalized Additive Models) lines, and split the data by keyword type,
 respectively. It is possible to see the behavior of the response
@@ -594,7 +709,7 @@ labs(x = "Keyword Metric Values", y = "Shares", title = "Shares by Keyword Metri
 The scatter plots below show the different types of the variables
 related to the Content metrics and graphs the relationship with the
 response variable `shares`. The function `ggplot()` is used to create
-the plot frame and `geom_point()`, `geom_smooth`, and `facert_wrap()`
+the plot frame and `geom_point()`, `geom_smooth`, and `facet_wrap()`
 function are used to plot the scatter points, the smooth GAM
 (Generalized Additive Models) lines, and split the data by content type,
 respectively. It is possible to see the behavior of the response
@@ -614,6 +729,31 @@ labs(x = "Content Metric Values", y = "Shares", title = "Shares by Content Metri
 ```
 
 ![](tech_files/figure-gfm/Contentplot-1.png)<!-- -->
+
+#### Box Plot of Shares for Data Channel ’r params\$channel\`
+
+The following box plot shows the distribution of shares for this data
+channel. The main chunk of the data can be seen within the “box”
+representing the region encompassing the first and third quartiles. For
+some cases, there are possible outliers in the data that make
+distortions to the box plot and this mentioned “box” looks thinner than
+usual. If this happens, then it means that the possible outliers are
+much larger than the main chunk of data. The outliers usually appear as
+individual points in the box plot. The graph below shows this pattern
+for the response variable `shares`. However, the data might not have
+outliers and the highlighted data points are in fact part of the data.
+This stresses the importance of knowing about the subject and data set
+in order to perform statistical analysis.
+
+``` r
+boxSharesGraph <- ggplot(statsData, aes(x = dataChannel, y = shares))
+boxSharesGraph + geom_boxplot() + 
+  ggtitle(paste("Number of Shares for Data Channel:", dataChannelSelect)) +
+  ylab("Number of Shares") +
+  xlab("Data Channel") 
+```
+
+![](tech_files/figure-gfm/boxsharesGraph-1.png)<!-- -->
 
 #### Scatter Plot of Title Words
 
@@ -701,37 +841,26 @@ dfTest = activeTest %>%
 
 Linear regression is a modeling technique by which one attempts to model
 a response variable (in this case `shares`) with one or more explanatory
-variables using a straight line. If there is only one explanatory
-variable, you would call this simple linear regression. Using more than
-one explanatory variable is called multiple linear regression. For the
-purposes of this report, we will be looking at multiple linear
-regression (MLR).
+variables using a straight line. A model with only one explanatory
+variable is called simple linear regression (SLR). In simple linear
+regression, the response variable is predicted by an intercept and a
+regression coefficient multiplied by the value of your explanatory
+variable. The goal of regression is to determine the intercept and the
+regression coefficients. This is done by fitting a straight line across
+all of the data with the goal of minimizing the residuals sum of squares
+via Least Squares method. The model is fit by minimizing the sum of
+squared errors (SSE).
 
-The basic formula that is used for multiple linear regression is
-
-$$ 
-Y_i = \beta_0 + \beta_{1}x_{1i} + \beta_{2}x_{2i} + ... + \beta_{n}x_{ni} + E_i
-$$ Here:  
-- $Yi$ is our response variable for the $i^{th}$ observation  
-- $x_{i}$ is the value of our explanatory variable for the \$i^{th}
-observation for each explanatory variable (1-n)  
-- $\beta_0$ is the y intercept  
-- $\beta_{1,...,n)$ is the regression coefficient corresponding to the
-explanatory variable of interest (1-n)  
-- $E_i$ is an error parameter
-
-The goal of linear regression is to model the fit by minimizing the sum
-of squared errors.
-
-$$
-SSE = \sum_{i=1}^n(y_{i} - \hat{y}_{i})^2
-$$ Here:  
-- $y_i$ is the actual value  
-- $\hat{y}_{i}$ is the predicted value
+The same concept can be applied to multiple linear regression (MLR),
+which has more than one explanatory variable. In this case, the goal is
+to determine the intercept and a regression coefficient corresponding to
+each explanatory variable in an attempt to minimize the sum of squared
+errors.
 
 In R, MLR is generally done with the function `lm`. There are also a
-variety of other methods that fall under the umbrella of MLR, namely
-LASSO regression which we will explore as part of this analysis.
+variety of other methods that fall under the umbrella of MLR. One of
+these methods, LASSO regression, will be explored as part of this
+analysis.
 
 #### Linear Regression Model \#1: Multiple Linear Regression Using `lm`
 
@@ -753,33 +882,33 @@ summary(lmFit)
     ## lm(formula = .outcome ~ ., data = dat)
     ## 
     ## Residuals:
-    ##    Min     1Q Median     3Q    Max 
-    ## -14211  -1828  -1025    136 654984 
+    ##      Min       1Q   Median       3Q      Max 
+    ## -10313.0  -1455.9   -866.1    277.0  22650.9 
     ## 
     ## Coefficients: (1 not defined because of singularities)
     ##                          Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)               3083.84     142.23  21.682  < 2e-16 ***
-    ## LDA_00                     328.63     144.19   2.279 0.022702 *  
-    ## LDA_01                      20.73     145.75   0.142 0.886916    
-    ## LDA_02                      11.57     148.64   0.078 0.937973    
-    ## LDA_03                     -23.45     145.81  -0.161 0.872256    
+    ## (Intercept)              2683.640     39.922  67.223  < 2e-16 ***
+    ## LDA_00                     11.398     40.473   0.282 0.778251    
+    ## LDA_01                    -52.337     40.920  -1.279 0.200952    
+    ## LDA_02                     83.893     41.711   2.011 0.044347 *  
+    ## LDA_03                     -5.727     40.939  -0.140 0.888753    
     ## LDA_04                         NA         NA      NA       NA    
-    ## average_token_length       -53.73     157.50  -0.341 0.733017    
-    ## is_weekend                 153.01     143.87   1.064 0.287600    
-    ## n_tokens_content           713.38     203.78   3.501 0.000468 ***
-    ## n_non_stop_unique_tokens   -83.36     197.81  -0.421 0.673481    
-    ## num_hrefs                  478.82     198.85   2.408 0.016075 *  
-    ## num_self_hrefs            -745.43     180.81  -4.123  3.8e-05 ***
-    ## num_videos                 181.33     144.43   1.255 0.209361    
-    ## kw_avg_min                -351.38     163.85  -2.144 0.032043 *  
-    ## kw_avg_max                -389.03     169.99  -2.289 0.022148 *  
-    ## kw_avg_avg                 605.54     172.24   3.516 0.000442 ***
+    ## average_token_length      -45.444     44.222  -1.028 0.304172    
+    ## is_weekend                235.792     40.395   5.837 5.64e-09 ***
+    ## n_tokens_content          213.841     57.155   3.741 0.000185 ***
+    ## n_non_stop_unique_tokens  -12.935     55.469  -0.233 0.815618    
+    ## num_hrefs                 157.485     55.892   2.818 0.004856 ** 
+    ## num_self_hrefs           -218.470     50.820  -4.299 1.75e-05 ***
+    ## num_videos                117.295     40.544   2.893 0.003832 ** 
+    ## kw_avg_min               -147.259     45.996  -3.202 0.001375 ** 
+    ## kw_avg_max               -208.635     47.709  -4.373 1.25e-05 ***
+    ## kw_avg_avg                467.697     48.382   9.667  < 2e-16 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
-    ## Residual standard error: 10200 on 5130 degrees of freedom
-    ## Multiple R-squared:  0.0137, Adjusted R-squared:  0.01101 
-    ## F-statistic: 5.091 on 14 and 5130 DF,  p-value: 1.341e-09
+    ## Residual standard error: 2852 on 5090 degrees of freedom
+    ## Multiple R-squared:  0.04353,    Adjusted R-squared:  0.0409 
+    ## F-statistic: 16.55 on 14 and 5090 DF,  p-value: < 2.2e-16
 
 The following table shows the output training metrics for this linear
 regression.
@@ -791,14 +920,14 @@ kable(lm_out, caption = "Output Training Metrics for Linear Regression",
       digits = 3)
 ```
 
-| intercept |    RMSE | Rsquared |      MAE |  RMSESD | RsquaredSD |   MAESD |
-|:----------|--------:|---------:|---------:|--------:|-----------:|--------:|
-| TRUE      | 7701.02 |    0.012 | 2388.943 | 7615.79 |      0.004 | 313.088 |
+| intercept |     RMSE | Rsquared |      MAE |  RMSESD | RsquaredSD |  MAESD |
+|:----------|---------:|---------:|---------:|--------:|-----------:|-------:|
+| TRUE      | 2855.232 |    0.037 | 1757.933 | 231.097 |      0.012 | 78.415 |
 
 Output Training Metrics for Linear Regression
 
-The following shows the RMSE, $R^2$, and MAE values for the model as it
-performed on predicting the test set.
+The following shows the RMSE, RSquared, and MAE values for the model as
+it performed on predicting the test set.
 
 ``` r
 metric_lm = postResample(pred = predict(lmFit, newdata = dfTest), 
@@ -808,7 +937,7 @@ metric_lm
 ```
 
     ##         RMSE     Rsquared          MAE 
-    ## 5.022856e+03 2.789813e-02 2.305239e+03
+    ## 5.015551e+03 3.619879e-02 2.088571e+03
 
 #### Linear Regression Model \#2: LASSO Regression using `glmnet`
 
@@ -838,23 +967,23 @@ coef(LASSO$finalModel, LASSO$bestTune$lambda)
 ```
 
     ## 16 x 1 sparse Matrix of class "dgCMatrix"
-    ##                                   s1
-    ## (Intercept)              3083.844898
-    ## LDA_00                    314.324802
-    ## LDA_01                      6.688812
-    ## LDA_02                      .       
-    ## LDA_03                    -13.025763
-    ## LDA_04                     -3.721726
-    ## average_token_length      -40.883991
-    ## is_weekend                145.680028
-    ## n_tokens_content          708.587666
-    ## n_non_stop_unique_tokens  -77.196606
-    ## num_hrefs                 461.087525
-    ## num_self_hrefs           -720.167094
-    ## num_videos                171.315649
-    ## kw_avg_min               -325.203118
-    ## kw_avg_max               -362.792300
-    ## kw_avg_avg                578.856254
+    ##                                     s1
+    ## (Intercept)              2683.63996082
+    ## LDA_00                      0.08651943
+    ## LDA_01                    -44.86412235
+    ## LDA_02                     72.40442398
+    ## LDA_03                      .         
+    ## LDA_04                      .         
+    ## average_token_length      -32.20031813
+    ## is_weekend                228.85717837
+    ## n_tokens_content          208.46249237
+    ## n_non_stop_unique_tokens   -7.78713527
+    ## num_hrefs                 141.93239311
+    ## num_self_hrefs           -194.97804184
+    ## num_videos                106.83337253
+    ## kw_avg_min               -121.92522564
+    ## kw_avg_max               -181.86777383
+    ## kw_avg_avg                443.37677517
 
 The best `lambda` for this model is 10 and this value can be seen in the
 table below which summarizes all the metrics for the 5-fold
@@ -867,19 +996,19 @@ kable(lasso_out, caption = "Output Training Metrics for LASSO",
       digits = 3)
 ```
 
-| alpha | lambda |     RMSE | Rsquared |      MAE |   RMSESD | RsquaredSD |   MAESD |
-|------:|-------:|---------:|---------:|---------:|---------:|-----------:|--------:|
-|     1 |      0 | 7889.217 |    0.014 | 2378.517 | 7312.151 |      0.005 | 219.589 |
-|     1 |      1 | 7889.218 |    0.014 | 2378.516 | 7312.153 |      0.005 | 219.586 |
-|     1 |      2 | 7889.228 |    0.014 | 2378.471 | 7312.204 |      0.005 | 219.519 |
-|     1 |      3 | 7888.821 |    0.014 | 2378.019 | 7312.484 |      0.005 | 219.650 |
-|     1 |      4 | 7888.395 |    0.014 | 2377.542 | 7312.774 |      0.005 | 219.789 |
-|     1 |      5 | 7887.973 |    0.014 | 2377.073 | 7313.063 |      0.005 | 219.931 |
-|     1 |      6 | 7887.555 |    0.014 | 2376.617 | 7313.350 |      0.005 | 220.070 |
-|     1 |      7 | 7887.133 |    0.014 | 2376.175 | 7313.631 |      0.005 | 220.197 |
-|     1 |      8 | 7886.713 |    0.014 | 2375.731 | 7313.920 |      0.005 | 220.324 |
-|     1 |      9 | 7886.294 |    0.014 | 2375.292 | 7314.204 |      0.005 | 220.451 |
-|     1 |     10 | 7885.881 |    0.014 | 2374.859 | 7314.490 |      0.005 | 220.579 |
+| alpha | lambda |     RMSE | Rsquared |      MAE |  RMSESD | RsquaredSD |  MAESD |
+|------:|-------:|---------:|---------:|---------:|--------:|-----------:|-------:|
+|     1 |      0 | 2863.232 |    0.037 | 1759.106 | 208.928 |      0.018 | 62.389 |
+|     1 |      1 | 2863.227 |    0.037 | 1759.094 | 208.928 |      0.018 | 62.378 |
+|     1 |      2 | 2863.101 |    0.037 | 1759.013 | 208.829 |      0.018 | 62.254 |
+|     1 |      3 | 2862.983 |    0.037 | 1758.947 | 208.727 |      0.018 | 62.137 |
+|     1 |      4 | 2862.876 |    0.037 | 1758.884 | 208.629 |      0.018 | 62.018 |
+|     1 |      5 | 2862.780 |    0.037 | 1758.836 | 208.521 |      0.018 | 61.882 |
+|     1 |      6 | 2862.692 |    0.037 | 1758.788 | 208.410 |      0.018 | 61.742 |
+|     1 |      7 | 2862.609 |    0.037 | 1758.744 | 208.302 |      0.018 | 61.598 |
+|     1 |      8 | 2862.534 |    0.037 | 1758.711 | 208.195 |      0.018 | 61.461 |
+|     1 |      9 | 2862.466 |    0.037 | 1758.684 | 208.090 |      0.018 | 61.325 |
+|     1 |     10 | 2862.406 |    0.037 | 1758.663 | 207.987 |      0.018 | 61.183 |
 
 Output Training Metrics for LASSO
 
@@ -906,7 +1035,7 @@ metric_LASSO
 ```
 
     ##         RMSE     Rsquared          MAE 
-    ## 5.020706e+03 2.780156e-02 2.301849e+03
+    ## 5.018754e+03 3.568045e-02 2.089045e+03
 
 ### Tree-Based Modeling
 
@@ -988,13 +1117,13 @@ kable(rf_out, caption = "Output Training Metrics for Random Forest",
       digits = 3)
 ```
 
-| mtry |     RMSE | Rsquared |      MAE |   RMSESD | RsquaredSD |   MAESD |
-|-----:|---------:|---------:|---------:|---------:|-----------:|--------:|
-|    1 | 7721.228 |    0.020 | 2361.521 | 7515.532 |      0.012 | 225.146 |
-|    2 | 7837.004 |    0.019 | 2420.412 | 7445.496 |      0.015 | 215.576 |
-|    3 | 7939.945 |    0.019 | 2456.664 | 7382.846 |      0.015 | 205.319 |
-|    4 | 8034.132 |    0.018 | 2487.590 | 7334.475 |      0.015 | 201.763 |
-|    5 | 8106.802 |    0.017 | 2508.357 | 7302.253 |      0.014 | 199.586 |
+| mtry |     RMSE | Rsquared |      MAE |  RMSESD | RsquaredSD |  MAESD |
+|-----:|---------:|---------:|---------:|--------:|-----------:|-------:|
+|    1 | 2838.201 |    0.051 | 1766.749 | 106.310 |      0.010 | 54.588 |
+|    2 | 2848.644 |    0.048 | 1796.780 | 106.996 |      0.011 | 54.525 |
+|    3 | 2864.866 |    0.043 | 1814.860 | 106.131 |      0.008 | 53.289 |
+|    4 | 2873.700 |    0.042 | 1824.117 | 104.295 |      0.011 | 55.495 |
+|    5 | 2881.532 |    0.040 | 1831.895 | 107.066 |      0.012 | 56.363 |
 
 Output Training Metrics for Random Forest
 
@@ -1014,30 +1143,30 @@ metric_rf
 ```
 
     ##         RMSE     Rsquared          MAE 
-    ## 4.997559e+03 3.310394e-02 2.281586e+03
+    ## 4.997206e+03 4.706505e-02 2.092497e+03
 
 #### Boosted Tree Model
 
 In this section the Ensemble Learning algorithm Boosting will be
 trained. Boosted tree method is one of the Tree based models most used
-in data science because it presents a fitting strategy improves
+in data science because it presents a fitting strategy that improves
 sequentially throughout the iterations. Boosting uses single trees
 fitted (each single tree has `d` splits) on the training data and
 produces predictions off of that training. The residuals of this
 prediction is, then, used as response variable for the next single tree
-training step. New predictions are done for this new model. This process
-occurs several times during `B` iterations and the predictions are
-updated during the fitting process, being driven by the shrinkage
-parameter, also called growth rate, `lambda`. These training features of
-Boosting make this method to produce a reduction in the variance of the
-predictions as well as gains in accuracy, mainly over Random Forest,
-Bagging, and single tree. The shrinkage parameter will be set as 0.1 and
-n.minobsinnode set as 10. The parameters n.tree and interaction.depth
-will be chosen based on 5-fold cross-validation. The former will be
-chosen from a sequence from 25 to 200, counting by 25. The latter will
-be chosen from a sequence from 1 to 4. The code below shows the training
-and tuning procedure and prints out the resultant values of the two
-considered hyperparameters.
+training step. New predictions are done for this new model as well and
+so on. This process occurs several times during `B` iterations and the
+predictions are updated during the fitting process, being driven by the
+shrinkage parameter, also called growth rate, `lambda`. These training
+features of Boosting make this method to produce a reduction in the
+variance of the predictions as well as gains in precision, mainly over
+Random Forest, Bagging, and single tree. The shrinkage parameter will be
+set as 0.1 and n.minobsinnode set as 10. The parameters n.tree and
+interaction.depth will be chosen based on 5-fold cross-validation. The
+former will be chosen from a sequence from 25 to 200, counting by 25.
+The latter will be chosen from a sequence from 1 to 4. The code below
+shows the training and tuning procedure and prints out the resultant
+values of the two considered hyperparameters.
 
 ``` r
 tunG = expand.grid(n.trees = seq(25,200,25),
@@ -1057,16 +1186,16 @@ gbmFit <- train(shares~.,
 gbmFit$bestTune$n.trees
 ```
 
-    ## [1] 25
+    ## [1] 75
 
 ``` r
 gbmFit$bestTune$interaction.depth
 ```
 
-    ## [1] 3
+    ## [1] 2
 
-The best n.trees and interaction.depth parameters for this model are 25
-and 3, respectively. These values can be seen in the table below, which
+The best n.trees and interaction.depth parameters for this model are 75
+and 2, respectively. These values can be seen in the table below, which
 summarizes all the metrics for the 5-fold cross-validation. It is easy
 to see that these values minimize the RMSE.
 
@@ -1080,46 +1209,46 @@ kable(gbm_out, caption = "Output Training Metrics for Boosting",
       digits = 3, row.names = FALSE)
 ```
 
-| shrinkage | interaction.depth | n.minobsinnode | n.trees |     RMSE | Rsquared |      MAE |   RMSESD | RsquaredSD |   MAESD |
-|----------:|------------------:|---------------:|--------:|---------:|---------:|---------:|---------:|-----------:|--------:|
-|       0.1 |                 3 |             10 |      25 | 7781.121 |    0.009 | 2367.006 | 7540.197 |      0.009 | 308.609 |
-|       0.1 |                 3 |             10 |      50 | 7842.065 |    0.009 | 2354.877 | 7502.027 |      0.008 | 298.730 |
-|       0.1 |                 4 |             10 |      25 | 7889.387 |    0.007 | 2398.751 | 7458.385 |      0.004 | 292.259 |
-|       0.1 |                 2 |             10 |      25 | 7903.066 |    0.004 | 2404.118 | 7466.232 |      0.004 | 278.320 |
-|       0.1 |                 2 |             10 |      50 | 7922.699 |    0.004 | 2384.219 | 7445.965 |      0.005 | 281.575 |
-|       0.1 |                 1 |             10 |      25 | 7956.357 |    0.002 | 2425.226 | 7423.697 |      0.002 | 259.564 |
-|       0.1 |                 4 |             10 |      50 | 8016.149 |    0.009 | 2412.625 | 7356.704 |      0.006 | 285.951 |
-|       0.1 |                 3 |             10 |      75 | 8049.652 |    0.006 | 2408.768 | 7387.756 |      0.005 | 284.380 |
-|       0.1 |                 2 |             10 |      75 | 8078.490 |    0.003 | 2425.173 | 7361.139 |      0.004 | 260.212 |
-|       0.1 |                 1 |             10 |     100 | 8093.321 |    0.002 | 2453.474 | 7347.791 |      0.002 | 246.464 |
-|       0.1 |                 1 |             10 |      50 | 8115.858 |    0.002 | 2465.009 | 7345.725 |      0.002 | 251.112 |
-|       0.1 |                 4 |             10 |      75 | 8127.909 |    0.009 | 2423.260 | 7284.274 |      0.006 | 265.491 |
-|       0.1 |                 1 |             10 |     125 | 8137.816 |    0.002 | 2472.195 | 7328.578 |      0.002 | 243.306 |
-|       0.1 |                 1 |             10 |      75 | 8140.139 |    0.002 | 2471.242 | 7328.453 |      0.002 | 241.395 |
-|       0.1 |                 2 |             10 |     100 | 8151.695 |    0.003 | 2409.053 | 7321.957 |      0.004 | 265.141 |
-|       0.1 |                 1 |             10 |     150 | 8165.638 |    0.002 | 2464.797 | 7315.437 |      0.002 | 238.736 |
-|       0.1 |                 1 |             10 |     200 | 8171.212 |    0.002 | 2453.452 | 7304.630 |      0.002 | 239.592 |
-|       0.1 |                 2 |             10 |     125 | 8173.975 |    0.003 | 2388.696 | 7308.672 |      0.004 | 271.387 |
-|       0.1 |                 1 |             10 |     175 | 8180.005 |    0.002 | 2467.862 | 7304.202 |      0.002 | 234.835 |
-|       0.1 |                 3 |             10 |     100 | 8200.849 |    0.005 | 2407.076 | 7296.466 |      0.006 | 275.155 |
-|       0.1 |                 4 |             10 |     100 | 8208.934 |    0.009 | 2412.124 | 7256.674 |      0.005 | 284.935 |
-|       0.1 |                 3 |             10 |     125 | 8303.653 |    0.005 | 2419.833 | 7233.908 |      0.005 | 274.831 |
-|       0.1 |                 4 |             10 |     125 | 8348.632 |    0.008 | 2437.226 | 7194.273 |      0.004 | 278.918 |
-|       0.1 |                 3 |             10 |     150 | 8381.909 |    0.005 | 2438.718 | 7196.526 |      0.004 | 267.755 |
-|       0.1 |                 2 |             10 |     150 | 8440.137 |    0.003 | 2456.488 | 7176.236 |      0.004 | 248.873 |
-|       0.1 |                 4 |             10 |     150 | 8494.328 |    0.007 | 2452.447 | 7108.918 |      0.004 | 278.287 |
-|       0.1 |                 3 |             10 |     175 | 8508.550 |    0.005 | 2440.627 | 7113.122 |      0.004 | 269.052 |
-|       0.1 |                 2 |             10 |     175 | 8522.373 |    0.003 | 2452.516 | 7127.556 |      0.003 | 253.328 |
-|       0.1 |                 4 |             10 |     175 | 8606.834 |    0.007 | 2480.048 | 7030.530 |      0.005 | 258.990 |
-|       0.1 |                 4 |             10 |     200 | 8655.479 |    0.007 | 2477.656 | 7008.296 |      0.005 | 268.740 |
-|       0.1 |                 2 |             10 |     200 | 8681.192 |    0.003 | 2467.318 | 7027.770 |      0.002 | 233.629 |
-|       0.1 |                 3 |             10 |     200 | 8706.250 |    0.006 | 2486.308 | 6978.420 |      0.005 | 260.256 |
+| shrinkage | interaction.depth | n.minobsinnode | n.trees |     RMSE | Rsquared |      MAE |  RMSESD | RsquaredSD |  MAESD |
+|----------:|------------------:|---------------:|--------:|---------:|---------:|---------:|--------:|-----------:|-------:|
+|       0.1 |                 2 |             10 |      75 | 2835.256 |    0.050 | 1748.003 | 212.517 |      0.011 | 63.273 |
+|       0.1 |                 2 |             10 |     100 | 2837.411 |    0.049 | 1744.089 | 214.689 |      0.010 | 64.799 |
+|       0.1 |                 1 |             10 |     150 | 2837.458 |    0.049 | 1748.162 | 207.207 |      0.014 | 56.296 |
+|       0.1 |                 1 |             10 |     175 | 2837.826 |    0.049 | 1743.917 | 208.351 |      0.012 | 54.858 |
+|       0.1 |                 2 |             10 |      50 | 2838.289 |    0.048 | 1750.229 | 207.249 |      0.009 | 60.028 |
+|       0.1 |                 2 |             10 |     200 | 2838.396 |    0.051 | 1740.185 | 210.381 |      0.012 | 70.185 |
+|       0.1 |                 1 |             10 |     100 | 2838.451 |    0.048 | 1746.244 | 207.615 |      0.012 | 56.175 |
+|       0.1 |                 1 |             10 |     200 | 2838.494 |    0.048 | 1743.943 | 208.451 |      0.013 | 58.987 |
+|       0.1 |                 1 |             10 |     125 | 2838.665 |    0.048 | 1748.324 | 207.450 |      0.014 | 58.560 |
+|       0.1 |                 2 |             10 |     150 | 2838.913 |    0.050 | 1741.923 | 211.143 |      0.009 | 62.996 |
+|       0.1 |                 1 |             10 |      75 | 2839.029 |    0.048 | 1749.316 | 208.495 |      0.012 | 59.289 |
+|       0.1 |                 2 |             10 |     175 | 2839.657 |    0.050 | 1744.306 | 211.794 |      0.011 | 64.090 |
+|       0.1 |                 2 |             10 |     125 | 2839.683 |    0.048 | 1743.534 | 214.334 |      0.009 | 69.230 |
+|       0.1 |                 3 |             10 |      50 | 2843.075 |    0.045 | 1748.025 | 222.347 |      0.013 | 67.385 |
+|       0.1 |                 3 |             10 |      75 | 2844.844 |    0.045 | 1745.765 | 221.200 |      0.011 | 71.607 |
+|       0.1 |                 4 |             10 |      50 | 2844.858 |    0.046 | 1753.693 | 211.087 |      0.013 | 68.563 |
+|       0.1 |                 4 |             10 |      75 | 2844.869 |    0.048 | 1748.371 | 214.883 |      0.013 | 68.984 |
+|       0.1 |                 3 |             10 |     100 | 2845.895 |    0.046 | 1747.806 | 223.915 |      0.011 | 71.380 |
+|       0.1 |                 4 |             10 |      25 | 2846.528 |    0.042 | 1764.193 | 208.244 |      0.009 | 66.041 |
+|       0.1 |                 1 |             10 |      50 | 2846.626 |    0.043 | 1758.496 | 210.036 |      0.012 | 60.242 |
+|       0.1 |                 2 |             10 |      25 | 2847.331 |    0.044 | 1761.935 | 210.075 |      0.009 | 62.168 |
+|       0.1 |                 4 |             10 |     100 | 2850.818 |    0.047 | 1752.562 | 221.171 |      0.012 | 71.224 |
+|       0.1 |                 3 |             10 |     125 | 2852.235 |    0.044 | 1747.469 | 225.724 |      0.012 | 71.809 |
+|       0.1 |                 3 |             10 |      25 | 2852.937 |    0.038 | 1760.384 | 216.781 |      0.010 | 63.694 |
+|       0.1 |                 4 |             10 |     125 | 2853.708 |    0.047 | 1754.022 | 219.120 |      0.011 | 71.015 |
+|       0.1 |                 3 |             10 |     150 | 2856.747 |    0.043 | 1752.054 | 225.617 |      0.010 | 71.103 |
+|       0.1 |                 1 |             10 |      25 | 2857.255 |    0.040 | 1768.748 | 210.789 |      0.011 | 60.095 |
+|       0.1 |                 4 |             10 |     150 | 2858.221 |    0.047 | 1759.407 | 217.599 |      0.010 | 69.077 |
+|       0.1 |                 3 |             10 |     175 | 2859.928 |    0.043 | 1755.121 | 225.644 |      0.010 | 72.722 |
+|       0.1 |                 3 |             10 |     200 | 2865.295 |    0.042 | 1760.725 | 222.608 |      0.010 | 67.496 |
+|       0.1 |                 4 |             10 |     175 | 2867.915 |    0.044 | 1766.602 | 222.489 |      0.011 | 76.572 |
+|       0.1 |                 4 |             10 |     200 | 2871.784 |    0.044 | 1772.723 | 217.188 |      0.009 | 71.988 |
 
 Output Training Metrics for Boosting
 
 The plot below shows the RMSE by Number of Boosting Iterations and
 display Max Tree Depth lines for the 5-fold CV performed. It is easy to
-see that RMSE is minimized when n.trees = 25 and interaction.depth = 3.
+see that RMSE is minimized when n.trees = 75 and interaction.depth = 2.
 
 ``` r
 plot(gbmFit)
@@ -1142,7 +1271,7 @@ metric_boosting
 ```
 
     ##         RMSE     Rsquared          MAE 
-    ## 5058.7387897    0.0140672 2260.9025186
+    ## 4.987962e+03 4.891964e-02 2.072540e+03
 
 ## Model Comparison & Conclusion
 
@@ -1177,17 +1306,17 @@ kable(tb, caption = "Accuracy Metric by Ensemble Method on Test Set",
 
 |          |       RF | Boosting |    LASSO |   Linear |
 |:---------|---------:|---------:|---------:|---------:|
-| RMSE     | 4997.559 | 5058.739 | 5020.706 | 5022.856 |
-| Rsquared |    0.033 |    0.014 |    0.028 |    0.028 |
-| MAE      | 2281.586 | 2260.903 | 2301.849 | 2305.239 |
+| RMSE     | 4997.206 | 4987.962 | 5018.754 | 5015.551 |
+| Rsquared |    0.047 |    0.049 |    0.036 |    0.036 |
+| MAE      | 2092.497 | 2072.540 | 2089.045 | 2088.571 |
 
 Accuracy Metric by Ensemble Method on Test Set
 
 After comparing all the 4 models fit throughout this analysis, the best
 model was chosen based on the RMSE value, such that the model with
-minimum RMSE is the “winner”. Therefore, the best model is **Random
-Forest** based on RMSE metric. The RMSE, coefficient of determination,
-and MAE metrics for all 4 models can be seen in the table above.
+minimum RMSE is the “winner”. Therefore, the best model is **Boosting**
+based on RMSE metric. The RMSE, coefficient of determination, and MAE
+metrics for all 4 models can be seen in the table above.
 
 ## Reference List
 
@@ -1195,3 +1324,5 @@ K. Fernandes, P. Vinagre and P. Cortez. A Proactive Intelligent Decision
 Support System for Predicting the Popularity of Online News. Proceedings
 of the 17th EPIA 2015 - Portuguese Conference on Artificial
 Intelligence, September, Coimbra, Portugal.
+
+[back to intro](#introduction)
